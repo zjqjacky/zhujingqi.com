@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Jackianity</title>
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				display: flex;
+				min-height: 100vh;
+			}
+
+			a:link {
+				color: #777;
+				transition: all 0.2s;
+			}
+
+			a:hover {
+				color: #bbb;
+			}
+
+			a:visited {
+				color: #000;
+			}
+
+			nav {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 200px;
+				padding: 10px;
+				background: #f3f3f3;
+			}
+
+			nav li {
+				margin: 10px 0;
+			}
+
+			nav a {
+				text-decoration: none;
+				display: block;
+				color: #000;
+				padding: 5px 10px;
+				border-radius: 5px;
+				transition: all 0.2s;
+			}
+
+			nav a:hover,
+			nav a.active {
+				background: #b7f1d9;
+				color: #000;
+			}
+
+			main {
+				margin-left: 200px;
+				margin-top: 0;
+				flex-grow: 1;
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			header {
+				top: 0;
+				z-index: 9;
+				padding-top: 40px;
+				width: 80%;
+				position: fixed;
+				background-color: #fff;
+				border-bottom: #000 solid 3px;
+			}
+
+			header h1 {
+				font-size: 45px;
+				margin-bottom: 20px;
+				font-family: Georgia, 'Times New Roman', Times, serif;
+				text-align: center;
+			}
+
+			header h2 {
+				font-family: Georgia, 'Times New Roman', Times, serif;
+				text-align: center;
+			}
+
+			.content {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 20px;
+			}
+
+			.texts {
+				flex: 2;
+				min-width: 300px;
+			}
+
+			.img-box {
+				flex: 1;
+				min-width: 200px;
+				background: #f3f3f3;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+				margin: 20px;
+				margin-top: 200px;
+				border-radius: 20px;
+			}
+
+			.img-box img {
+				max-width: 100%;
+				padding: 20px;
+				height: auto;
+				border-radius: 20px;
+			}
+
+			.btn {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: #b7f1d9;
+				color: #000;
+				text-decoration: none;
+				padding: 5px 8px;
+				border-radius: 20px;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				transition: all 0.25s ease;
+				z-index: 99;
+			}
+
+			.btn:hover {
+				background: #afeef1;
+				transform: scale(1.1);
+			}
+
+			.register {
+				background: #b7f1d9;
+				color: #000;
+				text-decoration: none;
+				padding: 10px 18px;
+				margin: 8px;
+				border-radius: 20px;
+				border: none;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				transition: all 0.25s ease;
+			}
+
+			.register:hover {
+				background: #afeef1;
+				transform: scale(1.1);
+			}
+
+			.overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.4);
+				display: none;
+				justify-content: center;
+				align-items: center;
+				z-index: 100;
+			}
+
+			.popup {
+				background: #fff;
+				padding: 20px;
+				border-radius: 10px;
+				width: 300px;
+				z-index: 999;
+				text-align: center;
+				box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			}
+
+			input[type="text"] {
+				width: 90%;
+				padding: 6px;
+				margin: 10px 0;
+				border: 1px solid #aaa;
+				border-radius: 5px;
+			}
+
+			label {
+				font-size: 14px;
+				display: block;
+				margin: 5px 0 10px;
+			}
+
+			.confirm-btn {
+				padding: 8px 15px;
+				border: none;
+				border-radius: 6px;
+				background: #b7f1d9;
+				color: #000;
+				transition: all 0.2s;
+				cursor: pointer;
+			}
+
+			.confirm-btn:hover {
+				background: #afeef1;
+			}
+
+			.msgdiv {
+				max-width: 800px;
+				margin: auto;
+			}
+
+			#messages {
+				white-space: pre-wrap;
+				background: #fff;
+				padding: 1em;
+				border-radius: 8px;
+				border: 1px solid #ccc;
+				height: 400px;
+				overflow-y: auto;
+				margin-bottom: 1em;
+			}
+
+			input,
+			textarea,
+			button {
+				display: block;
+				width: 100%;
+				margin-top: 0.5em;
+				font-size: 1em;
+			}
+
+			input,
+			textarea {
+				padding: 0.5em;
+				border-radius: 6px;
+				border: 1px solid #ccc;
+			}
+
+			button {
+				background-color: #b7f1d9;
+				color: #000000;
+				border: none;
+				padding: 0.7em;
+				border-radius: 6px;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: #b7ecec;
+			}
+
+			.status {
+				margin-top: 1em;
+				color: gray;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<br><br><br><br><br><br><br><br>
+			<h3>Contents</h3>
+			<li><a href="#name" class="active">Jackianity</a></li>
+			<li><a href="#info">Information</a></li>
+			<li><a href="#origin">Origin</a></li>
+			<li><a href="#classics">Classics</a></li>
+			<li><a href="#join">Want to join in?</a></li>
+			<li><a href="#comments">Comments</a></li>
+		</nav>
+		<main>
+			<header>
+				<h1>Jackianity</h1>
+				<h2>The Official Website Of Jackian Church</h2>
+				<br><br>
+			</header>
+
+			<div class="content">
+				<div class="texts">
+					<br><br><br><br><br><br><br><br>
+					<section id="name">
+						<h2>Jackianity</h2>
+						<br>
+						Jackianity is a fictional religion created by Jacky.
+						It's purpose are faith, hope, love, justice and mercy.
+						<br><br>
+					</section>
+
+					<section id="info">
+						<h2>Information</h2>
+						<br>
+						Name: Jackianity<br>
+						Believer: Jackian<br>
+						Creator: Jacky<br>
+						God: The Great God of Jacky<br>
+						<br>
+					</section>
+
+					<section id="origin">
+						<h2>Origin</h2>
+						<br>
+						Once upon a time, at 0000/13/32 BC, Jacky dreamed about Jesus was giving him an dragon-killer
+						sword. Jacky was told that he had got the responsibility to eliminate evil. Then Jacky created
+						Jackianity, to let more people do it.
+						<br><br>
+					</section>
+
+					<section id="classics">
+						<h2>Classics</h2>
+						<br>
+						<h4><i>The Great Classic of Jacky</i></h4>
+						<br>
+						Chapter 1 The Origin of the World<br><br>
+						Long long ago, Jacky created the world. At first, the world was like an egg and Jacky was in it.
+						After eighteen thousand years, the egg cracked. What are soft and light became the sky, others
+						became the earth. The sky, the earth and Jacky all became a little larger every day. This lasted
+						another eighteen thousand years. At last, the sky was extreamly high, the earth was extreamly
+						low, and Jacky was extreamly big. Jacky created the world. Jacky hasn't died yet, because he got
+						the God's Power and bacame the God of Jackianity.
+						<br><br>
+					</section>
+
+					<section id="join">
+						<h2>Want to join?</h2>
+						<br>Want to be a Jackian? Click on the button below to register!<br>
+						<button class="register" id="openPopup">REGISTER</button>
+					</section>
+
+					<section id="comments" class="comments">
+						<h2>Comments</h2>
+						<br>
+						<div class="msgdiv">
+							<div id="messages">Loading...</div>
+							<label for="nickname">Name</label>
+							<input type="text" id="nickname" placeholder="Your name">
+							<label for="newMessage">Comment</label>
+							<textarea id="newMessage" rows="3" placeholder="Comment"></textarea>
+							<button onclick="submitMessage()">Send</button>
+							<div class="status" id="statusText"></div>
+						</div>
+					</section>
+
+					<section id="footer">
+						<br>
+						<a href="/index.html"><b>Zhujingqi</b></a> - By Jacky Zhu<br><br>
+						<h6>©Jackianity Church All Rights Reserved</h6>
+					</section>
+				</div>
+
+				<div class="img-box">
+					<img src="jackianity.svg" alt="Jackianity Logo">
+					<br>
+					This is the Jackianity Logo. It looks like a stick with two crossed bars. It's like the Christianity
+					Cross.
+				</div>
+			</div>
+			<div class="btn" onclick="window.location.replace('zh.html');">EN/中文</div>
+		</main>
+		<div class="overlay" id="overlay">
+			<div class="popup">
+				Welcome to be a Jackian!<br><br>
+				<input type="text" placeholder="Name" />
+				<h6>Note: We won't record your name. It's not a real register window.</h6>
+				<label><input type="checkbox"> I want to be a Jackian</label>
+				<button class="confirm-btn" id="closePopup">REGISTER</button>
+			</div>
+		</div>
+		<script>
+			const links = document.querySelectorAll('nav a');
+			const sections = document.querySelectorAll('main section');
+
+			window.addEventListener('scroll', () => {
+				let current = '';
+				sections.forEach(section => {
+					const sectionTop = section.offsetTop - 60;
+					if (pageYOffset >= sectionTop) current = section.getAttribute('id');
+				});
+				links.forEach(link => link.classList.remove('active'));
+				document.querySelector('nav a[href="#' + current + '"]').classList.add('active');
+			});
+
+			links.forEach(link => {
+				link.addEventListener('click', e => {
+					e.preventDefault();
+					const target = document.querySelector(link.getAttribute('href'));
+					target.scrollIntoView({
+						behavior: 'smooth'
+					});
+				});
+			});
+
+			const openBtn = document.getElementById("openPopup");
+			const overlay = document.getElementById("overlay");
+			const closeBtn = document.getElementById("closePopup");
+
+			openBtn.onclick = () => overlay.style.display = "flex";
+			closeBtn.onclick = () => overlay.style.display = "none";
+			overlay.onclick = e => {
+				if (e.target === overlay) overlay.style.display = "none";
+			};
+		</script>
+		<noscript>
+			<style>
+				body {
+					display: none;
+				}
+			</style>
+			No Script!
+		</noscript>
+		<script>
+			const dbKey = 'jackianitytextdbonline';
+			const dbReadURL = 'https://textdb.online/' + dbKey;
+			const dbWriteURL = 'https://api.textdb.online/update/';
+			const messagesDiv = document.getElementById('messages');
+			const status = document.getElementById('statusText');
+			async function loadMessages() {
+				try {
+					const res = await fetch(dbReadURL);
+					const text = await res.text();
+					messagesDiv.innerHTML = text || "No Comments";
+					status.innerText = "Loaded";
+				} catch (err) {
+					messagesDiv.textContent = "ERROR";
+					status.innerText = "Please check your network.";
+				}
+			}
+			async function submitMessage() {
+				const name = document.getElementById('nickname').value.trim() || "Unknown Jackian";
+				const message = document.getElementById('newMessage').value.trim();
+				if (!message) {
+					alert("Please say something!");
+					return;
+				}
+				const timestamp = new Date().toLocaleString();
+				const newEntry =
+					`<span style="color: gray;">[${timestamp}]</span><br><strong>${name}</strong>: ${message}<br>\n`;
+				try {
+					const res = await fetch(dbReadURL);
+					const oldText = await res.text();
+					const params = new URLSearchParams();
+					params.append('key', dbKey);
+					params.append('value', oldText + newEntry);
+					const updateRes = await fetch(dbWriteURL, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: params.toString()
+					});
+					const result = await updateRes.json();
+					if (result.status !== 1) throw new Error("API ERROR");
+					document.getElementById('newMessage').value = '';
+					loadMessages();
+					status.innerText = "Sent";
+				} catch (err) {
+					console.error(err);
+					status.innerText = "ERROR";
+				}
+			}
+			loadMessages();
+			messagesDiv.scrollTop = messagesDiv.scrollHeight;
+		</script>
+	</body>
+
+</html>

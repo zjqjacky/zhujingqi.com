@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>电路图 - Zhujingqi</title>
+		<link rel="stylesheet" href="/css/bar.css">
+		<link rel="stylesheet" href="/css/main.css">
+		<style>
+			body {
+				margin: 0;
+				font-family: Arial, sans-serif;
+				height: 100vh;
+				background: #fff;
+				color: #000;
+			}
+
+			.sidebar {
+				width: 150px;
+				padding: 10px;
+				box-sizing: border-box;
+			}
+			
+			.sidebar img {
+				width: 48px;
+				height: 48px;
+				margin: 5px;
+				cursor: grab;
+				border: 1px solid #000;
+				border-radius: 4px;
+			}
+
+			.board {
+				position: absolute;
+				top: 200px;
+				left: 300px;
+				display: grid;
+				background: #fff;
+			}
+
+			.cell {
+				width: 64px;
+				height: 64px;
+				border: 1px solid #8f8f8f;
+				box-sizing: border-box;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.cell img {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				cursor: pointer;
+				transform-origin: center center;
+				user-select: none;
+				-webkit-user-drag: none;
+			}
+
+			button {
+				margin: 5px 0;
+				padding: 6px 10px;
+				border: 1px solid #000;
+				border-radius: 4px;
+				background: #fff;
+				color: #000;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a>在线电路图绘制工具</a>
+		</div>
+		<div class="sidebar text">
+			<h3>电学元件</h3>
+			<div id="items">
+				<img src="b.jpg" draggable="true" data-name="b">
+				<img src="ac.jpg" draggable="true" data-name="ac">
+				<img src="w1.jpg" draggable="true" data-name="w1">
+				<img src="w2.jpg" draggable="true" data-name="w2">
+				<img src="w3.jpg" draggable="true" data-name="w3">
+				<img src="w4.jpg" draggable="true" data-name="w4">
+				<img src="s.jpg" draggable="true" data-name="s">
+				<img src="s2.jpg" draggable="true" data-name="s2">
+				<img src="l.jpg" draggable="true" data-name="l">
+				<img src="m.jpg" draggable="true" data-name="m">
+				<img src="a.jpg" draggable="true" data-name="a">
+				<img src="v.jpg" draggable="true" data-name="v">
+				<img src="r.jpg" draggable="true" data-name="r">
+				<img src="r2.jpg" draggable="true" data-name="r2">
+				<img src="e.jpg" draggable="true" data-name="e">
+			</div>
+			<h6>拖拽图片到任意一格。在格中，左键删除，右键旋转。</h6>
+			<button id="btnClear">清空</button>
+		</div>
+		<div id="board" class="board"></div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			- by Jacky Zhu
+			&emsp;
+			本工具为在线电路图绘制工具，画得开心！
+		</div>
+		<script>
+			const rows = 8;
+			const cols = 12;
+			const CELL_PX = 64;
+			const board = document.getElementById('board');
+			board.style.gridTemplateRows = `repeat(${rows}, ${CELL_PX}px)`;
+			board.style.gridTemplateColumns = `repeat(${cols}, ${CELL_PX}px)`;
+			for (let i = 0; i < rows * cols; i++) {
+				const cell = document.createElement('div');
+				cell.className = 'cell';
+				cell.addEventListener('dragover', e => e.preventDefault());
+				cell.addEventListener('drop', e => {
+					e.preventDefault();
+					const src = e.dataTransfer.getData('text/plain');
+					if (src) {
+						placeImageIntoCell(cell, src);
+					}
+				});
+				board.appendChild(cell);
+			}
+			document.querySelectorAll('#items img').forEach(img => {
+				img.addEventListener('dragstart', e => {
+					e.dataTransfer.setData('text/plain', img.src);
+				});
+				img.addEventListener('contextmenu', e => e.preventDefault());
+			});
+			function placeImageIntoCell(cell, src) {
+				cell.innerHTML = '';
+				const img = document.createElement('img');
+				img.src = src;
+				img.alt = '';
+				img.draggable = false;
+				img.dataset.rot = '0';
+				img.addEventListener('click', (ev) => {
+					ev.stopPropagation();
+					img.remove();
+				});
+				img.addEventListener('contextmenu', (ev) => {
+					ev.preventDefault();
+					ev.stopPropagation();
+					rotateImage(img, 90);
+				});
+				img.tabIndex = 0;
+				img.addEventListener('keydown', (ev) => {
+					if (ev.key === 'r' || ev.key === 'R') {
+						ev.preventDefault();
+						rotateImage(img, 90);
+					} else if (ev.key === 'Delete' || ev.key === 'Backspace') {
+						ev.preventDefault();
+						img.remove();
+					}
+				});
+
+				cell.appendChild(img);
+			}
+			function rotateImage(img, deltaDeg = 90) {
+				const cur = parseInt(img.dataset.rot || '0', 10);
+				const next = (cur + deltaDeg) % 360;
+				img.dataset.rot = String(next);
+				img.style.transform = `rotate(${next}deg)`;
+			}
+			document.getElementById('btnClear').addEventListener('click', () => {
+				document.querySelectorAll('.cell img').forEach(img => img.remove());
+			});
+			board.addEventListener('contextmenu', (e) => {
+				const isCell = e.target.classList && e.target.classList.contains('cell');
+				if (isCell) e.preventDefault();
+			});
+		</script>
+	</body>
+</html>

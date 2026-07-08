@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>NFLS Checklist</title>
+		<style>
+			body {
+				font-family: sans-serif;
+				background: #eee;
+				padding: 20px;
+				margin: 0;
+			}
+
+			h1 {
+				text-align: center;
+				margin-bottom: 30px;
+				font-size: 2.5rem;
+			}
+
+			h2 {
+				margin-top: 40px;
+				margin-bottom: 15px;
+				font-size: 2rem;
+				text-align: left;
+				border-bottom: 2px solid #ccc;
+				padding-bottom: 5px;
+			}
+
+			a {
+				color: #777;
+			}
+
+			#p {
+				text-align: center;
+				margin: 10px;
+				font-size: 18px;
+				color: #222;
+			}
+
+			.difficulty-row {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 20px;
+				margin-bottom: 30px;
+			}
+
+			.achievement {
+				display: flex;
+				align-items: center;
+				padding: 10px 20px;
+				border-radius: 20px;
+				cursor: pointer;
+				font-size: 1.2rem;
+				font-weight: bold;
+				transition: transform 0.2s, box-shadow 0.2s;
+				user-select: none;
+				min-height: 80px;
+			}
+
+			.achievement:hover {
+				transform: scale(1.03);
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+			}
+
+			input[type='checkbox'] {
+				margin-right: 20px;
+				width: 30px;
+				height: 30px;
+			}
+
+			.achievement.easy {
+				background-color: rgba(0, 170, 0, 0.3);
+			}
+
+			.achievement.medium {
+				background-color: rgba(255, 170, 0, 0.3);
+			}
+
+			.achievement.hard {
+				background-color: rgba(255, 85, 0, 0.3);
+			}
+
+			.achievement.insane {
+				background-color: rgba(85, 0, 127, 0.3);
+			}
+
+			.achievement.done {
+				opacity: 0.5;
+			}
+
+			.stats {
+				margin-top: 30px;
+				font-size: 1.2rem;
+				font-weight: bold;
+			}
+
+			@media(max-width:500px) {
+				.achievement {
+					font-size: 1rem;
+					padding: 15px 20px;
+					min-height: 70px;
+				}
+
+				.achievement input {
+					width: 25px;
+					height: 25px;
+					margin-right: 15px;
+				}
+			}
+
+			#checklist-container {
+				max-width: 600px;
+				margin: auto;
+				font-family: sans-serif;
+				padding: 20px;
+				border-radius: 12px;
+				box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+				background: #fdfdfd;
+			}
+
+			label {
+				display: block;
+				margin: 10px 0;
+				font-size: 18px;
+			}
+
+			#progress-bar {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				height: auto;
+			}
+
+			#progress-bar div {
+				height: 20px;
+				width: 0;
+				transition: width 0.3s;
+				border-radius: 10px;
+			}
+
+			.progress-easy {
+				background: #8BC34A;
+				width: 0%;
+			}
+
+			.progress-medium {
+				background: #FFC107;
+				width: 0%;
+			}
+
+			.progress-hard {
+				background: #FF5722;
+				width: 0%;
+			}
+
+			.progress-insane {
+				background: #9C27B0;
+				width: 0%;
+			}
+
+			.progress-total {
+				background: #2196F3;
+				width: 0%;
+			}
+
+			#student-id-container {
+				text-align: center;
+				margin-top: 30px;
+			}
+
+			#student-id {
+				margin: 10px;
+				width: 200px;
+				font-size: 16px;
+				padding: 10px 15px;
+				border-radius: 20px;
+				border: 1px solid #ccc;
+			}
+
+			#export-btn {
+				text-align: center;
+				margin-top: 20px;
+				font-size: 18px;
+				padding: 10px 30px;
+				border-radius: 30px;
+				background: #b1f7d9;
+				cursor: pointer;
+				transition: 0.2s;
+			}
+
+			#export-btn:hover {
+				transform: scale(1.1);
+			}
+		</style>
+	</head>
+	<body>
+		<h1>NFLS Checklist</h1>
+		<div id="p">
+			欢迎来到 NFLS Checklist！<br><br>
+			这里记录你的校园挑战与精彩体验，让每一次活动都值得纪念。
+			快来检查你的南外进度，挑战自己，并导出进度统计吧！<br><br>
+			<a href="https://github.com/zhujingqi/">Jacky</a> · <a href="https://zhujingqi.com/">Zhujingqi</a>
+		</div>
+		<div id="checklist"></div>
+		<div id="student-id-container">
+			<input type="text" id="student-id" placeholder="请输入你的南外8位学号" maxlength="8">
+		</div>
+		<div id="progress-bar">
+			<div class="progress-easy"></div>
+			<div class="progress-medium"></div>
+			<div class="progress-hard"></div>
+			<div class="progress-insane"></div>
+			<div class="progress-total"></div>
+		</div>
+		<div class="stats" id="stats"></div>
+		<canvas id="progress-canvas" width="800" height="800" style="display:none;"></canvas>
+		<button id="export-btn">
+			导出统计
+		</button>
+		<script>
+			const nflsChecklist = [{
+					text: "早晨全班第一个到",
+					diff: 1
+				},
+				{
+					text: "参加运动会",
+					diff: 1
+				},
+				{
+					text: "当志愿者",
+					diff: 1
+				},
+				{
+					text: "参加外语节",
+					diff: 1
+				},
+				{
+					text: "主持班会",
+					diff: 1
+				},
+				{
+					text: "参与级委竞选",
+					diff: 1
+				},
+				{
+					text: "成为课代表",
+					diff: 1
+				},
+				{
+					text: "获得五星学子及以上",
+					diff: 1
+				},
+				{
+					text: "考试满分",
+					diff: 1
+				},
+				{
+					text: "参加艺术节",
+					diff: 1
+				},
+				{
+					text: "在班级元旦晚会上表演",
+					diff: 1
+				},
+				{
+					text: "参与远足并觉得很累",
+					diff: 1
+				},
+				{
+					text: "学习另一门语言",
+					diff: 2
+				},
+				{
+					text: "当值周班长",
+					diff: 2
+				},
+				{
+					text: "获得六星学子",
+					diff: 2
+				},
+				{
+					text: "带领考生进入南外考场",
+					diff: 2
+				},
+				{
+					text: "当上级委",
+					diff: 2
+				},
+				{
+					text: "参与模拟联合国",
+					diff: 2
+				},
+				{
+					text: "成为班级干部",
+					diff: 2
+				},
+				{
+					text: "上晨会",
+					diff: 2
+				},
+				{
+					text: "登上千人剧场舞台",
+					diff: 2
+				},
+				{
+					text: "获得班级第一",
+					diff: 2
+				},
+				{
+					text: "参加合唱团",
+					diff: 2
+				},
+				{
+					text: "参加交响乐团",
+					diff: 2
+				},
+				{
+					text: "被小朱说校园拍摄",
+					diff: 2
+				},
+				{
+					text: "建立社团",
+					diff: 2
+				},
+				{
+					text: "与校长对话",
+					diff: 3
+				},
+				{
+					text: "投稿音乐至音乐欣赏并被采用",
+					diff: 3
+				},
+				{
+					text: "参加数学竞赛培训",
+					diff: 3
+				},
+				{
+					text: "参加物理竞赛培训",
+					diff: 3
+				},
+				{
+					text: "参加化学竞赛培训",
+					diff: 3
+				},
+				{
+					text: "参加生物竞赛培训",
+					diff: 3
+				},
+				{
+					text: "参加信息竞赛培训",
+					diff: 3
+				},
+				{
+					text: "全校第一个吃午饭",
+					diff: 3
+				},
+				{
+					text: "参与学校组织的出国游学",
+					diff: 3
+				},
+				{
+					text: "获得艺术节文艺汇演一等奖",
+					diff: 3
+				},
+				{
+					text: "获得外语节文艺汇演一等奖",
+					diff: 3
+				},
+				{
+					text: "成为班长",
+					diff: 3
+				},
+				{
+					text: "主持晨会",
+					diff: 3
+				},
+				{
+					text: "获得周恩来奖学金",
+					diff: 3
+				},
+				{
+					text: "获得运动会冠军",
+					diff: 4
+				},
+				{
+					text: "在大型活动中担任主持",
+					diff: 4
+				},
+				{
+					text: "获得年级第一",
+					diff: 4
+				},
+				{
+					text: "获得南外杯一等奖",
+					diff: 4
+				},
+				{
+					text: "在篝火晚会舞台上表演",
+					diff: 4
+				},
+				{
+					text: "获得保送资格",
+					diff: 4
+				},
+				{
+					text: "成为社团社长",
+					diff: 4
+				},
+				{
+					text: "成为级长",
+					diff: 4
+				},
+				{
+					text: "载入南外史册",
+					diff: 4
+				},
+				{
+					text: "终于完成了所有成就",
+					diff: 4
+				}
+			];
+			const saved = JSON.parse(localStorage.getItem("nflsChecklist") || "{}");
+			nflsChecklist.forEach(a => {
+				if (saved[a.text]) a.done = true;
+			});
+
+			function pinyinCompare(a, b) {
+				return a.localeCompare(b, 'zh-Hans-CN');
+			}
+			const checklistDiv = document.getElementById("checklist");
+			const statsDiv = document.getElementById("stats");
+			const diffName = ["Easy", "Medium", "Hard", "Insane"];
+			const updateProgress = () => {
+				const chks = document.querySelectorAll(".chk");
+				const total = chks.length;
+				const done = Array.from(chks).filter(c => c.checked).length;
+				const diffCount = [0, 0, 0, 0];
+				const diffDone = [0, 0, 0, 0];
+				chks.forEach(c => {
+					const d = parseInt(c.dataset.diff) - 1;
+					diffCount[d]++;
+					if (c.checked) diffDone[d]++;
+				});
+				document.querySelector(".progress-easy").style.width = (diffDone[0] / diffCount[0] * 100 || 0) + "%";
+				document.querySelector(".progress-medium").style.width = (diffDone[1] / diffCount[1] * 100 || 0) + "%";
+				document.querySelector(".progress-hard").style.width = (diffDone[2] / diffCount[2] * 100 || 0) + "%";
+				document.querySelector(".progress-insane").style.width = (diffDone[3] / diffCount[3] * 100 || 0) + "%";
+				document.querySelector(".progress-total").style.width = (done / total * 100) + "%";
+			};
+
+			function render() {
+				checklistDiv.innerHTML = "";
+				for (let diff = 1; diff <= 4; diff++) {
+					const items = nflsChecklist.filter(a => a.diff === diff).sort((a, b) => pinyinCompare(a.text, b.text));
+					if (items.length === 0) continue;
+					const title = document.createElement("h2");
+					title.textContent = diffName[diff - 1];
+					checklistDiv.appendChild(title);
+					const row = document.createElement("div");
+					row.className = "difficulty-row";
+					items.forEach(a => {
+						const div = document.createElement("div");
+						div.className = `achievement ${["easy","medium","hard","insane"][a.diff-1]} ${a.done?'done':''}`;
+						div.innerHTML =
+							`<input type="checkbox" class="chk" data-diff="${a.diff}" ${a.done?'checked':''}> ${a.text}`;
+						div.onclick = e => {
+							if (e.target.tagName !== "INPUT") div.querySelector("input").click();
+						};
+						div.querySelector("input").addEventListener("change", () => {
+							a.done = !a.done;
+							localStorage.setItem("nflsChecklist", JSON.stringify(Object.fromEntries(nflsChecklist
+								.map(a => [a.text, a.done]))));
+							render();
+						});
+						row.appendChild(div);
+					});
+					checklistDiv.appendChild(row);
+				}
+				const total = nflsChecklist.length;
+				const done = nflsChecklist.filter(a => a.done).length;
+				const easyDone = nflsChecklist.filter(a => a.done && a.diff === 1).length;
+				const mediumDone = nflsChecklist.filter(a => a.done && a.diff === 2).length;
+				const hardDone = nflsChecklist.filter(a => a.done && a.diff === 3).length;
+				const insaneDone = nflsChecklist.filter(a => a.done && a.diff === 4).length;
+				statsDiv.innerHTML = `
+					总进度:&emsp;${done}/${total} (${Math.round(done/total*100)}%)<br>
+					简单:&emsp;${easyDone}/${nflsChecklist.filter(a=>a.diff===1).length}<br>
+					中等:&emsp;${mediumDone}/${nflsChecklist.filter(a=>a.diff===2).length}<br>
+					困难:&emsp;${hardDone}/${nflsChecklist.filter(a=>a.diff===3).length}<br>
+					疯狂:&emsp;${insaneDone}/${nflsChecklist.filter(a=>a.diff===4).length}<br>
+				`;
+				updateProgress();
+			}
+			render();
+			const studentInput = document.getElementById("student-id");
+			studentInput.addEventListener("input", () => {
+				studentInput.value = studentInput.value.replace(/\D/g, "");
+			});
+			const exportBtn = document.getElementById("export-btn");
+
+			function drawRoundedRect(ctx, x, y, w, h, r) {
+				if (w <= 0) return;
+				if (r > w / 2) r = w / 2;
+				if (r > h / 2) r = h / 2;
+				ctx.beginPath();
+				ctx.moveTo(x + r, y);
+				ctx.lineTo(x + w - r, y);
+				ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+				ctx.lineTo(x + w, y + h - r);
+				ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+				ctx.lineTo(x + r, y + h);
+				ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+				ctx.lineTo(x, y + r);
+				ctx.quadraticCurveTo(x, y, x + r, y);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			function drawProgressImage() {
+				const canvas = document.getElementById("progress-canvas");
+				const ctx = canvas.getContext("2d");
+				const studentId = document.getElementById("student-id").value || "未知";
+				const year = studentId.slice(0, 4) || "未知";
+				const width = 400;
+				const barHeight = 25;
+				const startX = 50;
+				const textGap = 20;
+				const gap = 25;
+				const lineSpacing = 15;
+				let y = 60;
+				canvas.height = 50 + 5 * (barHeight + gap);
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.font = "16px sans-serif";
+				ctx.textBaseline = "middle";
+				ctx.fillStyle = "#000";
+				ctx.font = "bold 18px sans-serif";
+				ctx.fillText(`${studentId} 的 NFLS Checklist 进度（入学年份：${year}）`, startX, 20);
+				ctx.font = "16px sans-serif";
+				const total = nflsChecklist.length;
+				const doneItems = nflsChecklist.filter(a => a.done);
+				const easyDone = doneItems.filter(a => a.diff === 1).length;
+				const mediumDone = doneItems.filter(a => a.diff === 2).length;
+				const hardDone = doneItems.filter(a => a.diff === 3).length;
+				const insaneDone = doneItems.filter(a => a.diff === 4).length;
+				const totalDone = doneItems.length;
+				const colors = {
+					total: "#2196F3",
+					easy: "#8BC34A",
+					medium: "#FFC107",
+					hard: "#FF5722",
+					insane: "#9C27B0"
+				};
+				const progressData = [{
+						name: "总进度",
+						done: totalDone,
+						total: total,
+						color: colors.total
+					},
+					{
+						name: "简单",
+						done: easyDone,
+						total: nflsChecklist.filter(a => a.diff === 1).length,
+						color: colors.easy
+					},
+					{
+						name: "中等",
+						done: mediumDone,
+						total: nflsChecklist.filter(a => a.diff === 2).length,
+						color: colors.medium
+					},
+					{
+						name: "困难",
+						done: hardDone,
+						total: nflsChecklist.filter(a => a.diff === 3).length,
+						color: colors.hard
+					},
+					{
+						name: "疯狂",
+						done: insaneDone,
+						total: nflsChecklist.filter(a => a.diff === 4).length,
+						color: colors.insane
+					},
+				];
+
+				function getComment(ratio) {
+					if (ratio === 1) return "你骗人，你不可能做到完成所有进度";
+					if (ratio >= 0.9) return "全能炸裂者";
+					if (ratio >= 0.8) return "活动狂热者";
+					if (ratio >= 0.6) return "经历丰富者";
+					if (ratio >= 0.4) return "积极参与者";
+					if (ratio >= 0.2) return "略微体验者";
+					if (ratio > 0) return "初窥门径者";
+					return "你还没有达成任何进度";
+				}
+				ctx.font = "18px sans-serif";
+				ctx.fillText(getComment(totalDone / total) + `，分享你的南外进度吧🎉`, startX, 50);
+				y += lineSpacing;
+				progressData.forEach(p => {
+					ctx.fillStyle = "#fff";
+					drawRoundedRect(ctx, startX, y, width, barHeight, 12);
+					const doneWidth = width * (p.done / p.total);
+					ctx.fillStyle = p.color;
+					drawRoundedRect(ctx, startX, y, doneWidth, barHeight, 12);
+					ctx.fillStyle = "#000";
+					const text = `${p.name}: ${p.done}/${p.total} (${Math.round(p.done/p.total*100)}%)`;
+					ctx.fillText(text, startX + width + textGap, y + barHeight / 2);
+					y += barHeight + gap;
+				});
+				return canvas.toDataURL("image/png");
+			}
+			exportBtn.addEventListener("click", () => {
+				const imgData = drawProgressImage();
+				const a = document.createElement("a");
+				a.href = imgData;
+				a.download = "NFLS_Checklist_Progress.png";
+				a.click();
+			});
+		</script>
+	</body>
+</html>

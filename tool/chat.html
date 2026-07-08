@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Chat - Zhujingqi</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				min-height: 100vh;
+			}
+
+			.container {
+				width: 100%;
+				max-width: 600px;
+				background-color: white;
+				border-radius: 20px;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+				padding: 20px;
+				margin-top: 20px;
+			}
+
+			h1 {
+				text-align: center;
+				color: #333;
+				margin-bottom: 20px;
+			}
+
+			.key-input {
+				width: 100%;
+				max-width: 600px;
+				border-radius: 20px;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+				padding: 20px;
+				margin: 20px;
+				text-align: center;
+			}
+
+			input,
+			button {
+				padding: 10px;
+				margin: 5px;
+				border-radius: 20px;
+				border: 1px solid #ddd;
+			}
+
+			button {
+				background-color: #b7f1d9;
+				color: #000;
+				border: none;
+				cursor: pointer;
+				transition: 0.2s;
+			}
+
+			button:hover {
+				background-color: #aaffff;
+			}
+
+			.chat-container {
+				display: none;
+			}
+
+			.chat-box {
+				height: 400px;
+				overflow-y: auto;
+				border: 1px solid #ddd;
+				padding: 10px;
+				margin-bottom: 20px;
+				background-color: #f9f9f9;
+				border-radius: 20px;
+			}
+
+			.message {
+				margin-bottom: 15px;
+				padding: 10px;
+				border-radius: 20px;
+				background-color: #e9e9e9;
+			}
+
+			.message-header {
+				font-weight: bold;
+				margin-bottom: 5px;
+				color: #555;
+			}
+
+			.message-time {
+				font-size: 0.8em;
+				color: #888;
+			}
+
+			.input-area {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+
+			.name-input {
+				flex: 1;
+				min-width: 150px;
+			}
+
+			.message-input {
+				flex: 2;
+				min-width: 200px;
+			}
+
+			.send-btn {
+				flex: 0 0 auto;
+			}
+
+			a {
+				color: #888;
+				transition: 0.2s;
+			}
+
+			a:visited {
+				color: #888;
+			}
+
+			a:hover {
+				color: #333;
+			}
+
+			.bottom {
+				color: #888;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="key-input" id="keyInput">
+			<h1>Chat</h1>
+			<p>输入 textdb.online key 以继续</p>
+			<p>（填写一个你可以记得的字符串。详见<a href="https://textdb.online/">这里</a>）</p>
+			<input type="text" id="apiKey" placeholder="Enter your TextDB key (6-60 characters)"
+				pattern="[0-9a-zA-Z\-_]{6,60}" required="">
+			<button id="saveKey">保存</button>
+			<p style="font-size: 0.9em; color: #666; margin-top: 15px;">
+				字符串6至60个字符长且只能包含： 0-9, a-z, A-Z, -, _
+			</p>
+			<h6>
+				<p class="bottom">
+					Powered by <a href="https://textdb.online/">textdb.online</a><br>
+					By <a href="https://github.com/zhujingqi">Jacky</a> - <a href="https://zhujingqi.com">Zhujingqi</a>
+				</p>
+			</h6>
+		</div>
+
+		<div class="container chat-container" id="chatContainer">
+			<h1>Chat</h1>
+			<button id="clearBtn">清空聊天</button>
+			<button id="newKeyBtn">输入新的Key</button>
+			<button onclick="location.reload()">重新加载</button>
+			<br><br>
+			<div class="chat-box" id="chatBox">
+			</div>
+			<div class="input-area">
+				<input type="text" class="name-input" id="nameInput" placeholder="名字">
+				<input type="text" class="message-input" id="messageInput" placeholder="输入内容...">
+				<button class="send-btn" id="sendBtn">发送</button>
+			</div>
+			<br>
+			<p class="bottom">
+				Powered by <a href="https://textdb.online/">textdb.online</a><br>
+				By <a href="https://github.com/zhujingqi">Jacky</a><br>
+			</p>
+		</div>
+
+		<script>
+			const keyInputDiv = document.getElementById('keyInput');
+			const chatContainerDiv = document.getElementById('chatContainer');
+			const apiKeyInput = document.getElementById('apiKey');
+			const saveKeyBtn = document.getElementById('saveKey');
+			const chatBox = document.getElementById('chatBox');
+			const nameInput = document.getElementById('nameInput');
+			const messageInput = document.getElementById('messageInput');
+			const sendBtn = document.getElementById('sendBtn');
+			const clearBtn = document.getElementById('clearBtn');
+			const newKeyBtn = document.getElementById('newKeyBtn');
+
+			const API_URL = 'https://textdb.online/update/';
+			let currentKey = '';
+
+			window.addEventListener('DOMContentLoaded', () => {
+				const savedKey = localStorage.getItem('textdbKey');
+				if (savedKey) {
+					currentKey = savedKey;
+					apiKeyInput.value = savedKey;
+					showChatInterface();
+					loadChats();
+				}
+			});
+
+			saveKeyBtn.addEventListener('click', () => {
+				const key = apiKeyInput.value.trim();
+				if (key && /^[0-9a-zA-Z\-_]{6,60}$/.test(key)) {
+					currentKey = key;
+					localStorage.setItem('textdbKey', key);
+					showChatInterface();
+					loadChats();
+				} else {
+					alert('Please enter a valid key (6-60 characters, only 0-9, a-z, A-Z, -, _ allowed)');
+				}
+			});
+
+			newKeyBtn.addEventListener('click', () => {
+				keyInputDiv.style.display = 'block';
+				chatContainerDiv.style.display = 'none';
+			});
+
+			function showChatInterface() {
+				keyInputDiv.style.display = 'none';
+				chatContainerDiv.style.display = 'block';
+			}
+
+			async function loadChats() {
+				try {
+					const response = await fetch(`https://textdb.online/${currentKey}`);
+					if (response.ok) {
+						const data = await response.text();
+						if (data) {
+							const chats = JSON.parse(data);
+							displayChats(chats);
+						} else {
+							chatBox.innerHTML = '<div class="message">没有消息。快开始对话吧！</div>';
+						}
+					} else {
+						console.error('ERROR');
+						chatBox.innerHTML = '<div class="message">ERROR</div>';
+					}
+				} catch (error) {
+					console.error('ERROR', error);
+					chatBox.innerHTML = '<div class="message">ERROR</div>';
+				}
+			}
+
+			function displayChats(chats) {
+				chatBox.innerHTML = '';
+				if (chats.length === 0) {
+					chatBox.innerHTML = '<div class="message">没有消息。快开始对话吧！</div>';
+					return;
+				}
+
+				chats.forEach(chat => {
+					const messageDiv = document.createElement('div');
+					messageDiv.className = 'message';
+					messageDiv.innerHTML = `
+                    <div class="message-header">${escapeHtml(chat.name)}</div>
+                    <div>${escapeHtml(chat.message)}</div>
+                    <div class="message-time">${chat.timestamp}</div>
+                `;
+					chatBox.appendChild(messageDiv);
+				});
+
+				chatBox.scrollTop = chatBox.scrollHeight;
+			}
+
+			sendBtn.addEventListener('click', sendMessage);
+			messageInput.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') {
+					sendMessage();
+				}
+			});
+
+			async function sendMessage() {
+				const name = nameInput.value.trim();
+				const message = messageInput.value.trim();
+
+				if (!name) {
+					alert('请输入名字');
+					return;
+				}
+
+				if (!message) {
+					alert('请输入名字');
+					return;
+				}
+
+				let chats = [];
+				try {
+					const response = await fetch(`https://textdb.online/${currentKey}`);
+					if (response.ok) {
+						const data = await response.text();
+						if (data) {
+							chats = JSON.parse(data);
+						}
+					}
+				} catch (error) {
+					console.error('ERROR', error);
+				}
+
+				const timestamp = new Date().toLocaleString();
+				chats.push({
+					name: name,
+					message: message,
+					timestamp: timestamp
+				});
+
+				try {
+					const response = await fetch(
+						`https://api.textdb.online/update/?key=${currentKey}&value=${encodeURIComponent(JSON.stringify(chats))}`
+					);
+
+					const result = await response.json();
+					if (result.status === 1) {
+						messageInput.value = '';
+						displayChats(chats);
+					} else {
+						alert('ERROR');
+					}
+				} catch (error) {
+					console.error('ERROR', error);
+					alert('ERROR');
+				}
+			}
+
+			clearBtn.addEventListener('click', () => {
+				if (confirm('你确定吗？此为不可逆操作！')) {
+					clearAllChats();
+				}
+			});
+
+			async function clearAllChats() {
+				try {
+					const response = await fetch(`https://api.textdb.online/update/?key=${currentKey}&value=`);
+
+					const result = await response.json();
+					if (result.status === 1) {
+						chatBox.innerHTML = '<div class="message">没有消息。快开始对话吧！</div>';
+					} else {
+						alert('ERROR');
+					}
+				} catch (error) {
+					console.error('ERROR', error);
+					alert('ERROR');
+				}
+			}
+
+			function escapeHtml(text) {
+				const div = document.createElement('div');
+				div.textContent = text;
+				return div.innerHTML;
+			}
+		</script>
+
+
+	</body>
+</html>

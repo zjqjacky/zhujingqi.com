@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>井字棋 - Zhujingqi</title>
+		<link rel="stylesheet" href="/css/bar.css">
+		<link rel="stylesheet" href="/css/main.css">
+		<style>
+			canvas {
+				background: #fff;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+				cursor: pointer;
+				position: absolute;
+				left: 20px;
+				top: 80px;
+			}
+		</style>
+		<script>
+			function copyToClipboard(event, text) {
+				event.preventDefault();
+				navigator.clipboard.writeText(text).then(() => {
+					alert("已复制游戏链接：" + text);
+				}).catch(err => {
+					console.error("复制失败：", err);
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="#">井字棋</a>
+		</div>
+		<canvas id="tic-tac-toe" width="300" height="300"></canvas>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		<div class="text">
+			<a href="#" onclick="copyToClipboard(event, 'https://zhujingqi.com/game/tictactoe.html')">分享此游戏</a>
+		</div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			- by Jacky Zhu
+		</div>
+		<script>
+			const canvas = document.getElementById('tic-tac-toe');
+			const ctx = canvas.getContext('2d');
+			const SIZE = 100;
+
+			let board = [
+				['', '', ''],
+				['', '', ''],
+				['', '', '']
+			];
+
+			let gameOver = false;
+
+			drawBoard();
+
+			canvas.addEventListener('click', (e) => {
+				if (gameOver) return;
+				const rect = canvas.getBoundingClientRect();
+				const x = e.clientX - rect.left;
+				const y = e.clientY - rect.top;
+				const i = Math.floor(x / SIZE);
+				const j = Math.floor(y / SIZE);
+
+				if (board[i][j] === '') {
+					board[i][j] = 'X';
+					drawBoard();
+
+					if (checkWinner(board, 'X')) {
+						gameOver = true;
+						setTimeout(() => alert('你赢了！'), 10);
+						return;
+					} else if (isTie()) {
+						gameOver = true;
+						setTimeout(() => alert('平局！'), 10);
+						return;
+					}
+
+					aiMove();
+					drawBoard();
+
+					if (checkWinner(board, 'O')) {
+						gameOver = true;
+						setTimeout(() => alert('AI 赢了！'), 10);
+					} else if (isTie()) {
+						gameOver = true;
+						setTimeout(() => alert('平局！'), 10);
+					}
+				}
+			});
+
+			function drawBoard() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				ctx.lineWidth = 4;
+				ctx.strokeStyle = '#333';
+
+				for (let i = 1; i < 3; i++) {
+					ctx.beginPath();
+					ctx.moveTo(i * SIZE, 0);
+					ctx.lineTo(i * SIZE, 300);
+					ctx.stroke();
+
+					ctx.beginPath();
+					ctx.moveTo(0, i * SIZE);
+					ctx.lineTo(300, i * SIZE);
+					ctx.stroke();
+				}
+
+				for (let i = 0; i < 3; i++) {
+					for (let j = 0; j < 3; j++) {
+						const symbol = board[i][j];
+						if (symbol !== '') {
+							ctx.font = '60px Arial';
+							ctx.textAlign = 'center';
+							ctx.textBaseline = 'middle';
+							ctx.fillStyle = symbol === 'X' ? '#000' : '#f00';
+							ctx.fillText(symbol, i * SIZE + SIZE / 2, j * SIZE + SIZE / 2);
+						}
+					}
+				}
+			}
+
+			function aiMove() {
+				let bestScore = -Infinity;
+				let move;
+
+				for (let i = 0; i < 3; i++) {
+					for (let j = 0; j < 3; j++) {
+						if (board[i][j] === '') {
+							board[i][j] = 'O';
+							let score = minimax(board, 0, false);
+							board[i][j] = '';
+							if (score > bestScore) {
+								bestScore = score;
+								move = {
+									i,
+									j
+								};
+							}
+						}
+					}
+				}
+
+				if (move) {
+					board[move.i][move.j] = 'O';
+				}
+			}
+
+			function minimax(board, depth, isMaximizing) {
+				if (checkWinner(board, 'O')) return 10 - depth;
+				if (checkWinner(board, 'X')) return depth - 10;
+				if (isTie()) return 0;
+
+				if (isMaximizing) {
+					let bestScore = -Infinity;
+					for (let i = 0; i < 3; i++) {
+						for (let j = 0; j < 3; j++) {
+							if (board[i][j] === '') {
+								board[i][j] = 'O';
+								let score = minimax(board, depth + 1, false);
+								board[i][j] = '';
+								bestScore = Math.max(score, bestScore);
+							}
+						}
+					}
+					return bestScore;
+				} else {
+					let bestScore = Infinity;
+					for (let i = 0; i < 3; i++) {
+						for (let j = 0; j < 3; j++) {
+							if (board[i][j] === '') {
+								board[i][j] = 'X';
+								let score = minimax(board, depth + 1, true);
+								board[i][j] = '';
+								bestScore = Math.min(score, bestScore);
+							}
+						}
+					}
+					return bestScore;
+				}
+			}
+
+			function checkWinner(b, player) {
+				for (let i = 0; i < 3; i++) {
+					if (b[i][0] === player && b[i][1] === player && b[i][2] === player) return true;
+					if (b[0][i] === player && b[1][i] === player && b[2][i] === player) return true;
+				}
+				if (b[0][0] === player && b[1][1] === player && b[2][2] === player) return true;
+				if (b[2][0] === player && b[1][1] === player && b[0][2] === player) return true;
+
+				return false;
+			}
+
+			function isTie() {
+				for (let i = 0; i < 3; i++) {
+					for (let j = 0; j < 3; j++) {
+						if (board[i][j] === '') return false;
+					}
+				}
+				return true;
+			}
+		</script>
+	</body>
+</html>

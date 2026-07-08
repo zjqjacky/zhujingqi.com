@@ -1,0 +1,3443 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>ROOMS - Zhujingqi</title>
+		<style>
+			* {
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			body {
+				margin: 0;
+				background: #000;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			#game-container {
+				position: relative;
+				box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+				border: 5px solid #333;
+				width: min(100vw, calc(100vh * 16 / 9));
+				height: min(100vh, calc(100vw * 9 / 16));
+				aspect-ratio: 16 / 9;
+				background: #1a1a1a;
+			}
+
+			#game-canvas {
+				width: 1280px;
+				height: 720px;
+				image-rendering: pixelated;
+				transform-origin: top left;
+			}
+
+			canvas {
+				display: block;
+				background: #1a1a1a;
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			#ui-layer {
+				position: absolute;
+				top: clamp(12px, 8vh, 110px);
+				left: clamp(12px, 2vw, 30px);
+				font-size: clamp(16px, 2vw, 28px);
+				color: #fff;
+				font-weight: bold;
+				text-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 2px 2px 2px #000;
+				pointer-events: none;
+				z-index: 10;
+				display: none;
+			}
+
+			#ui-layer.supply {
+				color: gold;
+				text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 2px 2px 2px #000;
+			}
+
+			#score-layer {
+				position: absolute;
+				top: 150px;
+				left: 30px;
+				color: #0f0;
+				font-size: 24px;
+				font-weight: bold;
+				text-shadow: 1px 1px 2px #000;
+				z-index: 10;
+				display: none;
+			}
+
+			#gold-display {
+				position: absolute;
+				top: 185px;
+				left: 30px;
+				color: gold;
+				font-size: 24px;
+				font-weight: bold;
+				text-shadow: 1px 1px 2px #000;
+				z-index: 10;
+				display: none;
+			}
+
+			#minimap {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				width: clamp(80px, 10vw, 120px);
+				height: clamp(80px, 10vw, 120px);
+				background: rgba(0, 0, 0, 0.5);
+				border: 1px solid #555;
+				border-radius: 4px;
+				z-index: 10;
+				display: none;
+			}
+
+			#start-screen {
+				position: relative;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				z-index: 500;
+				transition: opacity 1s;
+			}
+
+			.title-wrapper {
+				display: flex;
+				align-items: center;
+				margin-bottom: 50px;
+			}
+
+			.title-icon {
+				width: 80px;
+				height: auto;
+				object-fit: contain;
+				margin-right: 20px;
+				border-radius: 10px;
+				border: 2px solid #0af;
+				box-shadow: 0 0 15px #0af;
+			}
+
+			#start-screen h1 {
+				font-size: clamp(42px, 8vw, 100px);
+				color: #fff;
+				margin: 0;
+				letter-spacing: 0px;
+				text-shadow: 0 0 20px rgba(0, 170, 255, 0.8), 4px 4px 0px #333;
+				font-family: "Arial Black", sans-serif;
+			}
+
+			#volume-box {
+				position: absolute;
+				top: 12px;
+				right: 12px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 10px;
+				border-radius: 10px;
+				background: rgba(0, 0, 0, 0.45);
+				color: #fff;
+				z-index: 999;
+				font-size: 14px;
+			}
+
+			#volume-slider {
+				-webkit-appearance: none;
+				width: 120px;
+				height: 6px;
+				border-radius: 3px;
+				background: #444;
+				outline: none;
+				cursor: pointer;
+				transition: 0.2s;
+			}
+
+			.menu-buttons {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+				align-items: center;
+			}
+
+			.btn {
+				padding: clamp(10px, 1.2vw, 12px) clamp(28px, 4vw, 60px);
+				font-size: clamp(16px, 2vw, 22px);
+				color: white;
+				border: none;
+				border-radius: 30px;
+				cursor: pointer;
+				transition: all 0.3s;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+				font-weight: bold;
+			}
+
+			#start-btn {
+				background: linear-gradient(45deg, #0078ff, #00d4ff);
+				width: 200px;
+				font-size: 18px;
+				padding: 12px;
+			}
+
+			#start-btn:hover {
+				transform: scale(1.08);
+				box-shadow: 0 0 25px rgba(0, 212, 255, 0.6);
+			}
+
+			.sub-btn {
+				background: #333;
+				color: #fff;
+				width: 200px;
+				font-size: 18px;
+				border: 1px solid #555;
+				z-index: 999;
+			}
+
+			.sub-btn:hover {
+				background: #444;
+				color: #0af;
+				border-color: #0af;
+			}
+
+			#modal-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.85);
+				display: none;
+				justify-content: center;
+				align-items: center;
+				z-index: 10000;
+				backdrop-filter: blur(5px);
+			}
+
+			#modal-content {
+				background: #222;
+				border: 2px solid #0af;
+				border-radius: 20px;
+				padding: 40px;
+				max-width: 500px;
+				width: 80%;
+				color: #ddd;
+				position: relative;
+				box-shadow: 0 0 30px rgba(0, 170, 255, 0.3);
+				line-height: 1.6;
+			}
+
+			#modal-content h2 {
+				color: #0af;
+				margin-top: 0;
+				border-bottom: 1px solid #444;
+				padding-bottom: 10px;
+			}
+
+			#modal-close {
+				margin-top: 25px;
+				background: #0af;
+				border: none;
+				color: white;
+				padding: 10px 30px;
+				border-radius: 20px;
+				cursor: pointer;
+				float: right;
+				transition: 0.2s;
+			}
+
+			#modal-close:hover {
+				background: #00d4ff;
+			}
+
+			#pause-menu {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				display: none;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				color: white;
+				z-index: 100;
+			}
+
+			#pause-menu h1 {
+				font-size: clamp(32px, 5vw, 60px);
+				margin-bottom: 40px;
+				letter-spacing: 10px;
+				color: #0af;
+				text-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
+			}
+
+			#resume-btn {
+				padding: 15px 50px;
+				font-size: 24px;
+				background: #0af;
+				color: white;
+				border: none;
+				border-radius: 30px;
+				cursor: pointer;
+				transition: transform 0.2s;
+			}
+
+			#resume-btn:hover {
+				background: #00d4ff;
+				transform: scale(1.05);
+			}
+
+			#achievement-modal {
+				position: fixed;
+				inset: 0;
+				display: none;
+				justify-content: center;
+				align-items: center;
+				background: rgba(0, 0, 0, 0.85);
+				z-index: 1200;
+				overflow: hidden;
+			}
+
+			#achievement-modal .modal-content {
+				background: #222;
+				border: 2px solid #0af;
+				border-radius: 20px;
+				padding: 40px;
+				max-width: 500px;
+				width: 80%;
+				color: #ddd;
+				box-shadow: 0 0 30px rgba(0, 170, 255, 0.3);
+			}
+
+			.modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.85);
+				display: none;
+				justify-content: center;
+				align-items: center;
+				z-index: 2000;
+			}
+
+			.modal-content {
+				background: #222;
+				border: 2px solid #0af;
+				padding: 30px;
+				border-radius: 20px;
+				position: relative;
+				box-shadow: 0 0 30px rgba(0, 170, 255, 0.4);
+			}
+
+			.sidebar-buttons {
+				position: absolute;
+				left: 20px;
+				top: 50%;
+				transform: translateY(-50%);
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				z-index: 999 !important;
+			}
+
+			.sidebar-buttons-right {
+				position: absolute;
+				right: 20px;
+				top: 50%;
+				transform: translateY(-50%);
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				z-index: 999 !important;
+			}
+
+			.achievement-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 10px;
+				max-height: 400px;
+				overflow-y: auto;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.achievement-grid::-webkit-scrollbar {
+				display: none;
+			}
+
+			.achievement-card {
+				background: rgba(255, 255, 255, 0.1);
+				border: 2px solid #555;
+				padding: 10px;
+				border-radius: 20px;
+				text-align: center;
+				transition: all 0.3s;
+				filter: grayscale(100%);
+				opacity: 0.6;
+			}
+
+			.achievement-card.unlocked {
+				filter: grayscale(0%);
+				opacity: 1;
+				border-color: #ffd700;
+				box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+				background: rgba(255, 215, 0, 0.1);
+			}
+
+			.achievement-card h4 {
+				margin: 5px 0;
+				font-size: 18px;
+				color: #fff;
+			}
+
+			.achievement-card p {
+				margin: 0;
+				font-size: 11px;
+				color: #ccc;
+			}
+
+			.achievement-toast {
+				position: fixed;
+				top: 20px;
+				right: -350px;
+				width: 280px;
+				background: rgba(0, 0, 0, 0.9);
+				border: 2px solid #ffd700;
+				border-radius: 20px;
+				padding: 15px;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+				z-index: 9999;
+				transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+				pointer-events: none;
+			}
+
+			.achievement-toast.show {
+				right: 20px;
+			}
+
+			.achievement-toast .icon {
+				font-size: 24px;
+				background: #ffd700;
+				width: 40px;
+				height: 40px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 8px;
+				color: #000;
+				flex-shrink: 0;
+			}
+
+			.achievement-toast .text h5 {
+				margin: 0;
+				color: #ffd700;
+				font-size: 16px;
+			}
+
+			.achievement-toast .text p {
+				margin: 3px 0 0 0;
+				color: #eee;
+				font-size: 12px;
+			}
+
+			.upgrade-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 15px;
+				max-height: 400px;
+				overflow-y: auto;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.upgrade-grid::-webkit-scrollbar {
+				display: none;
+			}
+
+			.upgrade-card {
+				background: rgba(255, 255, 255, 0.05);
+				padding: 15px;
+				border-radius: 20px;
+				border: 1px solid #444;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.upgrade-card .name {
+				font-weight: bold;
+				color: #fff;
+			}
+
+			.upgrade-card .level {
+				font-size: 12px;
+				color: #0af;
+			}
+
+			.buy-btn {
+				background: #00aa7f;
+				color: white;
+				border: none;
+				padding: 8px 12px;
+				border-radius: 20px;
+				cursor: pointer;
+			}
+
+			.buy-btn.max {
+				background: #555;
+				cursor: default;
+			}
+
+			#rank-modal h2 {
+				margin: 0;
+				color: #0af;
+			}
+
+			#rank-modal .rank-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 10px;
+				margin-bottom: 12px;
+				padding-right: 40px;
+			}
+
+			#rank-modal .rank-tabs {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 12px;
+			}
+
+			#rank-modal .rank-tabs button {
+				flex: 1;
+				background: #333;
+				color: #fff;
+				border: 1px solid #555;
+				border-radius: 20px;
+				padding: 8px 12px;
+				cursor: pointer;
+				transition: 0.2s;
+			}
+
+			#rank-modal .rank-tabs button:hover {
+				background: #444;
+			}
+
+			.rank-grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 10px;
+				width: min(400px, 90vw);
+				max-height: min(400px, 70vh);
+				overflow-y: auto;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+				color: #eee;
+				font-size: 18px;
+			}
+
+			.rank-grid::-webkit-scrollbar {
+				display: none;
+			}
+
+			.rank-card {
+				background: rgba(255, 255, 255, 0.05);
+				border: 1px solid #444;
+				padding: 12px 14px;
+				border-radius: 20px;
+				display: grid;
+				grid-template-columns: 48px 1fr auto;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.rank-card.top1 {
+				border-color: #ffd700;
+				background: rgba(255, 215, 0, 0.08);
+				box-shadow: 0 0 10px rgba(255, 215, 0, 0.18);
+			}
+
+			.rank-card .rank-no {
+				font-weight: bold;
+				color: #0af;
+			}
+
+			.rank-card .rank-name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.rank-card .rank-value {
+				color: #fff;
+				font-weight: bold;
+			}
+
+			#rank-status {
+				margin-top: 10px;
+				opacity: 0.75;
+				font-size: 12px;
+				color: #eee;
+			}
+
+			#modal-content,
+			#achievement-modal .modal-content,
+			.modal-content {
+				max-width: min(500px, 90vw);
+				max-height: min(80vh, 650px);
+			}
+
+			#modal-content,
+			#achievement-modal .modal-content,
+			.modal-content {
+				overflow-y: auto;
+			}
+
+			#modal-content,
+			#achievement-modal .modal-content,
+			.modal-content {
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			#modal-content::-webkit-scrollbar,
+			#achievement-modal .modal-content::-webkit-scrollbar,
+			.modal-content::-webkit-scrollbar {
+				display: none;
+			}
+
+			#achievement-btn {
+				border-color: #ffd700;
+			}
+
+			#upgrade-btn {
+				border-color: #00aa7f;
+			}
+
+			#rank-btn {
+				border-color: #ffaa00;
+			}
+
+			#export-btn {
+				border-color: #00aaff;
+			}
+
+			#import-btn {
+				border-color: #00aaff;
+			}
+
+			#reset-btn {
+				border-color: #ff5555;
+			}
+
+			#cmd-input {
+				position: absolute;
+				bottom: 20px;
+				left: 20px;
+				width: 300px;
+				padding: 10px;
+				font-size: 16px;
+				background: rgba(0, 0, 0, 0.8);
+				color: white;
+				border: 1px solid #555;
+				border-radius: 20px;
+				display: none;
+				z-index: 200;
+				outline: none;
+			}
+
+			@media (max-width: 900px) {
+				#volume-box {
+					top: 8px;
+					right: 8px;
+					font-size: 11px;
+					padding: 5px 7px;
+					gap: 6px;
+				}
+
+				#volume-slider {
+					width: 70px;
+				}
+
+				.sidebar-buttons,
+				.sidebar-buttons-right {
+					top: auto;
+					bottom: 10px;
+					transform: none;
+					gap: 10px;
+				}
+
+				.sidebar-buttons {
+					left: 10px;
+				}
+
+				.sidebar-buttons-right {
+					right: 10px;
+				}
+
+				.btn {
+					padding: 8px 18px;
+					font-size: 14px;
+					border-radius: 22px;
+				}
+
+				#start-btn,
+				.sub-btn,
+				#resume-btn {
+					width: 120px;
+					padding: 8px 12px;
+					font-size: 14px;
+				}
+
+				#cmd-input {
+					width: min(220px, calc(100vw - 24px));
+					bottom: 10px;
+					left: 10px;
+					font-size: 13px;
+					padding: 8px 10px;
+				}
+
+				#ui-layer {
+					top: 30px;
+					left: 12px;
+					font-size: 15px;
+				}
+
+				#score-layer {
+					top: 50px;
+					left: 12px;
+					font-size: 14px;
+				}
+
+				#gold-display {
+					top: 70px;
+					left: 12px;
+					font-size: 14px;
+				}
+
+				#minimap {
+					position: absolute;
+					top: 100px;
+					right: 10px;
+					width: 50px;
+					height: 50px;
+				}
+
+				#start-screen h1 {
+					font-size: 46px;
+				}
+
+				#pause-menu h1 {
+					font-size: 34px;
+					letter-spacing: 4px;
+				}
+
+				.title-wrapper {
+					margin-bottom: 28px;
+				}
+
+				.title-icon {
+					width: 54px;
+					margin-right: 12px;
+				}
+
+				.achievement-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+
+				.upgrade-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.rank-grid {
+					width: min(300px, 90vw);
+					font-size: 14px;
+				}
+
+				.rank-card {
+					grid-template-columns: 32px 1fr auto;
+					padding: 8px 10px;
+				}
+
+				.modal-content,
+				#modal-content,
+				#achievement-modal .modal-content {
+					padding: 22px;
+				}
+			}
+
+			#mobile-controls {
+				display: none;
+			}
+
+			@media (max-width: 900px),
+			(pointer: coarse) {
+				#game-container.playing:not(.paused) #mobile-controls {
+					display: block;
+				}
+
+				#mobile-controls {
+					position: absolute;
+					inset: 0;
+					z-index: 3000;
+					pointer-events: none;
+					display: none;
+				}
+
+				#game-container.playing:not(.paused) #mobile-controls {
+					display: block;
+					pointer-events: auto;
+				}
+
+				.mobile-dpad,
+				.mobile-actions {
+					position: absolute;
+					pointer-events: auto;
+					touch-action: none;
+					user-select: none;
+					-webkit-user-select: none;
+					-webkit-tap-highlight-color: transparent;
+				}
+
+				.mobile-dpad {
+					left: 10px;
+					bottom: 10px;
+					display: grid;
+					grid-template-columns: repeat(3, 40px);
+					grid-template-rows: repeat(3, 40px);
+					gap: 0px;
+				}
+
+				.mobile-actions {
+					right: 14px;
+					bottom: 14px;
+					display: grid;
+					grid-template-columns: repeat(2, 40px);
+					gap: 8px;
+					width: auto;
+				}
+
+				.mobile-btn {
+					border: none;
+					border-radius: 16px;
+					background: rgba(255, 255, 255, 0.14);
+					color: #fff;
+					font-weight: bold;
+					font-size: 16px;
+					box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+					backdrop-filter: blur(4px);
+					-webkit-backdrop-filter: blur(4px);
+				}
+
+				.mobile-btn:active {
+					transform: scale(0.96);
+					background: rgba(0, 170, 255, 0.35);
+				}
+
+				.center-btn {
+					opacity: 0;
+					pointer-events: none;
+				}
+
+				.action-btn {
+					height: 40px;
+					width: 40px;
+					margin: 2px;
+					font-size: 14px;
+					padding: 0 0px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="game-container">
+			<div id="start-screen">
+				<div class="title-wrapper">
+					<img src="roomsicon.jpg" alt="Icon" class="title-icon" onerror="this.style.display='none'">
+					<h1>ROOMS</h1>
+				</div>
+				<div class="menu-buttons">
+					<button class="btn" id="start-btn">开始游戏</button>
+					<button class="btn sub-btn" onclick="showModal('rules')">游戏规则</button>
+					<button class="btn sub-btn" onclick="showModal('intro')">游戏介绍</button>
+				</div>
+			</div>
+			<div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+				<button class="btn sub-btn" id="name-btn" onclick="openNameModal()">加载玩家名中...</button>
+			</div>
+			<div id="name-modal" class="modal" style="display:none;">
+				<div class="modal-content" style="width: 350px; text-align: center;">
+					<h3 style="color: #0af; margin-top: 0;">更改玩家名称</h3>
+					<input type="text" id="name-input" placeholder="输入玩家名称..."
+						style="width: 80%; padding: 10px; margin: 15px 0; background: #333; border: 1px solid #0af; color: white; border-radius: 20px; outline: none;">
+					<div style="display: flex; gap: 10px; justify-content: center;">
+						<button class="btn sub-btn" style="padding: 8px 20px; font-size: 14px; background: #555;"
+							onclick="closeModal('name-modal')">取消</button>
+						<button class="btn sub-btn" style="padding: 8px 20px; font-size: 14px;"
+							onclick="saveName()">确定</button>
+					</div>
+				</div>
+			</div>
+			<div id="volume-box">
+				<span>🔊</span>
+				<input id="volume-slider" type="range" min="0" max="100" value="50">
+			</div>
+			<div class="sidebar-buttons">
+				<button class="btn sub-btn" id="achievement-btn" onclick="openAchievements()">成就</button>
+				<button class="btn sub-btn" id="upgrade-btn" onclick="openUpgrades()">升级</button>
+				<button class="btn sub-btn" id="rank-btn" style="display: none !important;">排行榜</button>
+			</div>
+			<div class="sidebar-buttons-right">
+				<button class="btn sub-btn" id="export-btn" onclick="exportGameStats()">导出存档</button>
+				<button class="btn sub-btn" id="import-btn"
+					onclick="document.getElementById('import-file').click()">导入存档</button>
+				<button class="btn sub-btn" id="reset-btn" onclick="openResetModal()">重置数据</button>
+			</div>
+			<input type="file" id="import-file" accept=".json,application/json" style="display:none;">
+			<div id="achievement-modal" class="modal">
+				<div class="modal-content">
+					<h2 style="color: #0af;">成就<span style="font-size: 15px; color: #888;">（下滑查看更多）</span></h2>
+					<div class="achievement-grid" id="achievement-list">
+					</div>
+					<button class="btn sub-btn" onclick="closeModal('achievement-modal')">关闭</button>
+				</div>
+			</div>
+			<div id="achievement-toast" class="achievement-toast">
+				<div class="icon">🏆</div>
+				<div class="text">
+					<h5 id="toast-title">获得成就！</h5>
+					<p id="toast-desc">成就内容</p>
+				</div>
+			</div>
+			<div id="shop-modal" class="modal" style="display:none;">
+				<div class="modal-content" style="width: 600px;">
+					<h2 style="color: #0af; margin-top:0;">升级中心<span
+							style="font-size: 15px; color: #888;">（下滑查看更多）</span></h2>
+					<div id="shop-gold-display" style="color:gold; margin-bottom:15px; font-weight:bold;">金币: 0</div>
+					<div id="upgrade-list" class="upgrade-grid"></div>
+					<button class="btn sub-btn" style="margin-top:20px;" onclick="closeModal('shop-modal')">关闭</button>
+				</div>
+			</div>
+			<div id="reset-modal" class="modal" style="display:none;">
+				<div class="modal-content" style="width: 420px; text-align: center;">
+					<h3 style="color: #ff5555; margin-top: 0;">重置数据</h3>
+					<p style="color: #ddd; line-height: 1.6;">
+						确定要重置存档吗？<br>
+						这会清空玩家名、进度、升级、成就等所有数据。
+					</p>
+					<div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+						<button class="btn sub-btn" style="padding: 8px 20px; font-size: 14px; background: #555;"
+							onclick="closeModal('reset-modal')">取消</button>
+						<button class="btn sub-btn" style="padding: 8px 20px; font-size: 14px; background: #f55;"
+							onclick="confirmResetGameStats()">确定</button>
+					</div>
+				</div>
+			</div>
+			<div id="rank-modal" class="modal">
+				<div class="modal-content">
+					<div class="rank-header">
+						<h2>排行榜（目前有BUG）</h2>
+					</div>
+					<div class="rank-tabs">
+						<button id="rank-tab-score" onclick="switchRankTab('score')">最高分排行</button>
+						<button id="rank-tab-gold" onclick="switchRankTab('gold')">金币排行</button>
+					</div>
+					<div id="rank-list" class="rank-grid"></div>
+					<div id="rank-status"></div>
+					<br>
+					<button class="btn sub-btn" onclick="closeModal('rank-modal')">关闭</button>
+				</div>
+			</div>
+			<div id="modal-overlay" onclick="closeModal(event)">
+				<div id="modal-content" onclick="event.stopPropagation()">
+					<h2 id="modal-title">标题</h2>
+					<div id="modal-body">内容</div>
+					<button id="modal-close"
+						onclick="document.getElementById('modal-overlay').style.display='none'">关闭</button>
+				</div>
+			</div>
+			<div id="ui-layer">FLOOR: 1</div>
+			<div id="score-layer">SCORE: 0</div>
+			<div id="gold-display">GOLD: 0</div>
+			<div id="pause-menu">
+				<h1>暂停</h1>
+				<h3>ROOMS - <a style="color: #eee;" href="https://zhujingqi.com/">Zhujingqi</a></h3>
+				<button id="resume-btn">继续游戏</button>
+				<button class="btn sub-btn" style="margin-top:15px;" onclick="saveAndQuit()">保存退出</button>
+			</div>
+			<input type="text" id="cmd-input" placeholder="" autocomplete="off">
+			<canvas id="game" width="1280" height="720"></canvas>
+			<canvas id="minimap" width="150" height="150"></canvas>
+			<div id="mobile-controls">
+				<div class="mobile-dpad">
+					<div></div>
+					<button type="button" class="mobile-btn dir-btn" data-dir="up">▲</button>
+					<div></div>
+					<button type="button" class="mobile-btn dir-btn" data-dir="left">◀</button>
+					<div class="mobile-btn center-btn"></div>
+					<button type="button" class="mobile-btn dir-btn" data-dir="right">▶</button>
+					<div></div>
+					<button type="button" class="mobile-btn dir-btn" data-dir="down">▼</button>
+					<div></div>
+				</div>
+				<div class="mobile-actions">
+					<button type="button" class="mobile-btn action-btn" id="mobile-ult">B</button>
+					<button type="button" class="mobile-btn action-btn" id="mobile-attack">A</button>
+					<button type="button" class="mobile-btn action-btn" id="mobile-flag">F</button>
+					<button type="button" class="mobile-btn action-btn" id="mobile-pause">ESC</button>
+				</div>
+			</div>
+		</div>
+		<script>
+			const canvas = document.getElementById('game');
+			const ctx = canvas.getContext('2d');
+			const mini = document.getElementById('minimap');
+			const mctx = mini.getContext('2d');
+			const uiLayer = document.getElementById('ui-layer');
+			const scoreLayer = document.getElementById('score-layer');
+			const goldDisplay = document.getElementById('gold-display');
+			const pauseMenu = document.getElementById('pause-menu');
+			const resumeBtn = document.getElementById('resume-btn');
+			const cmdInput = document.getElementById('cmd-input');
+			const startScreen = document.getElementById('start-screen');
+			const startBtn = document.getElementById('start-btn');
+			const achievementBtn = document.getElementById('achievement-btn');
+			const upgradeBtn = document.getElementById('upgrade-btn');
+			const nameBtn = document.getElementById('name-btn');
+			const exportBtn = document.getElementById('export-btn');
+			const importBtn = document.getElementById('import-btn');
+			const resetBtn = document.getElementById('reset-btn');
+			const rankBtn = document.getElementById('rank-btn');
+			rankBtn?.addEventListener('click', openRankModal);
+			canvas.addEventListener('contextmenu', e => e.preventDefault());
+			document.querySelectorAll('.dir-btn').forEach(btn => {
+				bindHoldButton(btn, btn.dataset.dir);
+			});
+			document.getElementById('mobile-attack')?.addEventListener('pointerdown', e => {
+				e.preventDefault();
+				tapVirtualKey(' ');
+			});
+			document.getElementById('mobile-ult')?.addEventListener('pointerdown', e => {
+				e.preventDefault();
+				tapVirtualKey('Shift');
+			});
+			document.getElementById('mobile-flag')?.addEventListener('pointerdown', e => {
+				e.preventDefault();
+				tapVirtualKey('f');
+			});
+			document.getElementById('mobile-pause')?.addEventListener('pointerdown', e => {
+				e.preventDefault();
+				tapVirtualKey('Escape');
+			});
+			const ROOM_WIDTH = 1000,
+				ROOM_HEIGHT = 600;
+			const PLAYER_SIZE = 40,
+				PLAYER_SPEED = 4.0,
+				SWORD_LENGTH = 55;
+			const ENEMY_SIZE = 40,
+				ENEMY_SPEED = 1.3;
+			const PROJECTILE_SPEED = 5;
+			const PLAYER_ULT_RANGE = PLAYER_SIZE / 2 + SWORD_LENGTH + 40;
+			const FAST_ENEMY_SPEED = 1.55;
+			const FAST_ENEMY_ULT_COOLDOWN = 300;
+			const FAST_ENEMY_ULT_DAMAGE = 2;
+			const FAST_ENEMY_ULT_COLOR = 'cyan';
+			const FAST_ENEMY_TRIGGER_FRAMES = 30;
+			const FAST_ENEMY_ULT_RANGE = PLAYER_ULT_RANGE - 18;
+			const BOMB_TRIGGER_RANGE = PLAYER_ULT_RANGE + 40;
+			const BOMB_EXPLOSION_DELAY = 180;
+			const BOMB_DAMAGE = 4;
+			let difficulty = 1;
+			let score = 0;
+			let goldCount = 0;
+			let isPaused = false;
+			let isCmdMode = false;
+			let gameStarted = false;
+			let rooms = [];
+			let projectiles = [];
+			let keys = {};
+			const mobileHold = {
+				up: false,
+				down: false,
+				left: false,
+				right: false
+			};
+			const moveKeyMap = {
+				up: ['arrowup', 'w'],
+				down: ['arrowdown', 's'],
+				left: ['arrowleft', 'a'],
+				right: ['arrowright', 'd']
+			};
+
+			function setMoveKey(dir, down) {
+				const list = moveKeyMap[dir];
+				if (!list) return;
+				list.forEach(k => {
+					keys[k] = down;
+				});
+				mobileHold[dir] = down;
+			}
+
+			function tapVirtualKey(key) {
+				if (!gameStarted) return;
+				document.dispatchEvent(new KeyboardEvent('keydown', {
+					key,
+					bubbles: true
+				}));
+				setTimeout(() => {
+					document.dispatchEvent(new KeyboardEvent('keyup', {
+						key,
+						bubbles: true
+					}));
+				}, 40);
+			}
+
+			function bindHoldButton(btn, dir) {
+				if (!btn) return;
+				const down = e => {
+					e.preventDefault();
+					setMoveKey(dir, true);
+				};
+				const up = e => {
+					e.preventDefault();
+					setMoveKey(dir, false);
+				};
+				btn.addEventListener('pointerdown', down);
+				btn.addEventListener('pointerup', up);
+				btn.addEventListener('pointercancel', up);
+				btn.addEventListener('pointerleave', up);
+			}
+			let gameState = 'playing';
+			let endingY = 0;
+			let endingButtonShown = false;
+			const endingLines = [
+				'ROOMS',
+				'',
+				'制作人',
+				'Jacky',
+				'',
+				'策划 / 设计 / 美术 / 编剧',
+				'Jacky',
+				'',
+				'程序编写',
+				'Jacky',
+				'',
+				'音乐与音效',
+				'Jacky（Google Gemini、BeepBox）',
+				'',
+				'特别鸣谢',
+				'',
+				'操作系统',
+				'你的脑子',
+				'你的手',
+				'',
+				'感谢你一路走到这里，',
+				'按下每一次开始，',
+				'探索、失败、再来一次、通关。',
+				'',
+				'这里不是终点，',
+				'旅程并没有真正结束。',
+				'或许，这只是一个开始？',
+				'',
+				'继续前进吧……'
+			];
+
+			function stopAllAudio() {
+				[bgmAudio, hitAudio, bighitAudio, coinAudio, heartAudio, winAudio, dieAudio].forEach(a => {
+					try {
+						a.pause();
+						a.currentTime = 0;
+					} catch (e) {}
+				});
+			}
+			const endingOverlay = (() => {
+				const el = document.createElement('div');
+				el.id = 'ending-overlay';
+				el.style.cssText = `
+					position:fixed;
+					inset:0;
+					display:none;
+					z-index:99999;
+					background:transparent;
+					color:#fff;
+					overflow:hidden;
+					pointer-events:auto;
+				`;
+				el.innerHTML = `
+					<button class="btn sub-btn" id="ending-continue-btn" style="
+						position:absolute;
+						left:50%;
+						bottom:42px;
+						transform:translateX(-50%);
+						display:none;
+						cursor:pointer;
+						pointer-events:auto;
+					">继续游戏</button>
+				`;
+				document.body.appendChild(el);
+				return el;
+			})();
+			const endingContinueBtn = endingOverlay.querySelector('#ending-continue-btn');
+			endingOverlay.addEventListener('click', () => {
+				if (!endingButtonShown) {
+					endingButtonShown = true;
+					endingContinueBtn.style.display = 'block';
+				}
+			});
+
+			function startEnding() {
+				if (gameState !== 'playing') return;
+				gameState = 'ending';
+				endingY = canvas.height + 60;
+				endingButtonShown = false;
+				document.getElementById('volume-box').style.display = 'none';
+				stopAllAudio();
+				isPaused = false;
+				pauseMenu.style.display = 'none';
+				document.getElementById('game-container').classList.remove('playing');
+				document.getElementById('game-container').classList.remove('paused');
+				uiLayer.style.display = 'none';
+				scoreLayer.style.display = 'none';
+				goldDisplay.style.display = 'none';
+				mini.style.display = 'none';
+				endingOverlay.style.display = 'block';
+				endingContinueBtn.style.display = 'none';
+			}
+
+			function updateEnding() {
+				endingY -= 0.6;
+				let totalH = 0;
+				for (const line of endingLines) {
+					if (line === '') {
+						totalH += 24;
+					} else if (line === 'ROOMS') {
+						totalH += 52;
+					} else {
+						totalH += 38;
+					}
+				}
+				if (!endingButtonShown && endingY + totalH < 400) {
+					endingButtonShown = true;
+					endingContinueBtn.style.display = 'block';
+				}
+			}
+
+			function drawEnding() {
+				ctx.fillStyle = '#000';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+				ctx.textAlign = 'center';
+				ctx.fillStyle = '#fff';
+				let y = endingY;
+				for (const line of endingLines) {
+					if (line === '') {
+						y += 24;
+						continue;
+					}
+					if (line === 'ROOMS') {
+						ctx.font = 'bold 34px Arial';
+						ctx.fillText(line, canvas.width / 2, y);
+						y += 52;
+					} else {
+						ctx.font = '24px Arial';
+						ctx.fillText(line, canvas.width / 2, y);
+						y += 38;
+					}
+				}
+			}
+			endingContinueBtn.addEventListener('click', () => {
+				endingOverlay.style.display = 'none';
+				endingContinueBtn.style.display = 'none';
+				gameState = 'playing';
+				difficulty = 21;
+				uiLayer.style.display = 'block';
+				scoreLayer.style.display = 'block';
+				goldDisplay.style.display = 'block';
+				mini.style.display = stats.hasMinimap ? 'block' : 'none';
+				document.getElementById('volume-box').style.display = 'block';
+				startBgm();
+				initLevel();
+			});
+			let trans = {
+				active: false,
+				progress: 0,
+				fromRoom: null,
+				toRoom: null,
+				offsetX: 0,
+				offsetY: 0,
+				pStartX: 0,
+				pStartY: 0,
+				pEndX: 0,
+				pEndY: 0
+			};
+			let levelTrans = {
+				active: false,
+				state: 0,
+				alpha: 0,
+				timer: 0
+			};
+			let deathTrans = {
+				active: false,
+				state: 0,
+				alpha: 0,
+				timer: 0
+			};
+			let player = {
+				x: canvas.width / 2,
+				y: canvas.height / 2,
+				room: null,
+				lastRoom: null,
+				dx: 0,
+				dy: 0,
+				lastMove: {
+					dx: 0,
+					dy: -1
+				},
+				attacking: false,
+				attackCooldown: 0,
+				ulting: false,
+				ultCooldown: 0,
+				ultFrames: 0,
+				swordFrames: 0,
+				roomTransitionFrames: 0,
+				maxHearts: 10,
+				hearts: 10,
+				hitCooldown: 0,
+				knockback: {
+					x: 0,
+					y: 0,
+					frames: 0
+				}
+			};
+			const achievements = [{
+					id: 'start',
+					title: '启程',
+					desc: '通过第1层',
+					type: 'level',
+					goal: 2
+				},
+				{
+					id: 'supply',
+					title: '获得补给',
+					desc: '到达第5层',
+					type: 'level',
+					goal: 5
+				},
+				{
+					id: 'deep',
+					title: '深入密室',
+					desc: '到达第10层',
+					type: 'level',
+					goal: 10
+				},
+				{
+					id: 'exp',
+					title: '最终的胜利？',
+					desc: '到达第20层',
+					type: 'level',
+					goal: 20
+				},
+				{
+					id: 'victory',
+					title: '无尽深渊',
+					desc: '到达第50层',
+					type: 'level',
+					goal: 50
+				},
+
+				{
+					id: 'kill1',
+					title: '怪物杀手',
+					desc: '击杀1个怪物',
+					type: 'kills',
+					goal: 1
+				},
+				{
+					id: 'kill20',
+					title: '业余杀手',
+					desc: '击杀20个怪物',
+					type: 'kills',
+					goal: 20
+				},
+				{
+					id: 'kill80',
+					title: '资深杀手',
+					desc: '击杀80个怪物',
+					type: 'kills',
+					goal: 80
+				},
+				{
+					id: 'kill150',
+					title: '杀怪王',
+					desc: '击杀150个怪物',
+					type: 'kills',
+					goal: 150
+				},
+				{
+					id: 'kill250',
+					title: '杀怪魔',
+					desc: '击杀250个怪物',
+					type: 'kills',
+					goal: 250
+				},
+
+				{
+					id: 'death1',
+					title: '失败乃成功之母',
+					desc: '死亡1次',
+					type: 'deaths',
+					goal: 1
+				},
+				{
+					id: 'death20',
+					title: '手滑大赛一等奖',
+					desc: '死亡20次',
+					type: 'deaths',
+					goal: 20
+				},
+				{
+					id: 'death50',
+					title: '手滑大仙',
+					desc: '死亡50次',
+					type: 'deaths',
+					goal: 50
+				},
+
+				{
+					id: 'gold150',
+					title: '金币收藏家',
+					desc: '获得150金币',
+					type: 'gold',
+					goal: 150
+				},
+				{
+					id: 'gold500',
+					title: '家有金矿',
+					desc: '获得500金币',
+					type: 'gold',
+					goal: 500
+				}
+			];
+			const defaultStats = {
+				playerName: "Player",
+				maxLevel: 0,
+				totalKills: 0,
+				totalGold: 0,
+				totalScore: 0,
+				deaths: 0,
+				highScore: 0,
+				currentHearts: 10,
+				hasMinimap: false,
+				unlockedAchievements: [],
+				upgrades: {
+					atkPower: 1,
+					atkSpeed: 1,
+					atkRange: 1,
+					ultPower: 1,
+					ultSpeed: 1,
+					ultRange: 1,
+					knockback: 1,
+					hp: 1,
+					speed: 1
+				}
+			};
+			let stats = JSON.parse(localStorage.getItem('gameStats') || 'null') || JSON.parse(JSON.stringify(defaultStats));
+			stats.upgrades ??= JSON.parse(JSON.stringify(defaultStats.upgrades));
+			stats.unlockedAchievements ??= [];
+			stats.playerName ??= "Player";
+			stats.totalGold ??= 0;
+			stats.totalScore ??= 0;
+			stats.highScore ??= 0;
+			stats.currentHearts ??= 10;
+			stats.hasMinimap ??= false;
+			mini.style.display = stats.hasMinimap ? 'block' : 'none';
+			checkAchievements();
+			score = stats.totalScore || 0;
+			goldCount = stats.totalGold || 0;
+			localStorage.setItem('gameStats', JSON.stringify(stats));
+			const upgradeConfig = {
+				atkPower: [0, 2, 3, 4],
+				atkSpeed: [0, 30, 24, 18],
+				atkRange: [0, 70, 85, 100],
+				ultPower: [0, 4, 5, 6],
+				ultSpeed: [0, 600, 540, 480],
+				ultRange: [0, 120, 140, 160],
+				knockback: [0, 15, 25, 35],
+				hp: [0, 10, 11, 12],
+				speed: [0, 5, 6, 7],
+			};
+			const UPGRADE_COSTS = [0, 0, 80, 150];
+
+			function showModal(type) {
+				const overlay = document.getElementById('modal-overlay');
+				const title = document.getElementById('modal-title');
+				const body = document.getElementById('modal-body');
+				if (type === 'rules') {
+					title.innerText = '游戏规则与功能';
+					body.innerHTML = `
+            <p>1. <b>移动</b>: <b>WASD</b> 或 <b>方向键</b> 控制角色移动。</p>
+            <p>2. <b>攻击</b>: <b>鼠标左键</b> 或 <b>空格键</b> 进行出剑。（移动端: <b>A</b>）</p>
+            <p>3. <b>技能</b>: <b>鼠标右键</b> 或 <b>Shift键</b> 释放大招。（移动端: <b>B</b>）</p>
+            <p>4. <b>目标</b>: 击败房间内所有敌人以解锁通往下一个房间的门，寻找金色门并进入下一层。</p>
+            <p>5. <b>收集</b>: 收集金币增加分数并升级，拾取红心恢复生命值。</p>
+            <p>6. <b>标记</b>: 按 <b>F</b> 或 <b>鼠标中键</b> 在当前房间放置/撤销旗帜标记。</p>
+			<p>7. <b>音效</b>: 滑动右上角的滑块以调节音量。</p>
+			<p>8. <b>暂停</b>: 按下 <b>ESC</b> 键以暂停。</p>
+			<p>9. <b>数据</b>: 自动保存至浏览器缓存，也可以导入存档、导出存档和重置数据。</p>
+			<p>10. <b>成就</b>: 记录你的成就。</p>
+			<p>11. <b>升级</b>: 使用金币提升技能与购买物品。</p>
+			<p>12. <b>排行</b>: 查看全世界玩家的排行，互相竞争！</p>
+        `;
+				} else {
+					title.innerText = '游戏介绍';
+					body.innerHTML = `
+			<h3>主题</h3>
+            <p>
+				ROOMS是一款动作生存游戏。
+				你将被困在随机生成房间中，面对怪物的威胁。
+				每一层都会变得更加危险和困难，更难找到出口，但也隐藏着金币和补给。
+				利用灵活的走位和强大的技能，击败怪物，进入房间与房间连成的深渊吧！
+			</p>
+			<h3>制作人员</h3>
+			<p>
+			<li><b>制作人：</b>Jacky</li>
+			<li><b>策划/设计/美术/编剧：</b>Jacky</li>
+			<li><b>程序编写：</b>Jacky</li>
+			<li><b>音乐与音效：</b>Jacky（Google Gemini、BeepBox）</li>
+			</p>
+			<p><a style="color: #eee;" href="https://zhujingqi.com/">Zhujingqi</a> · <a style="color: #eee;" href="https://github.com/zhujingqi/">GitHub</a></p>
+        `;
+				}
+				overlay.style.display = 'flex';
+			}
+			const bgmAudio = new Audio('bgm.mp3');
+			const hitAudio = new Audio('hit.mp3');
+			const bighitAudio = new Audio('bighit.mp3');
+			const coinAudio = new Audio('coin.mp3');
+			const heartAudio = new Audio('heart.mp3');
+			const winAudio = new Audio('win.mp3');
+			const dieAudio = new Audio('die.mp3');
+			bgmAudio.loop = true;
+			let masterVolume = 0.5;
+
+			function applyVolume() {
+				bgmAudio.volume = masterVolume * 0.6;
+				hitAudio.volume = masterVolume;
+				bighitAudio.volume = masterVolume;
+				coinAudio.volume = masterVolume;
+				heartAudio.volume = masterVolume;
+				winAudio.volume = masterVolume * 1.2;
+				dieAudio.volume = masterVolume * 1.2;
+			}
+
+			function playSfx(audio) {
+				if (!audio || isPaused || gameState !== 'playing') return;
+				const a = audio.cloneNode();
+				a.volume = audio.volume;
+				a.play().catch(() => {});
+			}
+
+			function startBgm() {
+				bgmAudio.currentTime = 0;
+				bgmAudio.play().catch(() => {});
+			}
+
+			function stopBgm() {
+				bgmAudio.pause();
+				bgmAudio.currentTime = 0;
+			}
+			applyVolume();
+			const volumeSlider = document.getElementById('volume-slider');
+			if (volumeSlider) {
+				volumeSlider.addEventListener('input', () => {
+					masterVolume = Number(volumeSlider.value) / 100;
+					applyVolume();
+				});
+			}
+
+			function closeModal(e) {
+				if (typeof e === 'string') {
+					document.getElementById(e).style.display = 'none';
+					return;
+				}
+				document.getElementById('modal-overlay').style.display = 'none';
+			}
+			startBtn.addEventListener('click', () => {
+				startScreen.style.opacity = '0';
+				achievementBtn.style.display = 'none';
+				upgradeBtn.style.display = 'none';
+				nameBtn.style.display = 'none';
+				exportBtn.style.display = 'none';
+				importBtn.style.display = 'none';
+				resetBtn.style.display = 'none';
+				rankBtn.style.display = 'none';
+				setTimeout(() => {
+					document.getElementById('game-container').classList.add('playing');
+					document.getElementById('game-container').classList.remove('paused');
+					startBgm();
+					startScreen.style.display = 'none';
+					applyUpgradesToPlayer();
+					gameStarted = true;
+					uiLayer.style.display = 'block';
+					scoreLayer.style.display = 'block';
+					goldDisplay.style.display = 'block';
+					mini.style.display = stats.hasMinimap ? 'block' : 'none';
+					goldCount = stats.totalGold || 0;
+					score = stats.totalScore || 0;
+					difficulty = stats.maxLevel > 0 ? stats.maxLevel : 1;
+					initLevel();
+					updateUI();
+				}, 1000);
+			});
+
+			function shuffleArray(arr) {
+				for (let i = arr.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[arr[i], arr[j]] = [arr[j], arr[i]];
+				}
+				return arr;
+			}
+
+			function spawnEnemiesForRoom(r) {
+				r.enemies = [];
+				if (r.id === 0 || (difficulty % 5 === 0)) return;
+				let targetCount = Math.min(30, 1 + Math.floor(difficulty / 3) + Math.floor(Math.random() * 4));
+				let counts = {
+					zombie: 0,
+					skeleton: 0,
+					fast: 0,
+					bomb: 0,
+					swift: 0
+				};
+				if (difficulty >= 11) {
+					counts.bomb = Math.min(3, Math.floor(difficulty / 4));
+					counts.fast = Math.min(4, Math.floor(difficulty / 3));
+					counts.skeleton = Math.min(6, Math.floor(difficulty / 2));
+					counts.swift = Math.random() < 0.15 ? 1 : 0;
+					counts.zombie = Math.max(0, targetCount - counts.bomb - counts.fast - counts.skeleton - counts.swift);
+				} else if (difficulty >= 7) {
+					counts.bomb = Math.min(3, Math.floor(difficulty / 4));
+					counts.fast = Math.min(4, Math.floor(difficulty / 3));
+					counts.skeleton = Math.min(6, Math.floor(difficulty / 2));
+					counts.zombie = Math.max(0, targetCount - counts.bomb - counts.fast - counts.skeleton);
+				} else if (difficulty >= 4) {
+					counts.fast = 1;
+					counts.skeleton = 2;
+					counts.zombie = Math.max(3, targetCount - 3);
+				} else {
+					counts.skeleton = 1;
+					counts.zombie = Math.max(1, targetCount - 1);
+				}
+				const enemyList = [];
+				for (let i = 0; i < counts.zombie; i++) enemyList.push(Zombie);
+				for (let i = 0; i < counts.skeleton; i++) enemyList.push(Skeleton);
+				for (let i = 0; i < counts.fast; i++) enemyList.push(FastEnemy);
+				for (let i = 0; i < counts.bomb; i++) enemyList.push(BombEnemy);
+				for (let i = 0; i < counts.swift; i++) enemyList.push(SwiftEnemy);
+				shuffleArray(enemyList);
+				let eliteBudget = Math.max(0, Math.floor(targetCount / 4));
+				for (let i = 0; i < enemyList.length; i++) {
+					let isElite = false;
+					if (eliteBudget > 0) {
+						isElite = true;
+						eliteBudget--;
+					} else if (difficulty >= 4 && Math.random() < 0.15) {
+						isElite = true;
+					}
+					const Type = enemyList[i];
+					r.enemies.push(new Type(r, canvas.width / 2 + (Math.random() - 0.5) * 600, canvas.height / 2 + (Math
+						.random() - 0.5) * 400, isElite));
+				}
+			}
+
+			function initLevel() {
+				rooms = [];
+				player.lastRoom = null;
+				trans.active = false;
+				deathTrans.active = false;
+				projectiles = [];
+				keys = {};
+				updateUI();
+				if (difficulty % 5 === 0) {
+					let supplyRoom = new Room(0);
+					supplyRoom.x = 0;
+					supplyRoom.y = 0;
+					supplyRoom.placed = true;
+					supplyRoom.visited = true;
+					supplyRoom.doors.push({
+						side: 'top',
+						target: new Room(-1),
+						isGoal: true
+					});
+					supplyRoom.items.push({
+						x: canvas.width / 2 - 80,
+						y: canvas.height / 2
+					}, {
+						x: canvas.width / 2,
+						y: canvas.height / 2
+					}, {
+						x: canvas.width / 2 + 80,
+						y: canvas.height / 2
+					});
+					rooms.push(supplyRoom);
+					player.room = rooms[0];
+					player.x = canvas.width / 2;
+					player.y = canvas.height / 2 + 150;
+					return;
+				}
+				const numRooms = Math.min(200, Math.floor(difficulty / 2) + 5);
+				for (let i = 0; i < numRooms; i++) rooms.push(new Room(i));
+				let connected = [rooms[0]],
+					remaining = rooms.slice(1);
+				rooms[0].x = 0;
+				rooms[0].y = 0;
+				rooms[0].placed = true;
+				rooms[0].visited = true;
+
+				function positionTaken(x, y) {
+					return rooms.some(r => r.placed && r.x === x && r.y === y);
+				}
+				while (remaining.length > 0) {
+					let validOrigins = connected.filter(r => {
+						const sides = [
+							['top', 0, -1],
+							['bottom', 0, 1],
+							['left', -1, 0],
+							['right', 1, 0]
+						];
+						return sides.some(s => !positionTaken(r.x + s[1], r.y + s[2]));
+					});
+					if (validOrigins.length === 0) break;
+					let from = validOrigins[Math.floor(Math.random() * validOrigins.length)];
+					let to = remaining.pop();
+					const possibleSides = [
+						['top', 0, -1],
+						['bottom', 0, 1],
+						['left', -1, 0],
+						['right', 1, 0]
+					].filter(s => !positionTaken(from.x + s[1], from.y + s[2]));
+					let chosen = possibleSides[Math.floor(Math.random() * possibleSides.length)];
+					let sideFrom = chosen[0];
+					to.x = from.x + chosen[1];
+					to.y = from.y + chosen[2];
+					to.placed = true;
+					let sideTo = {
+						top: 'bottom',
+						bottom: 'top',
+						left: 'right',
+						right: 'left'
+					} [sideFrom];
+					from.doors.push({
+						side: sideFrom,
+						target: to
+					});
+					to.doors.push({
+						side: sideTo,
+						target: from
+					});
+					connected.push(to);
+				}
+				player.room = rooms[0];
+				player.x = canvas.width / 2;
+				player.y = canvas.height / 2;
+				let maxDist = -1,
+					goalRoom = null;
+				rooms.forEach(r => {
+					let d = Math.abs(r.x) + Math.abs(r.y);
+					if (d > maxDist) {
+						maxDist = d;
+						goalRoom = r;
+					}
+				});
+				const avSides = ['top', 'bottom', 'left', 'right'].filter(s => !goalRoom.doors.map(d => d.side).includes(s));
+				if (avSides.length > 0) goalRoom.doors.push({
+					side: avSides[0],
+					target: new Room(-1),
+					isGoal: true
+				});
+				rooms.forEach(r => {
+					spawnEnemiesForRoom(r);
+					r.generateGold();
+				});
+			}
+
+			function applyUpgradesToPlayer() {
+				const up = stats.upgrades;
+				player.atkHearts = upgradeConfig.atkPower[up.atkPower];
+				player.atkCooldownMax = upgradeConfig.atkSpeed[up.atkSpeed];
+				player.atkRange = upgradeConfig.atkRange[up.atkRange];
+				player.ultPower = upgradeConfig.ultPower[up.ultPower];
+				player.ultCooldownMax = upgradeConfig.ultSpeed[up.ultSpeed];
+				player.ultRange = upgradeConfig.ultRange[up.ultRange];
+				player.knockbackForce = upgradeConfig.knockback[up.knockback];
+				player.maxHearts = upgradeConfig.hp[up.hp];
+				player.speed = upgradeConfig.speed[up.speed];
+				player.hearts = Math.min(stats.currentHearts ?? player.maxHearts, player.maxHearts);
+			}
+
+			function update() {
+				if (!gameStarted || isPaused) return;
+				if (gameState === 'ending') {
+					updateEnding();
+					return;
+				}
+				if (deathTrans.active) {
+					if (deathTrans.state === 1) {
+						deathTrans.alpha += 0.02;
+						if (deathTrans.alpha >= 1) {
+							deathTrans.alpha = 1;
+							deathTrans.state = 2;
+							deathTrans.timer = 90;
+						}
+					} else if (deathTrans.state === 2) {
+						deathTrans.timer--;
+						if (deathTrans.timer <= 0) {
+							score = 0;
+							stats.deaths++;
+							checkAchievements();
+							saveStats();
+							respawnSameLevel();
+							deathTrans.state = 3;
+						}
+					} else if (deathTrans.state === 3) {
+						deathTrans.alpha -= 0.05;
+						if (deathTrans.alpha <= 0) {
+							deathTrans.alpha = 0;
+							deathTrans.state = 0;
+							deathTrans.active = false;
+							updateUI();
+						}
+					}
+					return;
+				}
+				if (levelTrans.active) {
+					if (levelTrans.state === 1) {
+						levelTrans.alpha += 0.05;
+						if (levelTrans.alpha >= 1) {
+							levelTrans.alpha = 1;
+							levelTrans.state = 2;
+							levelTrans.timer = 60;
+						}
+					} else if (levelTrans.state === 2) {
+						levelTrans.timer--;
+						if (levelTrans.timer <= 0) {
+							difficulty++;
+							score += 30;
+							submitRankIfNeeded('levelComplete');
+							if (difficulty > stats.maxLevel) {
+								stats.maxLevel = difficulty;
+								saveStats();
+							}
+							checkAchievements();
+							if (difficulty === 20) {
+								levelTrans.active = false;
+								levelTrans.state = 0;
+								levelTrans.alpha = 0;
+								startEnding();
+							} else {
+								initLevel();
+							}
+							levelTrans.state = 3;
+						}
+					} else if (levelTrans.state === 3) {
+						levelTrans.alpha -= 0.05;
+						if (levelTrans.alpha <= 0) {
+							levelTrans.alpha = 0;
+							levelTrans.state = 0;
+							levelTrans.active = false;
+							updateUI();
+						}
+					}
+					return;
+				}
+				if (trans.active) {
+					trans.progress += 0.05;
+					if (trans.progress >= 1) {
+						trans.active = false;
+						player.lastRoom = trans.fromRoom;
+						player.room = trans.toRoom;
+						player.room.visited = true;
+						player.x = trans.pEndX;
+						player.y = trans.pEndY;
+						player.roomTransitionFrames = 40;
+						player.room.enemyDelay = 30;
+						projectiles = [];
+					} else {
+						let ease = trans.progress;
+						player.x = trans.pStartX + (trans.pEndX - trans.pStartX) * ease;
+						player.y = trans.pStartY + (trans.pEndY - trans.pStartY) * ease;
+					}
+					return;
+				}
+				if (player.hearts <= 0 && !deathTrans.active) {
+					stopBgm();
+					playSfx(dieAudio);
+					deathTrans.active = true;
+					deathTrans.state = 1;
+					deathTrans.alpha = 0;
+					return;
+				}
+				if (player.roomTransitionFrames > 0) player.roomTransitionFrames--;
+				if (player.room.enemyDelay > 0) player.room.enemyDelay--;
+				player.room.items = player.room.items.filter(item => {
+					if (Math.hypot(player.x - item.x, player.y - item.y) < PLAYER_SIZE) {
+						if (player.hearts < player.maxHearts) player.hearts++;
+						playSfx(heartAudio);
+						stats.currentHearts = player.hearts;
+						saveStats();
+						score += 10;
+						updateUI();
+						return false;
+					}
+					return true;
+				});
+				player.room.gold = player.room.gold.filter(g => {
+					if (Math.hypot(player.x - g.x, player.y - g.y) < PLAYER_SIZE) {
+						score += 5;
+						goldCount += 1;
+						playSfx(coinAudio);
+						updateUI();
+						stats.totalGold++;
+						saveStats();
+						checkAchievements();
+						return false;
+					}
+					return true;
+				});
+				player.dx = player.dy = 0;
+				if (!isCmdMode) {
+					if (keys['arrowup'] || keys['w'] || mobileHold.up) player.dy = -PLAYER_SPEED;
+					if (keys['arrowdown'] || keys['s'] || mobileHold.down) player.dy = PLAYER_SPEED;
+					if (keys['arrowleft'] || keys['a'] || mobileHold.left) player.dx = -PLAYER_SPEED;
+					if (keys['arrowright'] || keys['d'] || mobileHold.right) player.dx = PLAYER_SPEED;
+				}
+				if (player.knockback.frames > 0) {
+					player.x += player.knockback.x * (player.knockback.frames / 20);
+					player.y += player.knockback.y * (player.knockback.frames / 20);
+					player.knockback.frames--;
+				} else {
+					player.x += player.dx;
+					player.y += player.dy;
+				}
+				player.room.obstacles.forEach(ob => {
+					let res = checkCircleRectCollision({
+						x: player.x,
+						y: player.y,
+						size: PLAYER_SIZE
+					}, ob);
+					if (res.hit) {
+						player.x += res.nx * res.overlap;
+						player.y += res.ny * res.overlap;
+					}
+				});
+				applyBounds(player, PLAYER_SIZE);
+				if (player.dx !== 0 || player.dy !== 0) {
+					let len = Math.sqrt(player.dx * player.dx + player.dy * player.dy);
+					player.lastMove = {
+						dx: player.dx / len,
+						dy: player.dy / len
+					};
+				}
+				projectiles = projectiles.filter(p => {
+					if (p.room !== player.room) return false;
+					p.x += p.vx;
+					p.y += p.vy;
+					if (Math.hypot(p.x - player.x, p.y - player.y) < PLAYER_SIZE / 2) {
+						damagePlayer(p.vx / PROJECTILE_SPEED, p.vy / PROJECTILE_SPEED, 1);
+						return false;
+					}
+					return (p.x > 0 && p.x < canvas.width && p.y > 0 && p.y < canvas.height);
+				});
+				if (player.roomTransitionFrames <= 0) {
+					for (const door of player.room.doors) {
+						let doorX = canvas.width / 2,
+							doorY = canvas.height / 2;
+						switch (door.side) {
+							case 'top':
+								doorY = (canvas.height - ROOM_HEIGHT) / 2;
+								break;
+							case 'bottom':
+								doorY = (canvas.height + ROOM_HEIGHT) / 2;
+								break;
+							case 'left':
+								doorX = (canvas.width - ROOM_WIDTH) / 2;
+								break;
+							case 'right':
+								doorX = (canvas.width + ROOM_WIDTH) / 2;
+								break;
+						}
+						if (Math.abs(player.x - doorX) < PLAYER_SIZE && Math.abs(player.y - doorY) < PLAYER_SIZE) {
+							if (player.room.enemies.length > 0 && door.target !== player.lastRoom) continue;
+							if (door.isGoal) {
+								if (!levelTrans.active) {
+									playSfx(winAudio);
+									levelTrans.active = true;
+									levelTrans.state = 1;
+									levelTrans.alpha = 0;
+								}
+							} else {
+								trans.active = true;
+								trans.progress = 0;
+								trans.fromRoom = player.room;
+								trans.toRoom = door.target;
+								trans.pStartX = player.x;
+								trans.pStartY = player.y;
+								const offset = 80;
+								switch (door.side) {
+									case 'top':
+										trans.offsetX = 0;
+										trans.offsetY = canvas.height;
+										trans.pEndX = canvas.width / 2;
+										trans.pEndY = (canvas.height + ROOM_HEIGHT) / 2 - offset;
+										break;
+									case 'bottom':
+										trans.offsetX = 0;
+										trans.offsetY = -canvas.height;
+										trans.pEndX = canvas.width / 2;
+										trans.pEndY = (canvas.height - ROOM_HEIGHT) / 2 + offset;
+										break;
+									case 'left':
+										trans.offsetX = canvas.width;
+										trans.offsetY = 0;
+										trans.pEndX = (canvas.width + ROOM_WIDTH) / 2 - offset;
+										trans.pEndY = canvas.height / 2;
+										break;
+									case 'right':
+										trans.offsetX = -canvas.width;
+										trans.offsetY = 0;
+										trans.pEndX = (canvas.width - ROOM_WIDTH) / 2 + offset;
+										trans.pEndY = canvas.height / 2;
+										break;
+								}
+							}
+							break;
+						}
+					}
+				}
+				if (player.attacking && player.attackCooldown <= 0) {
+					player.attackCooldown = 30;
+					player.swordFrames = 10;
+					playSfx(hitAudio);
+					player.room.enemies.forEach(e => {
+						if (e.dying) return;
+						let dx = e.x - player.x,
+							dy = e.y - player.y,
+							len = Math.sqrt(dx * dx + dy * dy);
+						if (len <= PLAYER_SIZE + SWORD_LENGTH && ((dx / len) * player.lastMove.dx + (dy / len) * player
+								.lastMove.dy) > 0.4) {
+							e.hearts -= 2.5;
+							e.knockback.x = dx / len * 12;
+							e.knockback.y = dy / len * 12;
+							e.knockback.frames = 15;
+							checkEnemyDeath(e);
+						}
+					});
+					player.attacking = false;
+				}
+				if (player.ulting && player.ultCooldown <= 0) {
+					player.ulting = false;
+					player.ultCooldown = 600;
+					player.ultFrames = 20;
+					playSfx(bighitAudio);
+					player.room.enemies.forEach(e => {
+						if (e.dying) return;
+						let dx = e.x - player.x,
+							dy = e.y - player.y,
+							len = Math.hypot(dx, dy);
+						if (len <= PLAYER_ULT_RANGE) {
+							e.hearts -= 4;
+							e.knockback.x = (dx / len) * 20;
+							e.knockback.y = (dy / len) * 20;
+							e.knockback.frames = 25;
+							checkEnemyDeath(e);
+						}
+					});
+				}
+				if (player.attackCooldown > 0) player.attackCooldown--;
+				if (player.swordFrames > 0) player.swordFrames--;
+				if (player.hitCooldown > 0) player.hitCooldown--;
+				if (player.ultCooldown > 0) player.ultCooldown--;
+				if (player.ultFrames > 0) player.ultFrames--;
+				player.room.enemies.forEach(e => e.update());
+			}
+			class Room {
+				constructor(id) {
+					this.id = id;
+					this.doors = [];
+					this.visited = false;
+					this.placed = false;
+					this.enemies = [];
+					this.items = [];
+					this.gold = [];
+					this.obstacles = [];
+					this.x = 0;
+					this.y = 0;
+					this.enemyDelay = 0;
+					this.flag = {
+						active: false,
+						x: 0,
+						y: 0
+					};
+					this.generateObstacles();
+				}
+				generateObstacles() {
+					if (this.id === 0) return;
+					const count = 4 + Math.floor(Math.random() * 5);
+					const minX = (canvas.width - ROOM_WIDTH) / 2 + 80,
+						maxX = (canvas.width + ROOM_WIDTH) / 2 - 140;
+					const minY = (canvas.height - ROOM_HEIGHT) / 2 + 80,
+						maxY = (canvas.height + ROOM_HEIGHT) / 2 - 140;
+					for (let i = 0; i < count; i++) {
+						let ox, oy, valid = false,
+							attempts = 0;
+						while (!valid && attempts < 20) {
+							ox = minX + Math.random() * (maxX - minX);
+							oy = minY + Math.random() * (maxY - minY);
+							const centerX = canvas.width / 2,
+								centerY = canvas.height / 2,
+								safeZone = 150;
+							if (Math.abs(ox - centerX + 30) > safeZone && Math.abs(oy - centerY + 30) > safeZone) valid =
+								true;
+							attempts++;
+						}
+						if (valid) this.obstacles.push({
+							x: ox,
+							y: oy,
+							w: 60,
+							h: 60
+						});
+					}
+				}
+				generateGold() {
+					if (this.id === 0 && difficulty % 5 !== 0) return;
+					const goldCount = 3 + Math.floor(Math.random() * 13);
+					const minX = (canvas.width - ROOM_WIDTH) / 2 + 60,
+						maxX = (canvas.width + ROOM_WIDTH) / 2 - 60;
+					const minY = (canvas.height - ROOM_HEIGHT) / 2 + 60,
+						maxY = (canvas.height + ROOM_HEIGHT) / 2 - 60;
+					for (let i = 0; i < goldCount; i++) {
+						let gx, gy, valid = false,
+							attempts = 0;
+						while (!valid && attempts < 30) {
+							gx = minX + Math.random() * (maxX - minX);
+							gy = minY + Math.random() * (maxY - minY);
+							let hit = this.obstacles.some(ob => gx > ob.x - 20 && gx < ob.x + ob.w + 20 && gy > ob.y - 20 &&
+								gy < ob.y + ob.h + 20);
+							if (!hit && Math.hypot(gx - canvas.width / 2, gy - canvas.height / 2) > 100) valid = true;
+							attempts++;
+						}
+						if (valid) this.gold.push({
+							x: gx,
+							y: gy
+						});
+					}
+				}
+				draw(ctx) {
+					ctx.fillStyle = '#252525';
+					ctx.fillRect((canvas.width - ROOM_WIDTH) / 2, (canvas.height - ROOM_HEIGHT) / 2, ROOM_WIDTH,
+						ROOM_HEIGHT);
+					if (this.flag.active) {
+						const fx = this.flag.x,
+							fy = this.flag.y;
+						ctx.fillStyle = '#fff';
+						ctx.fillRect(fx - 2, fy - 35, 4, 45);
+						ctx.fillStyle = 'yellow';
+						ctx.beginPath();
+						ctx.moveTo(fx + 2, fy - 35);
+						ctx.lineTo(fx + 25, fy - 25);
+						ctx.lineTo(fx + 2, fy - 15);
+						ctx.fill();
+					}
+					ctx.fillStyle = '#3a3a3a';
+					ctx.strokeStyle = '#111';
+					ctx.lineWidth = 4;
+					for (const ob of this.obstacles) {
+						roundRect(ctx, ob.x, ob.y, ob.w, ob.h, 8);
+						ctx.fill();
+						ctx.stroke();
+					}
+					const hasEnemies = this.enemies.length > 0;
+					for (const door of this.doors) {
+						const isLocked = hasEnemies && door.target !== player.lastRoom;
+						ctx.fillStyle = isLocked ? '#500' : (door.isGoal ? '#ffd700' : '#777');
+						let dx, dy, dw, dh;
+						switch (door.side) {
+							case 'top':
+								dx = canvas.width / 2 - 40;
+								dy = (canvas.height - ROOM_HEIGHT) / 2 - 15;
+								dw = 80;
+								dh = 30;
+								break;
+							case 'bottom':
+								dx = canvas.width / 2 - 40;
+								dy = (canvas.height + ROOM_HEIGHT) / 2 - 15;
+								dw = 80;
+								dh = 30;
+								break;
+							case 'left':
+								dx = (canvas.width - ROOM_WIDTH) / 2 - 15;
+								dy = canvas.height / 2 - 40;
+								dw = 30;
+								dh = 80;
+								break;
+							case 'right':
+								dx = (canvas.width + ROOM_WIDTH) / 2 - 15;
+								dy = canvas.height / 2 - 40;
+								dw = 30;
+								dh = 80;
+								break;
+						}
+						ctx.fillRect(dx, dy, dw, dh);
+					}
+					this.items.forEach(item => drawHeart(ctx, item.x, item.y, 20, '#ff2e2e'));
+					this.gold.forEach(g => {
+						ctx.fillStyle = 'gold';
+						ctx.beginPath();
+						ctx.arc(g.x, g.y, 8, 0, Math.PI * 2);
+						ctx.fill();
+						ctx.strokeStyle = '#b8860b';
+						ctx.lineWidth = 2;
+						ctx.stroke();
+					});
+				}
+			}
+			class BaseEnemy {
+				constructor(room, x, y, color, maxHearts) {
+					this.room = room;
+					this.x = x;
+					this.y = y;
+					this.color = color;
+					this.maxHearts = maxHearts;
+					this.hearts = maxHearts;
+					this.visualHearts = maxHearts;
+					this.hitCooldown = 0;
+					this.knockback = {
+						x: 0,
+						y: 0,
+						frames: 0
+					};
+					this.dying = false;
+					this.opacity = 1.0;
+					this.guaranteedHeartDrop = false;
+				}
+				commonUpdate() {
+					this.visualHearts += (this.hearts - this.visualHearts) * 0.1;
+					if (this.dying) {
+						this.opacity -= 0.04;
+						if (this.opacity <= 0) this.room.enemies = this.room.enemies.filter(x => x !== this);
+						return true;
+					}
+					if (this.room.enemyDelay > 0) return true;
+					if (this.knockback.frames > 0) {
+						this.x += this.knockback.x * (this.knockback.frames / 20);
+						this.y += this.knockback.y * (this.knockback.frames / 20);
+						this.knockback.frames--;
+						applyBounds(this, ENEMY_SIZE);
+						return true;
+					}
+					this.room.obstacles.forEach(ob => {
+						let res = checkCircleRectCollision({
+							x: this.x,
+							y: this.y,
+							size: ENEMY_SIZE
+						}, ob);
+						if (res.hit) {
+							this.x += res.nx * res.overlap;
+							this.y += res.ny * res.overlap;
+						}
+					});
+					return false;
+				}
+				draw(ctx) {
+					ctx.save();
+					ctx.globalAlpha = this.opacity;
+					ctx.fillStyle = this.color;
+					ctx.beginPath();
+					ctx.arc(this.x, this.y, ENEMY_SIZE / 2, 0, Math.PI * 2);
+					ctx.fill();
+					if (!this.dying) {
+						const barW = 40,
+							barH = 6,
+							barX = this.x - barW / 2,
+							barY = this.y - ENEMY_SIZE / 2 - 15;
+						ctx.fillStyle = 'rgba(0,0,0,0.5)';
+						roundRect(ctx, barX, barY, barW, barH, 3);
+						ctx.fill();
+						const fillW = Math.max(0, (this.visualHearts / this.maxHearts) * barW);
+						if (fillW > 0) {
+							ctx.fillStyle = '#ff2e2e';
+							roundRect(ctx, barX, barY, fillW, barH, 3);
+							ctx.fill();
+						}
+					}
+					ctx.restore();
+				}
+			}
+			class Zombie extends BaseEnemy {
+				constructor(room, x, y, isElite = false) {
+					super(room, x, y, isElite ? '#1144aa' : '#0af', isElite ? 12 : 5);
+					this.isElite = isElite;
+					this.type = "zombie";
+				}
+				update() {
+					if (this.commonUpdate()) return;
+					let dx = player.x - this.x,
+						dy = player.y - this.y,
+						dist = Math.sqrt(dx * dx + dy * dy);
+					if (dist > 0) {
+						const speed = this.isElite ? ENEMY_SPEED * 1.3 : ENEMY_SPEED;
+						this.x += dx / dist * speed;
+						this.y += dy / dist * speed;
+						applyBounds(this, ENEMY_SIZE);
+						if (dist < (PLAYER_SIZE + ENEMY_SIZE) / 2 && this.hitCooldown <= 0) {
+							damagePlayer(dx / dist, dy / dist, 1);
+							this.hitCooldown = 100;
+						}
+					}
+					if (this.hitCooldown > 0) this.hitCooldown--;
+				}
+			}
+			class Skeleton extends BaseEnemy {
+				constructor(room, x, y, isElite = false) {
+					super(room, x, y, isElite ? '#a9a9a9' : '#eee', isElite ? 10 : 5);
+					this.isElite = isElite;
+					this.type = "skeleton";
+					this.shootTimer = Math.random() * 200;
+				}
+				update() {
+					if (this.commonUpdate()) return;
+					let dx = player.x - this.x,
+						dy = player.y - this.y,
+						dist = Math.sqrt(dx * dx + dy * dy);
+					const speed = this.isElite ? ENEMY_SPEED * 1.1 : ENEMY_SPEED;
+					if (dist < 280) {
+						this.x -= dx / dist * speed;
+						this.y -= dy / dist * speed;
+					} else if (dist > 450) {
+						this.x += dx / dist * speed;
+						this.y += dy / dist * speed;
+					}
+					applyBounds(this, ENEMY_SIZE);
+					this.shootTimer++;
+					if (this.shootTimer >= (this.isElite ? 180 : 260)) {
+						this.shootTimer = 0;
+						const angle = Math.atan2(player.y - this.y, player.x - this.x);
+						projectiles.push({
+							x: this.x,
+							y: this.y,
+							vx: Math.cos(angle) * PROJECTILE_SPEED,
+							vy: Math.sin(angle) * PROJECTILE_SPEED,
+							room: this.room
+						});
+					}
+				}
+			}
+			class FastEnemy extends BaseEnemy {
+				constructor(room, x, y, isElite = false) {
+					super(room, x, y, isElite ? '#006b6b' : '#00e5e5', isElite ? 11 : 5);
+					this.isElite = isElite;
+					this.type = "fast";
+					this.ultCooldown = Math.floor(Math.random() * 90);
+					this.ultFlash = 0;
+					this.guaranteedHeartDrop = true;
+					this.nearTimer = 0;
+				}
+				update() {
+					if (this.commonUpdate()) return;
+					let dx = player.x - this.x,
+						dy = player.y - this.y,
+						dist = Math.hypot(dx, dy);
+					const speed = this.isElite ? 1.75 : FAST_ENEMY_SPEED;
+					if (dist > 0) {
+						this.x += dx / dist * speed;
+						this.y += dy / dist * speed;
+						applyBounds(this, ENEMY_SIZE);
+					}
+					if (dist <= FAST_ENEMY_ULT_RANGE) this.nearTimer++;
+					else this.nearTimer = 0;
+					if (this.ultCooldown > 0) this.ultCooldown--;
+					if (this.ultFlash > 0) this.ultFlash--;
+					if (this.nearTimer >= FAST_ENEMY_TRIGGER_FRAMES && this.ultCooldown <= 0) {
+						this.ultCooldown = FAST_ENEMY_ULT_COOLDOWN;
+						this.ultFlash = 18;
+						damageAllInRadius(this.room, this.x, this.y, FAST_ENEMY_ULT_RANGE, FAST_ENEMY_ULT_DAMAGE, this,
+							false, true);
+					}
+				}
+				draw(ctx) {
+					ctx.save();
+					ctx.globalAlpha = this.opacity;
+					ctx.fillStyle = this.color;
+					ctx.beginPath();
+					ctx.arc(this.x, this.y, ENEMY_SIZE / 2, 0, Math.PI * 2);
+					ctx.fill();
+					if (this.ultFlash > 0) {
+						const t = this.ultFlash / 18;
+						const radius = FAST_ENEMY_ULT_RANGE * (0.55 + (1 - t) * 0.45);
+						ctx.lineWidth = 5;
+						ctx.strokeStyle = FAST_ENEMY_ULT_COLOR;
+						ctx.beginPath();
+						ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+						ctx.stroke();
+					}
+					if (!this.dying) {
+						const barW = 40,
+							barH = 6,
+							barX = this.x - barW / 2,
+							barY = this.y - ENEMY_SIZE / 2 - 15;
+						ctx.fillStyle = 'rgba(0,0,0,0.5)';
+						roundRect(ctx, barX, barY, barW, barH, 3);
+						ctx.fill();
+						const fillW = Math.max(0, (this.visualHearts / this.maxHearts) * barW);
+						if (fillW > 0) {
+							ctx.fillStyle = '#ff2e2e';
+							roundRect(ctx, barX, barY, fillW, barH, 3);
+							ctx.fill();
+						}
+					}
+					ctx.restore();
+				}
+			}
+			class BombEnemy extends BaseEnemy {
+				constructor(room, x, y, isElite = false) {
+					super(room, x, y, isElite ? '#093d14' : '#145a1a', isElite ? 10 : 5);
+					this.isElite = isElite;
+					this.type = "bomb";
+					this.primed = false;
+					this.primeTimer = 0;
+					this.explodeFrames = 0;
+				}
+				triggerExplosion() {
+					if (this.explodeFrames > 0) return;
+					this.explodeFrames = 24;
+					damageAllInRadius(this.room, this.x, this.y, BOMB_TRIGGER_RANGE, BOMB_DAMAGE, this, false, true);
+				}
+				update() {
+					if (this.explodeFrames > 0) {
+						this.explodeFrames--;
+						if (this.explodeFrames <= 0) {
+							score += (this.isElite ? 20 : 15);
+							updateUI();
+							this.room.enemies = this.room.enemies.filter(e => e !== this);
+						}
+						return;
+					}
+					if (this.primed) {
+						if (this.primeTimer > 0) this.primeTimer--;
+						if (this.primeTimer <= 0) this.triggerExplosion();
+						return;
+					}
+					if (this.commonUpdate()) return;
+					let dx = player.x - this.x,
+						dy = player.y - this.y,
+						dist = Math.hypot(dx, dy);
+					const speed = this.isElite ? ENEMY_SPEED * 1.05 : ENEMY_SPEED;
+					if (dist > 0) {
+						this.x += dx / dist * speed;
+						this.y += dy / dist * speed;
+						applyBounds(this, ENEMY_SIZE);
+					}
+					if (dist <= BOMB_TRIGGER_RANGE) {
+						this.primed = true;
+						this.primeTimer = BOMB_EXPLOSION_DELAY;
+					}
+				}
+				draw(ctx) {
+					ctx.save();
+					let flash = this.primed ? (Math.floor(this.primeTimer / 8) % 2 === 0) : false;
+					let scale = this.primed ? 1 + (1 - (this.primeTimer / BOMB_EXPLOSION_DELAY)) * 0.35 : 1;
+					if (this.explodeFrames > 0) {
+						scale = 1 + (1 - (this.explodeFrames / 24)) * 1.1;
+						ctx.globalAlpha = 0.95;
+						ctx.fillStyle = flash ? 'white' : (this.isElite ? '#0b3c15' : '#176b22');
+						ctx.beginPath();
+						ctx.arc(this.x, this.y, ENEMY_SIZE / 2 * scale, 0, Math.PI * 2);
+						ctx.fill();
+					} else {
+						ctx.fillStyle = flash ? 'white' : (this.isElite ? '#093d14' : '#145a1a');
+						ctx.translate(this.x, this.y);
+						ctx.scale(scale, scale);
+						ctx.beginPath();
+						ctx.arc(0, 0, ENEMY_SIZE / 2, 0, Math.PI * 2);
+						ctx.fill();
+					}
+					ctx.restore();
+					if (!this.dying && this.explodeFrames <= 0) {
+						const barW = 40,
+							barH = 6,
+							barX = this.x - barW / 2,
+							barY = this.y - ENEMY_SIZE / 2 - 15;
+						ctx.fillStyle = 'rgba(0,0,0,0.5)';
+						roundRect(ctx, barX, barY, barW, barH, 3);
+						ctx.fill();
+						const fillW = Math.max(0, (this.visualHearts / this.maxHearts) * barW);
+						if (fillW > 0) {
+							ctx.fillStyle = '#ff2e2e';
+							roundRect(ctx, barX, barY, fillW, barH, 3);
+							ctx.fill();
+						}
+					}
+				}
+			}
+			class SwiftEnemy extends BaseEnemy {
+				constructor(room, x, y, isElite = false) {
+					super(room, x, y, isElite ? '#ff8c00' : '#ff4d00', 1);
+					this.isElite = isElite;
+					this.type = "swift";
+					this.speed = isElite ? 3.8 : 3.2;
+				}
+				update() {
+					if (this.commonUpdate()) return;
+					let dx = player.x - this.x,
+						dy = player.y - this.y,
+						dist = Math.hypot(dx, dy);
+					if (dist > 0) {
+						this.x += dx / dist * this.speed;
+						this.y += dy / dist * this.speed;
+						applyBounds(this, ENEMY_SIZE);
+						if (dist < (PLAYER_SIZE + ENEMY_SIZE) / 2 && this.hitCooldown <= 0) {
+							damagePlayer(dx / dist, dy / dist, 1);
+							this.hitCooldown = 45;
+						}
+					}
+					if (this.hitCooldown > 0) this.hitCooldown--;
+				}
+			}
+
+			function damagePlayer(nx, ny, amount = 1, force = false) {
+				if (player.hitCooldown > 0 && !force) return;
+				player.hearts = Math.max(0, player.hearts - amount);
+				const knock = amount >= 4 ? 14 : 10;
+				player.knockback.x = nx * knock;
+				player.knockback.y = ny * knock;
+				player.knockback.frames = amount >= 4 ? 20 : 15;
+				player.hitCooldown = amount >= 4 ? 70 : 60;
+				stats.currentHearts = player.hearts;
+				saveStats();
+			}
+
+			function damageAllInRadius(room, cx, cy, radius, amount, source = null, includeSource = false, forcePlayer = false) {
+				if (player.room === room) {
+					let pdx = player.x - cx,
+						pdy = player.y - cy,
+						pdist = Math.hypot(pdx, pdy);
+					if (pdist <= radius) damagePlayer(pdx / (pdist || 1), pdy / (pdist || 1), amount, forcePlayer);
+				}
+				room.enemies.slice().forEach(e => {
+					if (!includeSource && e === source) return;
+					if (e.dying) return;
+					let dx = e.x - cx,
+						dy = e.y - cy,
+						dist = Math.hypot(dx, dy);
+					if (dist <= radius) {
+						e.hearts -= amount;
+						e.knockback.x = dx / (dist || 1) * 12;
+						e.knockback.y = dy / (dist || 1) * 12;
+						e.knockback.frames = 15;
+						checkEnemyDeath(e);
+					}
+				});
+			}
+
+			function checkEnemyDeath(e) {
+				if (e.hearts <= 0 && !e.dying) {
+					e.dying = true;
+					let gain = 0;
+					if (e.type === "zombie") gain = 10;
+					else if (e.type === "skeleton") gain = 15;
+					else if (e.type === "fast") gain = 20;
+					else if (e.type === "bomb") gain = 15;
+					else if (e.type === "swift") gain = 5;
+					if (e.isElite) gain += 5;
+					score += gain;
+					updateUI();
+					stats.totalKills++;
+					checkAchievements();
+					saveStats();
+					if (e.guaranteedHeartDrop) e.room.items.push({
+						x: e.x,
+						y: e.y
+					});
+					else if (Math.random() < (e.isElite ? 0.3 : 0.15)) e.room.items.push({
+						x: e.x,
+						y: e.y
+					});
+				}
+			}
+
+			function applyBounds(obj, size) {
+				const left = (canvas.width - ROOM_WIDTH) / 2 + size / 2,
+					right = left + ROOM_WIDTH - size;
+				const top = (canvas.height - ROOM_HEIGHT) / 2 + size / 2,
+					bottom = top + ROOM_HEIGHT - size;
+				obj.x = Math.max(left, Math.min(right, obj.x));
+				obj.y = Math.max(top, Math.min(bottom, obj.y));
+			}
+
+			function checkCircleRectCollision(circle, rect) {
+				let closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.w));
+				let closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.h));
+				let dx = circle.x - closestX,
+					dy = circle.y - closestY;
+				let distSq = (dx * dx) + (dy * dy);
+				let radius = (circle.size || ENEMY_SIZE) / 2;
+				if (distSq < radius * radius) {
+					let dist = Math.sqrt(distSq);
+					if (dist === 0) return {
+						hit: true,
+						nx: 0,
+						ny: -1,
+						overlap: radius
+					};
+					return {
+						hit: true,
+						nx: dx / dist,
+						ny: dy / dist,
+						overlap: radius - dist
+					};
+				}
+				return {
+					hit: false
+				};
+			}
+
+			function drawHeart(ctx, x, y, size, color) {
+				ctx.fillStyle = color;
+				ctx.beginPath();
+				ctx.moveTo(x, y + size / 4);
+				ctx.bezierCurveTo(x, y - size / 4, x - size / 2, y - size / 4, x - size / 2, y + size / 4);
+				ctx.bezierCurveTo(x - size / 2, y + size / 2, x, y + size * 0.75, x, y + size);
+				ctx.bezierCurveTo(x, y + size * 0.75, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
+				ctx.bezierCurveTo(x + size / 2, y - size / 4, x, y - size / 4, x, y + size / 4);
+				ctx.fill();
+			}
+
+			function roundRect(ctx, x, y, w, h, r) {
+				ctx.beginPath();
+				ctx.moveTo(x + r, y);
+				ctx.arcTo(x + w, y, x + w, y + h, r);
+				ctx.arcTo(x + w, y + h, x, y + h, r);
+				ctx.arcTo(x, y + h, x, y, r);
+				ctx.arcTo(x, y, x + w, y, r);
+				ctx.closePath();
+			}
+
+			function updateUI() {
+				if (difficulty % 5 === 0) {
+					uiLayer.innerHTML = `补给站 (Level ${difficulty})`;
+					uiLayer.className = 'supply';
+				} else {
+					uiLayer.innerHTML = `FLOOR: ${difficulty}`;
+					uiLayer.className = '';
+				}
+				scoreLayer.innerHTML = `SCORE: ${score}`;
+				goldDisplay.innerHTML = `GOLD: ${goldCount}`;
+			}
+
+			function respawnSameLevel() {
+				startBgm();
+				applyUpgradesToPlayer();
+				player.hearts = player.maxHearts;
+				player.room = rooms[0];
+				player.lastRoom = null;
+				player.x = canvas.width / 2;
+				player.y = canvas.height / 2;
+				projectiles = [];
+				trans.active = false;
+				levelTrans.active = false;
+				rooms.forEach(r => spawnEnemiesForRoom(r));
+			}
+
+			function toggleFlag() {
+				if (!gameStarted) return;
+				if (player.room.flag.active) player.room.flag.active = false;
+				else {
+					player.room.flag.active = true;
+					player.room.flag.x = player.x;
+					player.room.flag.y = player.y;
+				}
+			}
+
+			function resumeGame() {
+				isPaused = false;
+				document.getElementById('game-container').classList.add('playing');
+				document.getElementById('game-container').classList.remove('paused');
+				startBgm();
+				pauseMenu.style.display = 'none';
+				canvas.focus();
+			}
+
+			resumeBtn.addEventListener('click', resumeGame);
+
+			canvas.addEventListener('mousedown', e => {
+				if (!gameStarted || isPaused || levelTrans.active || deathTrans.active) return;
+				if (e.button === 0 && player.attackCooldown <= 0 && !trans.active) player.attacking = true;
+				if (e.button === 2 && player.ultCooldown <= 0 && !trans.active) player.ulting = true;
+				if (e.button === 1) {
+					toggleFlag();
+					e.preventDefault();
+				}
+			});
+
+			document.addEventListener('keydown', e => {
+				if (!gameStarted) return;
+				if (gameState !== 'playing') return;
+				if (isCmdMode) {
+					if (e.key === 'Escape') {
+						isCmdMode = false;
+						cmdInput.style.display = 'none';
+						canvas.focus();
+					} else if (e.key === 'Enter') {
+						handleCommand(cmdInput.value.trim());
+						isCmdMode = false;
+						cmdInput.style.display = 'none';
+						cmdInput.value = '';
+						canvas.focus();
+					}
+					return;
+				}
+				const k = e.key.toLowerCase();
+				if (e.key === '/') {
+					isCmdMode = true;
+					cmdInput.style.display = 'block';
+					cmdInput.focus();
+					e.preventDefault();
+					return;
+				}
+				if (e.key === 'Escape') {
+					isPaused = !isPaused;
+					pauseMenu.style.display = isPaused ? 'flex' : 'none';
+					if (isPaused) {
+						stopBgm();
+						document.getElementById('game-container').classList.add('paused');
+					} else {
+						startBgm();
+						document.getElementById('game-container').classList.add('playing');
+						document.getElementById('game-container').classList.remove('paused');
+					}
+					return;
+				}
+				if (isPaused || levelTrans.active || deathTrans.active) return;
+				if (!keys[k] && k === ' ' && player.attackCooldown <= 0 && !trans.active) player.attacking = true;
+				if (!keys[k] && k === 'shift' && player.ultCooldown <= 0 && !trans.active) player.ulting = true;
+				if (!keys[k] && (k === 'f')) toggleFlag();
+				keys[k] = true;
+			});
+			document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+			function handleCommand(cmd) {
+				let parts = cmd.split(' ');
+				if (parts[0] === 'd') {
+					difficulty = parseInt(parts[1]) || difficulty;
+					if (difficulty === 20) {
+						startEnding();
+					} else {
+						initLevel();
+					}
+				} else if (parts[0] === 'h') {
+					player.maxHearts = player.hearts = parseInt(parts[1]) || player.maxHearts;
+					updateUI();
+					saveStats();
+				} else if (parts[0] === 'c') {
+					let amount = parseInt(parts[1]) || 0;
+					amount = Math.max(0, Math.min(99999999, amount));
+					stats.totalGold = goldCount = amount;
+					updateUI();
+					saveStats();
+					submitRankIfNeeded('指令修改金币');
+					if (document.getElementById('rank-modal').style.display === 'flex') {
+						renderRankList(currentRankTab);
+					}
+				}
+			}
+			initLevel();
+
+			function draw() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				if (!gameStarted) return;
+				if (gameState === 'ending') {
+					drawEnding();
+					return;
+				}
+				if (trans.active) {
+					let ease = trans.progress;
+					ctx.save();
+					ctx.translate(trans.offsetX * ease, trans.offsetY * ease);
+					trans.fromRoom.draw(ctx);
+					trans.fromRoom.enemies.forEach(e => e.draw(ctx));
+					ctx.restore();
+					ctx.save();
+					ctx.translate((trans.offsetX * ease) - trans.offsetX, (trans.offsetY * ease) - trans.offsetY);
+					trans.toRoom.draw(ctx);
+					trans.toRoom.enemies.forEach(e => e.draw(ctx));
+					ctx.restore();
+				} else {
+					player.room.draw(ctx);
+					player.room.enemies.forEach(e => e.draw(ctx));
+					projectiles.forEach(p => {
+						ctx.fillStyle = "white";
+						ctx.beginPath();
+						ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+						ctx.fill();
+					});
+				}
+				ctx.fillStyle = '#f55';
+				ctx.beginPath();
+				ctx.arc(player.x, player.y, PLAYER_SIZE / 2, 0, Math.PI * 2);
+				ctx.fill();
+				drawPlayerEyes(ctx, player);
+				if (player.swordFrames > 0) {
+					let dx = player.lastMove.dx,
+						dy = player.lastMove.dy,
+						thrust = SWORD_LENGTH * (1 - Math.abs(player.swordFrames - 5) / 5);
+					ctx.strokeStyle = 'white';
+					ctx.lineWidth = 6;
+					ctx.lineCap = 'round';
+					ctx.beginPath();
+					ctx.moveTo(player.x + dx * (PLAYER_SIZE / 2), player.y + dy * (PLAYER_SIZE / 2));
+					ctx.lineTo(player.x + dx * (PLAYER_SIZE / 2 + thrust), player.y + dy * (PLAYER_SIZE / 2 + thrust));
+					ctx.stroke();
+				}
+				if (player.ultFrames > 0) {
+					ctx.save();
+					ctx.strokeStyle = 'cyan';
+					ctx.lineWidth = 4;
+					let radius = PLAYER_SIZE / 2 + SWORD_LENGTH * (1 - player.ultFrames / 20) + 15;
+					ctx.beginPath();
+					ctx.arc(player.x, player.y, radius, 0, Math.PI * 2);
+					ctx.stroke();
+					ctx.restore();
+				}
+				for (let i = 0; i < player.maxHearts; i++) {
+					drawHeart(ctx, 40 + (i % 15) * 35, 35 + Math.floor(i / 15) * 35, 25, i < player.hearts ? '#ff2e2e' : '#333');
+				}
+				const barW = 120,
+					barH = 14;
+				ctx.fillStyle = 'rgba(255,255,255,0.1)';
+				roundRect(ctx, 30, canvas.height - 40, barW, barH, 7);
+				ctx.fill();
+				if (player.attackCooldown <= 0) {
+					ctx.fillStyle = '#4CAF50';
+					roundRect(ctx, 30, canvas.height - 40, barW, barH, 7);
+					ctx.fill();
+				} else {
+					ctx.fillStyle = '#888';
+					roundRect(ctx, 30, canvas.height - 40, barW * (1 - player.attackCooldown / 30), barH, 7);
+					ctx.fill();
+				}
+				ctx.fillStyle = 'rgba(255,255,255,0.1)';
+				roundRect(ctx, 170, canvas.height - 40, barW, barH, 7);
+				ctx.fill();
+				if (player.ultCooldown <= 0) {
+					ctx.fillStyle = '#0ff';
+					roundRect(ctx, 170, canvas.height - 40, barW, barH, 7);
+					ctx.fill();
+				} else {
+					ctx.fillStyle = '#888';
+					roundRect(ctx, 170, canvas.height - 40, barW * (1 - player.ultCooldown / 600), barH, 7);
+					ctx.fill();
+				}
+				if (levelTrans.active) {
+					ctx.fillStyle = `rgba(0, 0, 0, ${levelTrans.alpha})`;
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+					ctx.fillStyle = `rgba(255, 255, 255, ${levelTrans.alpha})`;
+					ctx.font = "bold 50px Arial";
+					ctx.textAlign = "center";
+					ctx.fillText(levelTrans.state < 3 ? ((difficulty + 1) % 5 === 0 ? "补给站" : `FLOOR ${difficulty+1}`) :
+						`FLOOR ${difficulty}`, canvas.width / 2, canvas.height / 2);
+				}
+				if (deathTrans.active) {
+					ctx.fillStyle = `rgba(120, 0, 0, ${deathTrans.alpha})`;
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+					ctx.fillStyle = `rgba(255, 255, 255, ${deathTrans.alpha})`;
+					ctx.font = "bold 80px Arial";
+					ctx.textAlign = "center";
+					ctx.fillText("YOU DIED", canvas.width / 2, canvas.height / 2 - 40);
+					ctx.font = "bold 40px Arial";
+					ctx.fillText(`TOTAL SCORE: ${score}`, canvas.width / 2, canvas.height / 2 + 60);
+				}
+			}
+
+			function drawMinimap() {
+				if (!gameStarted || gameState !== 'playing') return;
+				mctx.clearRect(0, 0, mini.width, mini.height);
+				if (rooms.length === 0) return;
+				let minX = Infinity,
+					maxX = -Infinity,
+					minY = Infinity,
+					maxY = -Infinity;
+				rooms.forEach(r => {
+					if (r.x < minX) minX = r.x;
+					if (r.x > maxX) maxX = r.x;
+					if (r.y < minY) minY = r.y;
+					if (r.y > maxY) maxY = r.y;
+				});
+				const mapW = maxX - minX + 1,
+					mapH = maxY - minY + 1,
+					padding = 20;
+				const cellSize = Math.min((mini.width - padding * 2) / mapW, (mini.height - padding * 2) / mapH);
+				const offsetX = (mini.width - mapW * cellSize) / 2,
+					offsetY = (mini.height - mapH * cellSize) / 2;
+				rooms.forEach(r => {
+					const rx = offsetX + (r.x - minX) * cellSize,
+						ry = offsetY + (r.y - minY) * cellSize,
+						ds = cellSize * 0.8;
+					mctx.fillStyle = r === player.room ? '#f55' : (r.visited ? '#4CAF50' : '#555');
+					mctx.fillRect(rx, ry, ds, ds);
+					if (r.flag.active) {
+						mctx.fillStyle = 'yellow';
+						mctx.beginPath();
+						mctx.arc(rx + ds / 2, ry + ds / 2, ds * 0.3, 0, Math.PI * 2);
+						mctx.fill();
+					}
+				});
+			}
+
+			function drawPlayerEyes(ctx, player) {
+				const centerX = player.x;
+				const centerY = player.y;
+				const radius = PLAYER_SIZE / 2;
+				const eyeRadius = radius * 0.25;
+				const pupilRadius = eyeRadius * 0.5;
+				const eyeSpacing = radius * 0.4;
+				const eyeY = centerY - radius * 0.2;
+				const leftEyeX = centerX - eyeSpacing;
+				const rightEyeX = centerX + eyeSpacing;
+				const dirX = player.lastMove.dx;
+				const dirY = player.lastMove.dy;
+				const offset = radius * 0.08;
+				const pupilX = dirX * offset;
+				const pupilY = dirY * offset;
+				ctx.fillStyle = '#fff';
+				ctx.beginPath();
+				ctx.arc(leftEyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.beginPath();
+				ctx.arc(rightEyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.fillStyle = '#000';
+				ctx.beginPath();
+				ctx.arc(leftEyeX + pupilX, eyeY + pupilY, pupilRadius, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.beginPath();
+				ctx.arc(rightEyeX + pupilX, eyeY + pupilY, pupilRadius, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			function saveStats() {
+				try {
+					localStorage.setItem('gameStats', JSON.stringify(stats));
+				} catch (e) {
+					console.warn('localStorage 不可用：', e);
+				}
+			}
+
+			function checkAchievements() {
+				achievements.forEach(ach => {
+					if (stats.unlockedAchievements.includes(ach.id)) return;
+					let reached = false;
+					if (ach.type === 'level' && stats.maxLevel >= ach.goal) reached = true;
+					if (ach.type === 'kills' && stats.totalKills >= ach.goal) reached = true;
+					if (ach.type === 'gold' && stats.totalGold >= ach.goal) reached = true;
+					if (ach.type === 'deaths' && stats.deaths >= ach.goal) reached = true;
+					if (reached) {
+						stats.unlockedAchievements.push(ach.id);
+						saveStats();
+						showToast(ach.title, ach.desc);
+					}
+				});
+			}
+
+			function openAchievements() {
+				const list = document.getElementById('achievement-list');
+				list.innerHTML = '';
+				checkAchievements();
+				achievements.forEach(ach => {
+					const isUnlocked = stats.unlockedAchievements.includes(ach.id);
+					const card = document.createElement('div');
+					card.className = `achievement-card ${isUnlocked ? 'unlocked' : ''}`;
+					card.innerHTML = `
+            <h4>${ach.title}</h4>
+            <p>${ach.desc}</p>
+            <div style="font-size:9px; margin-top:5px;">${isUnlocked ? '★ 已达成' : '未达成'}</div>
+        `;
+					list.appendChild(card);
+				});
+				document.getElementById('achievement-modal').style.display = 'flex';
+			}
+
+			function showToast(title, desc) {
+				const toast = document.getElementById('achievement-toast');
+				document.getElementById('toast-title').innerText = title;
+				document.getElementById('toast-desc').innerText = desc;
+				toast.classList.add('show');
+				setTimeout(() => {
+					toast.classList.remove('show');
+				}, 3000);
+			}
+
+			function openUpgrades() {
+				const modal = document.getElementById('shop-modal');
+				refreshUpgradeUI();
+				modal.style.display = 'flex';
+			}
+
+			function refreshUpgradeUI() {
+				const container = document.getElementById('upgrade-list');
+				if (!container) return;
+				container.innerHTML = '';
+				if (!stats.upgrades) {
+					stats.upgrades = {
+						atkPower: 1,
+						atkSpeed: 1,
+						atkRange: 1,
+						ultPower: 1,
+						ultSpeed: 1,
+						ultRange: 1,
+						knockback: 1,
+						hp: 1,
+						speed: 1
+					};
+				}
+				const names = {
+					atkPower: "攻击力度",
+					atkSpeed: "攻击速度",
+					atkRange: "攻击范围",
+					ultPower: "大招力度",
+					ultSpeed: "大招速度",
+					ultRange: "大招范围",
+					knockback: "击退距离",
+					hp: "血量上限",
+					speed: "移动速度"
+				};
+				Object.keys(stats.upgrades).forEach(key => {
+					const curLevel = stats.upgrades[key];
+					const nextLevel = curLevel + 1;
+					const cost = UPGRADE_COSTS[nextLevel];
+					const card = document.createElement('div');
+					card.className = 'upgrade-card';
+					card.innerHTML = `
+            <div class="info">
+                <div class="name">${names[key]}</div>
+                <div class="level">Lv.${curLevel} / 3</div>
+            </div>
+            ${curLevel < 3 ? 
+                `<button class="buy-btn" onclick="buyUpgrade('${key}')">升级 (${cost}金币)</button>` : 
+                `<button class="buy-btn max" disabled>已满级</button>`}
+        `;
+					container.appendChild(card);
+				});
+				const mapCard = document.createElement('div');
+				mapCard.className = 'upgrade-card';
+				mapCard.innerHTML = `
+				    <div class="info">
+				        <div class="name">小地图</div>
+				        <div class="level">${stats.hasMinimap ? '已购买' : '未购买'}</div>
+				    </div>
+				    ${stats.hasMinimap
+				        ? `<button class="buy-btn max" disabled>已拥有</button>`
+				        : `<button class="buy-btn" onclick="buyMinimap()">购买 (200金币)</button>`
+				    }
+				`;
+				container.appendChild(mapCard);
+				document.getElementById('shop-gold-display').innerText = `金币: ${stats.totalGold}`;
+			}
+			async function buyUpgrade(key) {
+				const nextLevel = stats.upgrades[key] + 1;
+				const cost = UPGRADE_COSTS[nextLevel];
+				if (stats.totalGold >= cost) {
+					stats.totalGold -= cost;
+					goldCount = stats.totalGold;
+					stats.upgrades[key] = nextLevel;
+					saveStats();
+					refreshUpgradeUI();
+					updateUI();
+					await submitRankIfNeeded('purchase');
+				} else {
+					showNoCoinsModal();
+				}
+			}
+			async function buyMinimap() {
+				const cost = 200;
+				if (stats.hasMinimap) return;
+				if (stats.totalGold >= cost) {
+					stats.totalGold -= cost;
+					goldCount = stats.totalGold;
+					stats.hasMinimap = true;
+					mini.style.display = 'block';
+					saveStats();
+					refreshUpgradeUI();
+					updateUI();
+					await submitRankIfNeeded('purchase');
+				} else {
+					showNoCoinsModal();
+				}
+			}
+
+			function showNoCoinsModal() {
+				const overlay = document.getElementById('modal-overlay');
+				const title = document.getElementById('modal-title');
+				const body = document.getElementById('modal-body');
+				title.innerText = '警告';
+				body.innerHTML = `金币不足！`;
+				overlay.style.display = 'flex';
+			}
+
+			function showNameErrorModal() {
+				const overlay = document.getElementById('modal-overlay');
+				const title = document.getElementById('modal-title');
+				const body = document.getElementById('modal-body');
+				title.innerText = '警告';
+				body.innerHTML = `用户名不能为空！`;
+				overlay.style.display = 'flex';
+			}
+
+			function showChangeName() {
+				const overlay = document.getElementById('modal-overlay');
+				const title = document.getElementById('modal-title');
+				const body = document.getElementById('modal-body');
+				title.innerText = '建议';
+				body.innerHTML = `你的名字是默认名 Player，点击左上角改玩家名吧！`;
+				overlay.style.display = 'flex';
+			}
+
+			function openNameModal() {
+				document.getElementById('name-modal').style.display = 'flex';
+				document.getElementById('name-input').value = stats.playerName;
+			}
+
+			function saveName() {
+				let input = document.getElementById('name-input').value;
+				if (input.includes('<') || input.includes('>')) {
+					input = input.replace(/[<>]/g, '');
+					document.getElementById('name-input').value = input;
+					return;
+				}
+				if (input.trim() === "") {
+					showNameErrorModal();
+					return;
+				}
+				stats.playerName = input.trim();
+				saveStats();
+				updateNameUI();
+				closeModal('name-modal');
+			}
+
+			function updateNameUI() {
+				const btn = document.getElementById('name-btn');
+				if (btn) btn.innerText = `${stats.playerName}`;
+			}
+
+			function promptRenameToastIfNeeded() {
+				if (stats.playerName === 'Player') {
+					sessionStorage.setItem('roomsRenameToastShown', '1');
+					setTimeout(() => {
+						showChangeName();
+					}, 500);
+				}
+			}
+			updateNameUI();
+			promptRenameToastIfNeeded();
+			async function saveAndQuit() {
+				stats.maxLevel = Math.max(stats.maxLevel || 0, difficulty);
+				stats.totalGold = goldCount;
+				stats.totalScore = score;
+				stats.highScore = Math.max(stats.highScore || 0, score);
+				stats.currentHearts = player.hearts;
+				saveStats();
+				try {
+					await submitRankIfNeeded('保存并退出');
+				} catch (err) {
+					console.warn('提交排行榜失败：', err);
+				}
+				gameStarted = false;
+				isPaused = false;
+				document.getElementById('game-container').classList.remove('playing', 'paused');
+				document.getElementById('pause-menu').style.display = 'none';
+				document.getElementById('ui-layer').style.display = 'none';
+				document.getElementById('start-screen').style.display = 'flex';
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				location.reload();
+			}
+
+			function getDateString() {
+				const d = new Date();
+				const pad = n => String(n).padStart(2, '0');
+				return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+			}
+
+			function exportGameStats() {
+				const data = localStorage.getItem('gameStats');
+				if (!data) {
+					alert('没有找到 gameStats 存档。');
+					return;
+				}
+				const blob = new Blob([data], {
+					type: 'application/json'
+				});
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `rooms-game-data-${getDateString()}.json`;
+				a.click();
+				URL.revokeObjectURL(url);
+			}
+
+			function importGameStats(file) {
+				const reader = new FileReader();
+				reader.onload = () => {
+					try {
+						const obj = JSON.parse(reader.result);
+						if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+							throw new Error('invalid');
+						}
+						localStorage.setItem('gameStats', JSON.stringify(obj));
+						location.reload();
+					} catch (e) {
+						alert('导入失败：这不是有效的 gameStats JSON 文件。');
+					}
+				};
+				reader.readAsText(file);
+			}
+
+			function openResetModal() {
+				document.getElementById('reset-modal').style.display = 'flex';
+			}
+
+			function confirmResetGameStats() {
+				localStorage.removeItem('gameStats');
+				localStorage.setItem('gameStats', JSON.stringify(JSON.parse(JSON.stringify(defaultStats))));
+				location.reload();
+			}
+			document.getElementById('import-file').addEventListener('change', e => {
+				const file = e.target.files && e.target.files[0];
+				if (file) importGameStats(file);
+				e.target.value = '';
+			});
+			const TEXTDB_KEY = 'zhujingqiroomsrank';
+			const TEXTDB_READ_URL = `https://textdb.online/${TEXTDB_KEY}`;
+			const TEXTDB_WRITE_URL = 'https://api.textdb.online/update/';
+			let rankData = {
+				score: [],
+				gold: []
+			};
+			let rankLoaded = false;
+			let rankLoading = false;
+			let currentRankTab = 'score';
+
+			function getSafePlayerName() {
+				return (stats.playerName || 'Player').trim().replace(/[<>]/g, '').slice(0, 20) || 'Player';
+			}
+
+			function normalizeRankData(data) {
+				const base = {
+					score: [],
+					gold: []
+				};
+				if (!data || typeof data !== 'object') return base;
+				for (const type of ['score', 'gold']) {
+					if (!Array.isArray(data[type])) continue;
+					base[type] = data[type]
+						.filter(x => x && typeof x === 'object')
+						.map(x => ({
+							name: String(x.name || 'Player').trim().slice(0, 20) || 'Player',
+							value: Number(x.value || 0)
+						}))
+						.filter(x => Number.isFinite(x.value));
+				}
+				return base;
+			}
+
+			function sortRank(type) {
+				rankData[type].sort((a, b) => {
+					if (b.value !== a.value) return b.value - a.value;
+					return (a.t || 0) - (b.t || 0);
+				});
+				if (rankData[type].length > 100) rankData[type] = rankData[type].slice(0, 100);
+			}
+
+			async function loadRankData() {
+				if (rankLoading) return rankData;
+				rankLoading = true;
+				try {
+					const res = await fetch(TEXTDB_READ_URL, {
+						cache: 'no-store'
+					});
+					if (!res.ok) throw new Error(`read failed: ${res.status}`);
+					const text = await res.text();
+					let parsed = null;
+					try {
+						parsed = JSON.parse(text);
+					} catch {
+						parsed = null;
+					}
+					rankData = normalizeRankData(parsed);
+					sortRank('score');
+					sortRank('gold');
+					rankLoaded = true;
+				} catch (err) {
+					console.warn('读取排行榜失败：', err);
+				}
+				rankLoading = false;
+				return rankData;
+			}
+			async function saveRankData() {
+				if (!rankData || !Array.isArray(rankData.score) || !Array.isArray(rankData.gold)) {
+					console.warn("排行榜数据结构错误，无法上传！");
+					return;
+				}
+				sortRank('score');
+				sortRank('gold');
+				const body = new URLSearchParams();
+				body.set('key', TEXTDB_KEY);
+				body.set('value', JSON.stringify(rankData));
+				const res = await fetch(TEXTDB_WRITE_URL, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					body
+				});
+				if (!res.ok) {
+					throw new Error(`save failed: ${res.status}`);
+				}
+			}
+
+			function upsertRankEntry(type, name, value) {
+				name = String(name || 'Player').trim().replace(/[<>]/g, '').slice(0, 20) || 'Player';
+				value = Number(value || 0);
+				if (!Number.isFinite(value)) return false;
+				if (!name || name.trim() === "") return false;
+				const list = rankData[type];
+				const idx = list.findIndex(x => x.name === name);
+				if (idx === -1) {
+					list.push({
+						name,
+						value
+					});
+					sortRank(type);
+					return true;
+				}
+				if (type === 'score') {
+					if (value > list[idx].value) {
+						list[idx].value = value;
+						sortRank(type);
+						return true;
+					}
+					return false;
+				}
+				if (list[idx].value !== value) {
+					list[idx].value = value;
+					sortRank(type);
+					return true;
+				}
+				return false;
+			}
+			async function submitRankIfNeeded(reason = '') {
+				const name = getSafePlayerName();
+				let changed = false;
+				if (score > 0) {
+					changed = upsertRankEntry('score', name, score) || changed;
+				}
+				if (goldCount > 0) {
+					changed = upsertRankEntry('gold', name, goldCount) || changed;
+				}
+				if (!changed) return;
+				try {
+					await saveRankData();
+					stats.lastRankSubmit = {
+						score,
+						gold: goldCount,
+						t: Date.now(),
+						reason
+					};
+					saveStats();
+				} catch (err) {
+					console.warn('保存排行榜失败：', err);
+				}
+			}
+
+			function renderRankList(type) {
+				const list = document.getElementById('rank-list');
+				const status = document.getElementById('rank-status');
+				if (!list || !status) return;
+				const arr = rankData[type] || [];
+				const title = type === 'score' ? '最高分排行' : '金币排行';
+				const unit = type === 'score' ? '分' : '金币';
+				if (!arr.length) {
+					list.innerHTML = `<div style="padding:12px;opacity:.8;">暂无数据</div>`;
+					status.innerText = `${title} · 0 人`;
+					return;
+				}
+				list.innerHTML = arr.map((item, i) => `
+		<div style="
+			display:grid;
+			grid-template-columns: 48px 1fr auto;
+			gap:10px;
+			align-items:center;
+			padding:10px 8px;
+			border-bottom:1px solid rgba(255,255,255,.08);
+		">
+			<div>#${i + 1}</div>
+			<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name}</div>
+			<div>${item.value} ${unit}</div>
+		</div>
+	`).join('');
+				status.innerText = `${title} · ${Math.min(arr.length, 50)} 人`;
+			}
+
+			function switchRankTab(type) {
+				currentRankTab = type;
+				const sBtn = document.getElementById('rank-tab-score');
+				const gBtn = document.getElementById('rank-tab-gold');
+				if (sBtn && gBtn) {
+					sBtn.style.opacity = type === 'score' ? '1' : '0.6';
+					gBtn.style.opacity = type === 'gold' ? '1' : '0.6';
+				}
+				renderRankList(type);
+			}
+			async function openRankModal() {
+				const modal = document.getElementById('rank-modal');
+				if (!modal) return;
+				modal.style.display = 'flex';
+				const status = document.getElementById('rank-status');
+				if (status) status.innerText = '正在加载...';
+				await loadRankData();
+				switchRankTab(currentRankTab);
+			}
+			window.addEventListener('blur', () => {
+				Object.keys(mobileHold).forEach(k => mobileHold[k] = false);
+				keys = {};
+			});
+
+			function gameLoop() {
+				update();
+				draw();
+				drawMinimap();
+				requestAnimationFrame(gameLoop);
+			}
+			gameLoop();
+		</script>
+	</body>
+</html>

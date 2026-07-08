@@ -1,0 +1,873 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>UNO - Zhujingqi</title>
+		<style>
+			:root {
+				--bg: #0f1724;
+				--card-bg: #0b1220;
+				--panel: #0b1220;
+				--glass: rgba(255, 255, 255, 0.04);
+			}
+
+			* {
+				box-sizing: border-box;
+				font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial
+			}
+
+			body {
+				margin: 0;
+				background: linear-gradient(180deg, #061025 0%, #071428 60%);
+				color: #e6eef8;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+			}
+
+			.wrap {
+				width: 960px;
+				max-width: 96vw;
+				padding: 18px;
+				border-radius: 12px;
+				background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+				box-shadow: 0 6px 30px rgba(2, 6, 23, 0.7)
+			}
+
+			header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 12px
+			}
+
+			h1 {
+				font-size: 18px;
+				margin: 0
+			}
+
+			.controls {
+				display: flex;
+				gap: 8px;
+				align-items: center
+			}
+
+			button,
+			.toggle {
+				background: var(--panel);
+				border: 0;
+				padding: 8px 12px;
+				border-radius: 10px;
+				color: inherit;
+				cursor: pointer
+			}
+
+			.status {
+				display: flex;
+				gap: 10px;
+				align-items: center
+			}
+
+			.board {
+				display: grid;
+				grid-template-columns: 1fr 320px 1fr;
+				gap: 12px;
+				position: relative;
+				align-items: center
+			}
+
+			.player,
+			.cpu {
+				min-height: 160px;
+				padding: 10px;
+				border-radius: 10px;
+				background: var(--card-bg);
+				display: flex;
+				flex-direction: column;
+				gap: 8px
+			}
+
+			.cpu .title,
+			.player .title {
+				font-size: 13px;
+				color: #9fb3d8
+			}
+
+			.cardback {
+				width: 40px;
+				height: 60px;
+				border-radius: 6px;
+				background: linear-gradient(180deg, #0b60a4, #033b6b);
+				box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.25)
+			}
+
+			.center {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px
+			}
+
+			.pile {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+				position: relative;
+				min-height: 200px;
+			}
+
+			.topcard {
+				width: 120px;
+				height: 170px;
+				border-radius: 10px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: 700;
+				font-size: 28px;
+				z-index: 2;
+				position: relative
+			}
+
+			.color-indicator {
+				position: absolute;
+				width: 140px;
+				height: 190px;
+				border-radius: 12px;
+				z-index: 1;
+				left: 50%;
+				transform: translateX(-50%);
+				top: 0;
+				opacity: 0.18;
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+				display: none
+			}
+
+			.color-indicator.red {
+				background: #ff595e
+			}
+
+			.color-indicator.green {
+				background: #27ae60
+			}
+
+			.color-indicator.blue {
+				background: #2f80ed
+			}
+
+			.color-indicator.yellow {
+				background: #f6c23e
+			}
+
+			.color-indicator.black {
+				background: #222
+			}
+
+			.deckcount {
+				font-size: 12px;
+				color: #9fb3d8
+			}
+
+			.player .hand {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				max-height: calc(100px*2 + 16px);
+				overflow-y: auto
+			}
+
+			.cpu .hand {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				max-height: calc(60px*2 + 12px);
+				overflow-y: auto
+			}
+
+			.card {
+				width: 72px;
+				height: 100px;
+				border-radius: 8px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: 700;
+				font-size: 20px;
+				cursor: pointer;
+				user-select: none;
+				box-shadow: 0 6px 14px rgba(2, 6, 23, 0.6)
+			}
+
+			.card.small {
+				width: 48px;
+				height: 68px;
+				font-size: 14px
+			}
+
+			.red {
+				background: #ff595e;
+				color: white
+			}
+
+			.green {
+				background: #27ae60;
+				color: white
+			}
+
+			.blue {
+				background: #2f80ed;
+				color: white
+			}
+
+			.yellow {
+				background: #f6c23e;
+				color: #111
+			}
+
+			.black {
+				background: #222;
+				color: white
+			}
+
+			footer {
+				margin-top: 12px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center
+			}
+
+			.log {
+				font-size: 13px;
+				color: #bcd3f0;
+				padding: 8px;
+				border-radius: 8px;
+				background: var(--glass);
+				white-space: nowrap;
+				overflow: hidden;
+				height: 92px;
+			}
+
+			.log div {
+				display: block;
+				white-space: nowrap;
+				margin: 2px 0;
+			}
+
+			.small {
+				font-size: 13px;
+				color: #9fb3d8
+			}
+
+			.picker {
+				position: fixed;
+				inset: 0;
+				display: none;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.6);
+				z-index: 10000;
+				backdrop-filter: none;
+			}
+
+			.picker .box {
+				background: #071428;
+				padding: 14px;
+				border-radius: 12px;
+				display: flex;
+				gap: 8px;
+				z-index: 10001;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+			}
+
+			.colorbtn {
+				width: 44px;
+				height: 64px;
+				border-radius: 8px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				font-weight: 700
+			}
+
+			.muted {
+				opacity: 0.7
+			}
+
+			@media (max-width:800px) {
+				.board {
+					grid-template-columns: 1fr 1fr;
+					grid-auto-rows: auto
+				}
+
+				.center {
+					order: 3
+				}
+			}
+
+			.bottom {
+				position: absolute;
+				right: 12px;
+				bottom: -100px;
+				padding: 8px 12px;
+				background: var(--card-bg);
+				border-radius: 10px;
+				font-size: 13px;
+				color: #e6eef8;
+				text-align: right;
+				line-height: 1.4;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+			}
+
+			.bottom a {
+				color: #9fb3d8;
+				text-decoration: underline;
+			}
+			
+			#zjqhref {
+				text-decoration: none;
+				color: #e6eef8; !important
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrap">
+			<header>
+				<h1>UNO - <a id="zjqhref" href="/index.html">Zhujingqi</a></h1>
+				<div class="controls">
+					<button id="restart">重置游戏</button>
+					<label style="display:flex;align-items:center;gap:6px"><input id="autoplay" type="checkbox" />
+						自动模式</label>
+				</div>
+			</header>
+
+			<div class="board">
+				<div class="cpu">
+					<div class="title">电脑</div>
+					<div class="hand" id="cpuHand"></div>
+					<div class="small muted">手牌数量：<span id="cpuCount">0</span></div>
+				</div>
+
+				<div class="center">
+					<div class="pile">
+						<div id="colorIndicator" class="color-indicator"></div>
+						<div id="deck" class="cardback" title="抽牌堆"></div>
+						<div id="topCard" class="topcard">?</div>
+					</div>
+					<div class="status">
+						<div class="deckcount">剩余：<span id="deckCount">0</span></div>
+						<div class="deckcount">回合：<span id="turnLabel">玩家</span></div>
+					</div>
+				</div>
+
+				<div class="player">
+					<div class="title">玩家（你）</div>
+					<div class="hand" id="playerHand"></div>
+					<div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+						<button id="drawBtn">摸1张</button>
+						<button id="unoBtn">UNO</button>
+						<div onclick="info()" style="cursor:pointer;color:#9fb3d8">ℹ信息</div>
+					</div>
+				</div>
+				<div class="bottom">
+					喜欢这个游戏？别忘了<a href="/money.html">赞助</a>！<br>
+					<a href="/me/contact.html">联系作者</a>
+				</div>
+			</div>
+
+			<footer>
+				<div class="log" id="log"></div>
+			</footer>
+		</div>
+
+		<div class="picker" id="picker" role="dialog" aria-modal="true">
+			<div class="box" id="pickerBox">
+				<div class="colorbtn red" data-color="red">红</div>
+				<div class="colorbtn yellow" data-color="yellow">黄</div>
+				<div class="colorbtn green" data-color="green">绿</div>
+				<div class="colorbtn blue" data-color="blue">蓝</div>
+			</div>
+		</div>
+
+		<script>
+			(function() {
+				const colors = ['red', 'yellow', 'green', 'blue'];
+
+				function makeDeck() {
+					const d = [];
+					colors.forEach(c => {
+						d.push(card(c, '0'));
+						for (let i = 1; i <= 9; i++) {
+							d.push(card(c, String(i)));
+							d.push(card(c, String(i)));
+						}
+						['skip', 'reverse', 'draw2'].forEach(act => {
+							d.push(card(c, act));
+							d.push(card(c, act));
+						});
+					});
+					for (let i = 0; i < 4; i++) {
+						d.push(card('black', 'wild'));
+						d.push(card('black', 'wild4'));
+					}
+					return shuffle(d);
+				}
+
+				function card(color, value) {
+					return {
+						id: Math.random().toString(36).slice(2, 9),
+						color,
+						value
+					}
+				}
+
+				function shuffle(a) {
+					for (let i = a.length - 1; i > 0; i--) {
+						let j = Math.floor(Math.random() * (i + 1));
+						[a[i], a[j]] = [a[j], a[i]]
+					}
+					return a
+				}
+
+				let deck = [],
+					discard = [];
+				let players = {
+					human: [],
+					cpu: []
+				};
+				let current = 'human';
+				let currentColor = null;
+				let skipNext = false;
+				let lock = false;
+				let pendingDraw = 0;
+				const logEl = document.getElementById('log');
+				const playerHandEl = document.getElementById('playerHand');
+				const cpuHandEl = document.getElementById('cpuHand');
+				const topCardEl = document.getElementById('topCard');
+				const deckCountEl = document.getElementById('deckCount');
+				const cpuCountEl = document.getElementById('cpuCount');
+				const turnLabel = document.getElementById('turnLabel');
+				const picker = document.getElementById('picker');
+				const pickerBox = document.getElementById('pickerBox');
+				const autoplayCheckbox = document.getElementById('autoplay');
+				const drawBtn = document.getElementById('drawBtn');
+				const colorIndicator = document.getElementById('colorIndicator');
+				const delay = 100;
+
+				let logLines = [];
+
+				function startGame() {
+					deck = makeDeck();
+					discard = [];
+					players.human = [];
+					players.cpu = [];
+					current = 'human';
+					currentColor = null;
+					skipNext = false;
+					lock = false;
+					pendingDraw = 0;
+					logLines = [];
+					for (let i = 0; i < 7; i++) {
+						players.human.push(drawFromDeck());
+						players.cpu.push(drawFromDeck());
+					}
+					let first = drawFromDeck();
+					while (first.value === 'wild' || first.value === 'wild4') {
+						discard.push(first);
+						first = drawFromDeck();
+					}
+					discard.push(first);
+					currentColor = first.color === 'black' ? colors[Math.floor(Math.random() * 4)] : first.color;
+					log('开始游戏！');
+					updateUI();
+					if (first.value === 'skip' || first.value === 'reverse') {
+						log('首张牌为跳过，电脑先手。');
+						current = 'cpu';
+						setTimeout(runTurn, getDelay());
+					} else if (first.value === 'draw2') {
+						pendingDraw += 2;
+						log('首张为+2，即将摸2张！');
+					}
+				}
+
+				function drawFromDeck() {
+					if (deck.length === 0) reshuffleDiscardToDeck();
+					return deck.pop()
+				}
+
+				function reshuffleDiscardToDeck() {
+					const top = discard.pop();
+					deck = shuffle(discard);
+					discard = [top];
+					log('洗牌...');
+				}
+
+				function renderLog() {
+					logEl.innerHTML = '';
+					for (let i = 0; i < logLines.length; i++) {
+						const p = document.createElement('div');
+						p.textContent = logLines[i];
+						logEl.appendChild(p);
+					}
+				}
+
+				function log(t) {
+					logLines.unshift(t);
+					if (logLines.length > 4) logLines.length = 4;
+					renderLog();
+				}
+
+				function canPlay(card) {
+					if (pendingDraw > 0) {
+						return card.value === 'draw2' || card.value === 'wild4';
+					}
+					const top = discard[discard.length - 1];
+					if (card.color === 'black') return true;
+					if (card.color === currentColor) return true;
+					if (card.value === top.value) return true;
+					return false;
+				}
+
+				function renderCardEl(c, small = false) {
+					const el = document.createElement('div');
+					el.className = 'card' + (small ? ' small' : '') + ' ' + c.color;
+					el.dataset.id = c.id;
+					el.innerText = (c.value === 'skip' ? '⏭' : c.value === 'reverse' ? '↺' : c.value === 'draw2' ? '+2' : c
+						.value === 'wild' ? '★' : c.value === 'wild4' ? '+4' : c.value);
+					return el;
+				}
+
+				function updateUI() {
+					playerHandEl.innerHTML = '';
+					cpuHandEl.innerHTML = '';
+					players.human.forEach(c => {
+						const el = renderCardEl(c);
+						if (canPlay(c) && current === 'human' && !lock) el.style.outline =
+							'2px solid rgba(255,255,255,0.08)';
+						el.addEventListener('click', () => onPlayerCardClick(c.id));
+						playerHandEl.appendChild(el);
+					});
+					for (let i = 0; i < players.cpu.length; i++) {
+						const back = document.createElement('div');
+						back.className = 'cardback';
+						back.style.width = '40px';
+						back.style.height = '60px';
+						cpuHandEl.appendChild(back);
+					}
+					cpuCountEl.innerText = players.cpu.length;
+					deckCountEl.innerText = deck.length;
+					const top = discard[discard.length - 1];
+					topCardEl.innerHTML = '';
+					topCardEl.className = 'topcard ' + top.color;
+					topCardEl.innerText = (top.value === 'skip' ? '⏭' : top.value === 'reverse' ? '↺' : top.value ===
+						'draw2' ? '+2' : top.value === 'wild' ? '★' : top.value === 'wild4' ? '+4' : top.value);
+
+					if (currentColor) {
+						colorIndicator.style.display = 'block';
+						colorIndicator.className = 'color-indicator ' + (colors.includes(currentColor) ? currentColor :
+							'black');
+					} else {
+						colorIndicator.style.display = 'none';
+					}
+
+					turnLabel.innerText = current === 'human' ? '玩家' : '电脑';
+
+					if (pendingDraw > 0 && current === 'human') {
+						drawBtn.innerText = '摸 ' + pendingDraw + ' 张';
+						drawBtn.disabled = lock || current !== 'human';
+					} else {
+						drawBtn.innerText = '摸 1 张';
+						drawBtn.disabled = lock || current !== 'human';
+					}
+				}
+
+				function onPlayerCardClick(id) {
+					if (lock) return;
+					if (current !== 'human') return;
+					const cardIdx = players.human.findIndex(c => c.id === id);
+					if (cardIdx < 0) return;
+					const card = players.human[cardIdx];
+					if (!canPlay(card)) {
+						log('不能出这张牌！');
+						return;
+					}
+					playCard('human', cardIdx);
+				}
+
+				function playCard(which, idx) {
+					lock = true;
+					const hand = players[which];
+					const card = hand.splice(idx, 1)[0];
+					discard.push(card);
+					currentColor = card.color === 'black' ? currentColor : card.color;
+					log((which === 'human' ? '你' : '电脑') + '出了 ' + (card.color === 'black' ? card.value : card.color + ' ' +
+						card.value));
+					updateUI();
+					if (card.value === 'skip') {
+						log('跳过下一位。');
+						skipNext = true;
+						endTurnAfter(400);
+					} else if (card.value === 'reverse') {
+						log('反转（双人局当作跳过）。');
+						skipNext = true;
+						endTurnAfter(400);
+					} else if (card.value === 'draw2') {
+						pendingDraw += 2;
+						log('即将摸' + pendingDraw + '张！');
+						endTurnAfter(600);
+					} else if (card.value === 'wild') {
+						if (which === 'human') {
+							showPicker(chosen => {
+								currentColor = chosen;
+								log('你将颜色改为' + chosen);
+								endTurnAfter(200);
+							});
+						} else {
+							currentColor = aiChooseColor(players.cpu);
+							log('电脑将颜色改为' + currentColor);
+							endTurnAfter(400);
+						}
+					} else if (card.value === 'wild4') {
+						if (which === 'human') {
+							showPicker(chosen => {
+								currentColor = chosen;
+								pendingDraw += 4;
+								log('你将颜色改为' + chosen);
+								log('即将摸' + pendingDraw + '张！');
+								endTurnAfter(300);
+							});
+						} else {
+							currentColor = aiChooseColor(players.cpu);
+							pendingDraw += 4;
+							log('电脑将颜色改为' + currentColor);
+							log('即将摸' + pendingDraw + '张！');
+							endTurnAfter(400);
+						}
+					} else {
+						endTurnAfter(200);
+					}
+					checkWin();
+				}
+
+				function applyDrawImmediate(n, who) {
+					log((who === 'human' ? '你' : '电脑') + '摸了' + n + '张。');
+					for (let i = 0; i < n; i++) {
+						players[who].push(drawFromDeck());
+					}
+					pendingDraw = 0;
+					updateUI();
+				}
+
+				function otherOf(w) {
+					return w === 'human' ? 'cpu' : 'human'
+				}
+
+				function endTurnAfter(ms) {
+					setTimeout(() => {
+						lock = false;
+						if (skipNext) {
+							skipNext = false;
+							current = otherOf(current);
+							log((current === 'human' ? '你' : '电脑') + '被跳过。');
+							current = otherOf(current);
+						} else {
+							current = otherOf(current);
+						}
+						updateUI();
+						if (current === 'cpu') setTimeout(runTurn, getDelay());
+						else if (current === 'human' && autoplay()) setTimeout(runTurn, getDelay());
+					}, ms);
+				}
+
+				function runTurn() {
+					if (lock) return;
+					if (checkWin()) return;
+					if (current === 'cpu') aiPlay();
+					else if (autoplay()) aiPlayForHuman();
+				}
+
+				function aiPlay() {
+					lock = true;
+					setTimeout(() => {
+						if (pendingDraw > 0) {
+							let idx = players.cpu.findIndex(canPlay);
+							if (idx >= 0) {
+								playCard('cpu', idx);
+								lock = false;
+							} else {
+								applyDrawImmediate(pendingDraw, 'cpu');
+								lock = false;
+								current = otherOf(current);
+								updateUI();
+								if (current === 'cpu') setTimeout(runTurn, getDelay());
+							}
+							return;
+						}
+						let idx = players.cpu.findIndex(canPlay);
+						if (idx >= 0) playCard('cpu', idx);
+						else {
+							const c = drawFromDeck();
+							players.cpu.push(c);
+							log('电脑摸1张。');
+							updateUI();
+							const lastIdx = players.cpu.length - 1;
+							lock = false;
+							current = otherOf(current);
+							updateUI();
+						}
+					}, getDelay());
+				}
+
+				function aiPlayForHuman() {
+					lock = true;
+					setTimeout(() => {
+						if (pendingDraw > 0) {
+							let idx = players.human.findIndex(canPlay);
+							if (idx >= 0) {
+								playCard('human', idx);
+								lock = false;
+							} else {
+								applyDrawImmediate(pendingDraw, 'human');
+								lock = false;
+								current = otherOf(current);
+								updateUI();
+								if (current === 'cpu') setTimeout(runTurn, getDelay());
+							}
+							return;
+						}
+						let idx = players.human.findIndex(canPlay);
+						if (idx >= 0) playCard('human', idx);
+						else {
+							const c = drawFromDeck();
+							players.human.push(c);
+							log('你摸1张。');
+							updateUI();
+							const lastIdx = players.human.length - 1;
+							if (canPlay(c)) playCard('human', lastIdx);
+							else {
+								lock = false;
+								current = otherOf(current);
+								updateUI();
+								if (current === 'cpu') setTimeout(runTurn, getDelay());
+							}
+						}
+					}, getDelay());
+				}
+
+				function aiChooseColor(hand) {
+					const cnt = {
+						red: 0,
+						yellow: 0,
+						green: 0,
+						blue: 0
+					};
+					hand.forEach(c => {
+						if (colors.includes(c.color)) cnt[c.color]++
+					});
+					let best = 'red',
+						max = -1;
+					for (const k of colors) {
+						if (cnt[k] > max) {
+							max = cnt[k];
+							best = k
+						}
+					}
+					return best;
+				}
+
+				function getDelay() {
+					return delay;
+				}
+
+				function autoplay() {
+					return autoplayCheckbox.checked;
+				}
+
+				drawBtn.addEventListener('click', () => {
+					if (lock || current !== 'human') return;
+					if (pendingDraw > 0) {
+						applyDrawImmediate(pendingDraw, 'human');
+						current = otherOf(current);
+						updateUI();
+						if (current === 'cpu') setTimeout(runTurn, getDelay());
+						return;
+					}
+					const c = drawFromDeck();
+					players.human.push(c);
+					log('你抽了一张');
+					updateUI();
+					const lastIdx = players.human.length - 1;
+					if (autoplay() && canPlay(c)) {
+						setTimeout(() => {
+							playCard('human', lastIdx);
+						}, getDelay());
+					} else {
+						current = 'cpu';
+						setTimeout(runTurn, getDelay());
+					}
+				});
+
+				document.getElementById('restart').addEventListener('click', startGame);
+				document.getElementById('autoplay').addEventListener('change', () => {
+					if (autoplay()) {
+						log('自动模式已开启（玩家会自动出牌）。');
+						setTimeout(() => {
+							if (current === 'cpu') runTurn();
+							else if (current === 'human') runTurn();
+						}, 200)
+					} else log('自动模式已关闭：请手动操作你的回合。')
+				});
+
+				document.getElementById('unoBtn').addEventListener('click', () => {
+					log('UNO！');
+				});
+
+				function showPicker(cb) {
+					picker.style.display = 'flex';
+					pickerBox.focus && pickerBox.focus();
+					const onPick = (e) => {
+						const c = e.target.dataset.color;
+						if (!c) return;
+						picker.style.display = 'none';
+						document.querySelectorAll('.colorbtn').forEach(b => b.removeEventListener('click', onPick));
+						cb(c);
+					};
+					document.querySelectorAll('.colorbtn').forEach(b => b.addEventListener('click', onPick));
+					const onBackdrop = (ev) => {
+						if (ev.target === picker) {
+							picker.style.display = 'none';
+							document.querySelectorAll('.colorbtn').forEach(b => b.removeEventListener('click', onPick));
+							picker.removeEventListener('click', onBackdrop);
+						}
+					};
+					picker.addEventListener('click', onBackdrop);
+				}
+
+				function checkWin() {
+					if (players.human.length === 0) {
+						log('你赢了！');
+						alert('你赢了！')
+						lock = true;
+						return true;
+					}
+					if (players.cpu.length === 0) {
+						log('电脑赢了！');
+						alert('电脑赢了！')
+						lock = true;
+						return true;
+					}
+					return false;
+				}
+
+				document.addEventListener('visibilitychange', () => {});
+				startGame();
+				if (current === 'cpu') setTimeout(runTurn, 350);
+			})();
+
+			function info() {
+				alert('点击手牌出牌；黑色星星为换色牌，出牌后电脑会自动出牌。\n本网页部分源代码由AI合成。\n发现BUG？点击【联系作者】告诉我吧！\n享受你的UNO之旅吧！\n\n作者：Jacky')
+			}
+		</script>
+	</body>
+</html>

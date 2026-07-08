@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>语言学 - Zhujingqi</title>
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="stylesheet" href="/css/bar.css">
+		<style>
+			body {
+				margin: 0;
+				background: #fff;
+			}
+
+			.section {
+				padding: 20px;
+				max-width: 1000px;
+				margin: auto;
+			}
+
+			h2 {
+				margin-bottom: 10px;
+			}
+
+			button {
+				border-radius: 20px;
+				border: none;
+				cursor: pointer;
+				padding: 8px 15px;
+				margin: 5px;
+				background: #b7f1d9;
+				color: #000;
+				font-size: 16px;
+				transition: transform 0.2s;
+			}
+
+			button:hover {
+				transform: scale(1.05);
+			}
+
+			.question {
+				border: 1px solid #ccc;
+				border-radius: 20px;
+				padding: 15px;
+				margin-bottom: 20px;
+			}
+
+			.q-row {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+
+			.q-row>.q-img {
+				flex: 1;
+				width: 50%;
+				height: 50%;
+				cursor: pointer;
+				transition: transform 0.2s;
+			}
+
+			.q-row>.q-img:hover {
+				transform: scale(1.01);
+			}
+
+			.answer-wrapper {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.answer-wrapper .answer-content img {
+				width: 100%;
+				cursor: pointer;
+				transition: transform 0.2s;
+			}
+
+			.answer-wrapper .answer-content img:hover {
+				transform: scale(1.01);
+			}
+
+			.info,
+			.answer-content {
+				display: none;
+				margin-top: 10px;
+				padding-top: 5px;
+			}
+
+			.gallery {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+				gap: 10px;
+			}
+
+			.gallery img {
+				width: 100%;
+				height: auto;
+				cursor: pointer;
+				transition: transform 0.2s;
+			}
+
+			.gallery img:hover {
+				transform: scale(1.01);
+			}
+
+			.img-popup-bg {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.3s ease;
+				z-index: 1000;
+			}
+
+			.img-popup-bg.show {
+				opacity: 1;
+				pointer-events: auto;
+			}
+
+			.img-popup-bg img {
+				max-width: 95%;
+				max-height: 95%;
+				transition: transform 0.2s ease;
+				cursor: grab;
+			}
+
+			.img-popup-bg.show img {
+				transform: scale(1);
+			}
+
+			.popup-bg {
+				display: none;
+				justify-content: center;
+				align-items: center;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.5);
+				z-index: 1001;
+			}
+
+			.popup {
+				background: #fff;
+				padding: 20px;
+				border-radius: 20px;
+				max-width: 400px;
+				text-align: center;
+			}
+
+			.popup button {
+				margin-top: 10px;
+				padding: 5px 10px;
+			}
+
+			@media (max-width: 600px) {
+				.q-row {
+					flex-direction: column;
+				}
+
+				.q-row>.q-img,
+				.answer-wrapper {
+					width: 100%;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="#">语言学</a>
+		</div>
+		<div class="section">
+			<h2>欢迎来到语言学的世界</h2>
+			<p>语言不仅是交流的工具，更是思想、文化与历史的载体。
+				在这里，你将探索文字与声音的微妙规律，
+				解读语言背后的逻辑与美学，感受每一次符号排列所孕育的深意与智慧。<br>
+				这里分为两个模块，即语言学题目与趣图画廊。<br>
+				在每道语言学题目中，四个方框内都是同一个词在4种不同语言中的说法，
+				试说明该四词的含义。<br>
+				你可以点击【展开】查看题目的详细信息；
+				每张图片都可以点击放大，然后滚轮缩放、鼠标拖动；
+				点击【查看答案】以查看答案。<br>
+				题目及趣图提供者：Elías<br>
+			</p>
+		</div>
+		<div class="section">
+			<h2>语言学题目</h2>
+			<div class="question">
+				1
+				<button class="q-btn">展开</button>
+				<div class="info">
+					<div class="q-row">
+						<img src="q1.jpg" class="q-img">
+						<div class="answer-wrapper">
+							<button class="answer-btn">查看答案</button>
+							<div class="answer-content" style="display:none;">
+								<img src="ans1.jpg" class="ans-img">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="question">
+				2
+				<button class="q-btn">展开</button>
+				<div class="info">
+					<div class="q-row">
+						<img src="q2.jpg" class="q-img">
+						<div class="answer-wrapper">
+							<button class="answer-btn">查看答案</button>
+							<div class="answer-content" style="display:none;">
+								<img src="ans2.jpg" class="ans-img">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="question">
+				3
+				<button class="q-btn">展开</button>
+				<div class="info">
+					<div class="q-row">
+						<img src="q3.jpg" class="q-img">
+						<div class="answer-wrapper">
+							<button class="answer-btn">查看答案</button>
+							<div class="answer-content" style="display:none;">
+								<img src="ans3.jpg" class="ans-img">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="section">
+			<h2>趣图画廊</h2>
+			<div class="gallery">
+				<img src="1.jpg">
+				<img src="2.jpg">
+				<img src="3.jpg">
+				<img src="4.jpg">
+				<img src="5.jpg">
+				<img src="6.jpg">
+				<img src="7.jpg">
+				<img src="8.jpg">
+				<img src="9.jpg">
+				<img src="10.jpg">
+				<img src="11.jpg">
+				<img src="12.jpg">
+				<img src="13.jpg">
+				<img src="14.jpg">
+				<img src="15.jpg">
+				<img src="16.jpg">
+				<img src="17.jpg">
+				<img src="18.jpg">
+				<img src="19.jpg">
+				<img src="20.jpg">
+				<img src="21.jpg">
+				<img src="22.jpg">
+				<img src="23.jpg">
+				<img src="24.jpg">
+				<img src="25.jpg">
+				<img src="26.jpg">
+				<img src="27.jpg">
+				<img src="28.jpg">
+				<img src="29.jpg">
+				<img src="30.jpg">
+				<img src="31.jpg">
+				<img src="32.jpg">
+				<img src="33.jpg">
+				<img src="34.jpg">
+				<img src="35.jpg">
+				<img src="36.jpg">
+				<img src="37.jpg">
+				<img src="38.jpg">
+				<img src="39.jpg">
+				<img src="40.jpg">
+			</div>
+		</div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			- by Jacky Zhu
+		</div>
+		<div class="popup-bg" id="popup">
+			<div class="popup">
+				<p>确认查看答案？</p>
+				<button id="popup-yes">确认</button>
+				<button id="popup-no">取消</button>
+			</div>
+		</div>
+		<div class="img-popup-bg" id="imgPopup"><img src=""></div>
+		<script>
+			document.querySelectorAll(".q-btn").forEach(btn => {
+				btn.addEventListener("click", e => {
+					const info = e.target.nextElementSibling;
+					info.style.display = info.style.display === "block" ? "none" : "block";
+				});
+			});
+			let currentAnswer = null;
+			const popup = document.getElementById("popup");
+			document.querySelectorAll(".answer-btn").forEach(btn => {
+				btn.addEventListener("click", e => {
+					currentAnswer = e.target.nextElementSibling;
+					popup.style.display = "flex";
+				});
+			});
+			document.getElementById("popup-yes").addEventListener("click", () => {
+				if (currentAnswer) {
+					currentAnswer.style.display = "block";
+					currentAnswer.previousElementSibling.style.display = "none";
+				}
+				popup.style.display = "none";
+			});
+			document.getElementById("popup-no").addEventListener("click", () => {
+				popup.style.display = "none";
+			});
+			const imgPopup = document.getElementById("imgPopup");
+			const imgPopupImg = imgPopup.querySelector("img");
+			let imgScale = 1;
+			let imgX = 0,
+				imgY = 0;
+			let isDragging = false;
+			let startX, startY;
+
+			function showImgPopup(src) {
+				imgPopupImg.src = src;
+				imgScale = 1;
+				imgX = 0;
+				imgY = 0;
+				imgPopupImg.style.transform = `translate(0px,0px) scale(${imgScale})`;
+				imgPopup.classList.add("show");
+			}
+
+			function hideImgPopup() {
+				imgPopup.classList.remove("show");
+			}
+			imgPopup.addEventListener("click", e => {
+				if (e.target === imgPopup) hideImgPopup();
+			});
+
+			imgPopupImg.addEventListener("wheel", e => {
+				e.preventDefault();
+				const delta = e.deltaY > 0 ? 0.9 : 1.1;
+				imgScale *= delta;
+				imgScale = Math.min(Math.max(imgScale, 0.5), 5);
+				imgPopupImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+			});
+
+			imgPopupImg.addEventListener("mousedown", e => {
+				e.preventDefault();
+				isDragging = true;
+				startX = e.clientX - imgX;
+				startY = e.clientY - imgY;
+				imgPopupImg.style.cursor = "grabbing";
+			});
+
+			window.addEventListener("mousemove", e => {
+				if (!isDragging) return;
+				imgX = e.clientX - startX;
+				imgY = e.clientY - startY;
+				imgPopupImg.style.transform = `translate(${imgX}px, ${imgY}px) scale(${imgScale})`;
+			});
+
+			window.addEventListener("mouseup", () => {
+				if (isDragging) {
+					isDragging = false;
+					imgPopupImg.style.cursor = "grab";
+				}
+			});
+
+			document.querySelectorAll(".q-img, .answer-content img, .gallery img").forEach(img => {
+				if (!img.closest("#imgPopup")) {
+					img.addEventListener("click", e => showImgPopup(e.target.src));
+				}
+			});
+		</script>
+
+	</body>
+</html>

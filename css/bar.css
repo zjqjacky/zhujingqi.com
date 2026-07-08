@@ -1,0 +1,22 @@
+.bar {
+	overflow: hidden;
+	background-color: #b7f1d9;
+	font-size: 20px;
+	transition: 0.2s;
+}
+
+.bar a {
+	float: left;
+	display: block;
+	color: #000;
+	text-align: center;
+	padding: 15px 20px;
+	text-decoration: none;
+	transition: 0.2s;
+}
+
+.bar a:hover {
+	background-color: #c2ffe6;
+	color: black;
+	transition: 0.2s;
+}

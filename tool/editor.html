@@ -1,0 +1,221 @@
+<html>
+	<head>
+		<title>HTML编辑器 - Zhujingqi</title>
+		<meta charset="gb2312">
+		<style>
+			body {
+				margin: 0;
+				background-color: #ffffff;
+			}
+
+			.head {
+				overflow: hidden;
+				background-color: #b7f1d9;
+				transition: 0.2s;
+			}
+
+			.head button {
+				float: left;
+				display: block;
+				color: #000;
+				background-color: #b7f1d9;
+				border: none;
+				font-size: 15px;
+				text-align: center;
+				padding: 8px 15px;
+				transition: 0.2s;
+			}
+
+			.head button:hover {
+				background-color: #c2ffe6;
+				color: black;
+				transition: 0.2s;
+			}
+
+			.new {
+				background-color: #00aaff !important;
+				color: #ffffff !important;
+			}
+
+			.new:hover {
+				background-color: #1aceff !important;
+			}
+
+			.main {
+				overflow: hidden;
+				background-color: buttonface;
+				transition: 0.2s;
+			}
+
+			.main button {
+				float: left;
+				display: block;
+				color: #000;
+				border: none;
+				font-size: 15px;
+				text-align: center;
+				padding: 8px 15px;
+				transition: 0.2s;
+			}
+
+			.main button:hover {
+				background-color: #e8e8e8;
+				transition: 0.2s;
+			}
+
+			.runbtn {
+				float: left;
+				display: block;
+				color: #000;
+				background-color: #ffb70f;
+				border: none;
+				font-size: 13px;
+				width: 60px;
+				text-align: center;
+				padding: 8px 15px;
+				transition: 0.2s;
+			}
+
+			.runbtn:hover {
+				background-color: #ffe72c !important;
+				transition: 0.2s;
+			}
+
+			.hbtn {
+				background-color: #cdfdff !important;
+			}
+
+			.hbtn:hover {
+				background-color: #b2f9ff !important;
+			}
+
+			textarea {
+				font-family: consolas;
+				font-size: 18px;
+				border: none;
+				background-color: #f3f3f3;
+				color: black;
+				padding: 10px;
+				margin: 0;
+				transition: 0.2s;
+				width: 100%;
+				height: 80%;
+				outline: none;
+			}
+
+			textarea:hover {
+				background-color: #f6f6f6;
+				transition: 0.2s;
+			}
+
+			.bottom {
+				background-color: #f3f3f3;
+				color: #999999;
+				padding: 20px;
+			}
+
+			.bottom a {
+				color: #999999;
+				text-decoration: none;
+				margin-right: 15px;
+			}
+
+			.bottom a:hover {
+				color: #888888;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="head">
+			<button class="new" onclick="if(txt.value!=''){if(confirm('确认清空？')){txt.value=''}}">新建</button>
+			<button onclick="save()" alt="保存并下载到本地">保存</button>
+			<button onclick="basic()">模板</button>
+		</div>
+		<div class="main">
+			<button class="runbtn" onclick=run()><b>运行</b></button>
+			<button onclick="txt.value+='<b></b>'"><b>b</b></button>
+			<button onclick="txt.value+='<i></i>'"><i>i</i></button>
+			<button onclick="txt.value+='<u></u>'"><u>u</u></button>
+			<button onclick="a()">a</button>
+			<button class="hbtn" onclick="txt.value+='<h1></h1>'">h1</button>
+			<button class="hbtn" onclick="txt.value+='<h2></h2>'">h2</button>
+			<button class="hbtn" onclick="txt.value+='<h3></h3>'">h3</button>
+			<button class="hbtn" onclick="txt.value+='<h4></h4>'">h4</button>
+			<button class="hbtn" onclick="txt.value+='<h5></h5>'">h5</button>
+			<button class="hbtn" onclick="txt.value+='<h6></h6>'">h6</button>
+			<button onclick="txt.value+='<br />'">br</button>
+			<button onclick="txt.value+='<p></p>'">p</button>
+			<button onclick="txt.value+='<hr />'">hr</button>
+			<button onclick="txt.value+='<script>\nJavaScript脚本在此填写\n</script>'">script</button>
+			<button onclick="img()">img</button>
+			<button onclick="txt.value+='<marquee>弹幕内容</marquee>'">marquee</button>
+		</div>
+		<textarea id=txt name=txt autofocus>
+<html>
+    <head>
+        <title>示例HTML网页</title>
+    </head>
+    <body>
+        <h1>标题</h1>
+        <p>
+            这是一个示例HTML网页。
+            点击【运行】，看看效果吧！
+        </p>
+    </body>
+</html>
+</textarea>
+		<div class="bottom">
+			<b><a href="/index.html">Zhujingqi</a></b>
+			&emsp;
+			<b onclick="alert('HTML在线编辑工具\n\n这是一个在线的HTML编辑与运行工具，有众多的便捷标签和在线运行功能，编得愉快！\n\nZhujingqi');">这是什么</b>
+		</div>
+		<script>
+			function look() {
+				if (event.keyCode == 113) {
+					onclcl.onclick()
+				}
+			}
+			if (document.onkeydown == null) {
+				document.onkeydown = look
+			}
+
+			function run() {
+				if (txt.value != '') {
+					var edit1 = window.open('', 'sttt', '');
+					edit1.document.open();
+					edit1.document.write(txt.value);
+					edit1.document.close();
+				} else alert('没有任何代码！')
+			}
+
+			function save() {
+				const html = document.documentElement.outerHTML;
+				const blob = new Blob([html], {
+					type: "text/html"
+				});
+				const url = URL.createObjectURL(blob);
+				const doc = document.createElement("a");
+				doc.href = url;
+				doc.download = "document.html";
+				doc.click();
+				URL.revokeObjectURL(url);
+			}
+
+			function basic() {
+				txt.value +=
+					'<html>\n    <head>\n        <title>标题</title>\n    </head>\n    <body>\n        正文\n    </body>\n</html>';
+			}
+
+			function img() {
+				var imghref = prompt('请输入预备显示的图片网址', 'https://example.com/photo.jpg');
+				txt.value += '<img src=\'' + imghref + '\' />'
+			}
+
+			function a() {
+				var ahref = prompt('请输入要跳转的网址', 'https://example.com/');
+				var atext = prompt('请输入要显示的文字', '一条链接');
+				txt.value += '<a href=\'' + ahref + '\'>' + atext + '</a>'
+			}
+		</script>
+	</body>
+</html>

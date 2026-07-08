@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<title>杰基教</title>
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				display: flex;
+				min-height: 100vh;
+			}
+
+			a:link {
+				color: #777;
+				transition: all 0.2s;
+			}
+
+			a:hover {
+				color: #bbb;
+			}
+
+			a:visited {
+				color: #000;
+			}
+
+			nav {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 200px;
+				padding: 10px;
+				background: #f3f3f3;
+			}
+
+			nav li {
+				margin: 10px 0;
+			}
+
+			nav a {
+				text-decoration: none;
+				display: block;
+				color: #000;
+				padding: 5px 10px;
+				border-radius: 5px;
+				transition: all 0.2s;
+			}
+
+			nav a:hover,
+			nav a.active {
+				background: #b7f1d9;
+				color: #000;
+			}
+
+			main {
+				margin-left: 200px;
+				margin-top: 0;
+				flex-grow: 1;
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			header {
+				top: 0;
+				z-index: 9;
+				padding-top: 40px;
+				width: 80%;
+				position: fixed;
+				background-color: #fff;
+				border-bottom: #000 solid 3px;
+			}
+
+			header h1 {
+				font-size: 45px;
+				margin-bottom: 20px;
+				font-family: Georgia, 'Times New Roman', Times, serif;
+				text-align: center;
+			}
+
+			header h2 {
+				font-family: Georgia, 'Times New Roman', Times, serif;
+				text-align: center;
+			}
+
+			.content {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 20px;
+			}
+
+			.texts {
+				flex: 2;
+				min-width: 300px;
+			}
+
+			.img-box {
+				flex: 1;
+				min-width: 200px;
+				background: #f3f3f3;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+				margin: 20px;
+				margin-top: 200px;
+				border-radius: 20px;
+			}
+
+			.img-box img {
+				max-width: 100%;
+				padding: 20px;
+				height: auto;
+				border-radius: 20px;
+			}
+
+			.btn {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: #b7f1d9;
+				color: #000;
+				text-decoration: none;
+				padding: 5px 8px;
+				border-radius: 20px;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				transition: all 0.25s ease;
+				z-index: 99;
+			}
+
+			.btn:hover {
+				background: #afeef1;
+				transform: scale(1.1);
+			}
+
+			.register {
+				background: #b7f1d9;
+				color: #000;
+				text-decoration: none;
+				padding: 10px 18px;
+				margin: 8px;
+				border-radius: 20px;
+				border: none;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				transition: all 0.25s ease;
+			}
+
+			.register:hover {
+				background: #afeef1;
+				transform: scale(1.1);
+			}
+
+			.overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.4);
+				display: none;
+				justify-content: center;
+				align-items: center;
+				z-index: 100;
+			}
+
+			.popup {
+				background: #fff;
+				padding: 20px;
+				border-radius: 10px;
+				width: 300px;
+				z-index: 999;
+				text-align: center;
+				box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+			}
+
+			input[type="text"] {
+				width: 90%;
+				padding: 6px;
+				margin: 10px 0;
+				border: 1px solid #aaa;
+				border-radius: 5px;
+			}
+
+			label {
+				font-size: 14px;
+				display: block;
+				margin: 5px 0 10px;
+			}
+
+			.confirm-btn {
+				padding: 8px 15px;
+				border: none;
+				border-radius: 6px;
+				background: #b7f1d9;
+				color: #000;
+				transition: all 0.2s;
+				cursor: pointer;
+			}
+
+			.confirm-btn:hover {
+				background: #afeef1;
+			}
+
+			.msgdiv {
+				max-width: 800px;
+				margin: auto;
+			}
+
+			#messages {
+				white-space: pre-wrap;
+				background: #fff;
+				padding: 1em;
+				border-radius: 8px;
+				border: 1px solid #ccc;
+				height: 400px;
+				overflow-y: auto;
+				margin-bottom: 1em;
+			}
+
+			input,
+			textarea,
+			button {
+				display: block;
+				width: 100%;
+				margin-top: 0.5em;
+				font-size: 1em;
+			}
+
+			input,
+			textarea {
+				padding: 0.5em;
+				border-radius: 6px;
+				border: 1px solid #ccc;
+			}
+
+			button {
+				background-color: #b7f1d9;
+				color: #000000;
+				border: none;
+				padding: 0.7em;
+				border-radius: 6px;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: #b7ecec;
+			}
+
+			.status {
+				margin-top: 1em;
+				color: gray;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<br><br><br><br><br><br><br><br>
+			<h3>目录</h3>
+			<li><a href="#name" class="active">杰基教</a></li>
+			<li><a href="#info">信息</a></li>
+			<li><a href="#origin">起源</a></li>
+			<li><a href="#classics">典籍</a></li>
+			<li><a href="#join">想加入？</a></li>
+			<li><a href="#comments">评论</a></li>
+		</nav>
+		<main>
+			<header>
+				<h1>杰基教</h1>
+				<h2>杰基教会的官方网站</h2>
+				<br><br>
+			</header>
+
+			<div class="content">
+				<div class="texts">
+					<br><br><br><br><br><br><br><br>
+					<section id="name">
+						<h2>杰基教</h2>
+						<br>
+						杰基教是一个由杰基创立的虚构宗教。
+						它的主旨是信仰，希望，爱，正义和仁慈。
+						<br><br>
+					</section>
+
+					<section id="info">
+						<h2>信息</h2>
+						<br>
+						名称：杰基教<br>
+						信徒：杰基教徒<br>
+						建立者：杰基<br>
+						神：杰基神<br>
+						<br>
+					</section>
+
+					<section id="origin">
+						<h2>起源</h2>
+						<br>
+						很久很久以前，在公元前0000年13月32日，杰基做了一个梦。梦中，耶稣给了他一个降龙宝剑。
+						杰基知道他有着消灭邪恶的责任，于是杰基建立了杰基教，旨在让更多人与他一起做正义的人。
+						<br><br>
+					</section>
+
+					<section id="classics">
+						<h2>典籍</h2>
+						<br>
+						<h4><i>杰基大典</i></h4>
+						<br>
+						第一章 杰基开天地<br><br>
+						天地浑沌如鸡子，杰基生其中。
+						万八千岁，天地开辟，阳清为天，阴浊为地。
+						杰基在其中，一日九变，神于天，圣于地。
+						天日高一丈，地日厚一丈，杰基日长一丈，如此万八千岁。
+						天数极高，地数极深，杰基极长。
+						杰基至今未死，盖得神力也。
+						<br><br>
+					</section>
+
+					<section id="join">
+						<h2>想加入？</h2>
+						<br>想成为杰基教徒吗？点击下方按钮注册！<br>
+						<button class="register" id="openPopup">注册</button>
+					</section>
+
+					<section id="comments" class="comments">
+						<h2>评论</h2>
+						<br>
+						<div class="msgdiv">
+							<div id="messages">加载...</div>
+							<label for="nickname">名字</label>
+							<input type="text" id="nickname" placeholder="名字">
+							<label for="newMessage">评论</label>
+							<textarea id="newMessage" rows="3" placeholder="评论"></textarea>
+							<button onclick="submitMessage()">发送</button>
+							<div class="status" id="statusText"></div>
+						</div>
+					</section>
+
+					<section id="footer">
+						<br>
+						<a href="/index.html"><b>Zhujingqi</b></a> - By Jacky Zhu<br><br>
+						<h6>©杰基教会 版权所有</h6>
+					</section>
+				</div>
+
+				<div class="img-box">
+					<img src="jackianity.svg" alt="Jackianity Logo">
+					<br>
+					这是杰基教的标志。它像一个棍子，上面有两条杠。它也类似于基督教的十字架。
+				</div>
+			</div>
+			<div class="btn" onclick="window.location.replace('index.html');">EN/中文</div>
+		</main>
+		<div class="overlay" id="overlay">
+			<div class="popup">
+				欢迎成为杰基教徒！<br><br>
+				<input type="text" placeholder="Name" />
+				<h6>注：我们不会记录你的名字，因为这不是一个真的注册窗口。</h6>
+				<label><input type="checkbox"> 我想成为杰基教徒</label>
+				<button class="confirm-btn" id="closePopup">注册</button>
+			</div>
+		</div>
+		<script>
+			const links = document.querySelectorAll('nav a');
+			const sections = document.querySelectorAll('main section');
+
+			window.addEventListener('scroll', () => {
+				let current = '';
+				sections.forEach(section => {
+					const sectionTop = section.offsetTop - 60;
+					if (pageYOffset >= sectionTop) current = section.getAttribute('id');
+				});
+				links.forEach(link => link.classList.remove('active'));
+				document.querySelector('nav a[href="#' + current + '"]').classList.add('active');
+			});
+
+			links.forEach(link => {
+				link.addEventListener('click', e => {
+					e.preventDefault();
+					const target = document.querySelector(link.getAttribute('href'));
+					target.scrollIntoView({
+						behavior: 'smooth'
+					});
+				});
+			});
+
+			const openBtn = document.getElementById("openPopup");
+			const overlay = document.getElementById("overlay");
+			const closeBtn = document.getElementById("closePopup");
+
+			openBtn.onclick = () => overlay.style.display = "flex";
+			closeBtn.onclick = () => overlay.style.display = "none";
+			overlay.onclick = e => {
+				if (e.target === overlay) overlay.style.display = "none";
+			};
+		</script>
+		<noscript>
+			<style>
+				body {
+					display: none;
+				}
+			</style>
+			No Script!
+		</noscript>
+		<script>
+			const dbKey = 'jackianitytextdbonline';
+			const dbReadURL = 'https://textdb.online/' + dbKey;
+			const dbWriteURL = 'https://api.textdb.online/update/';
+			const messagesDiv = document.getElementById('messages');
+			const status = document.getElementById('statusText');
+			async function loadMessages() {
+				try {
+					const res = await fetch(dbReadURL);
+					const text = await res.text();
+					messagesDiv.innerHTML = text || "暂无评论！";
+					status.innerText = "已加载";
+				} catch (err) {
+					messagesDiv.textContent = "错误";
+					status.innerText = "请检查网络连接";
+				}
+			}
+			async function submitMessage() {
+				const name = document.getElementById('nickname').value.trim() || "匿名的杰基教徒";
+				const message = document.getElementById('newMessage').value.trim();
+				if (!message) {
+					alert("请说一些东西！");
+					return;
+				}
+				const timestamp = new Date().toLocaleString();
+				const newEntry =
+					`<span style="color: gray;">[${timestamp}]</span><br><strong>${name}</strong>: ${message}<br>\n`;
+				try {
+					const res = await fetch(dbReadURL);
+					const oldText = await res.text();
+					const params = new URLSearchParams();
+					params.append('key', dbKey);
+					params.append('value', oldText + newEntry);
+					const updateRes = await fetch(dbWriteURL, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: params.toString()
+					});
+					const result = await updateRes.json();
+					if (result.status !== 1) throw new Error("API ERROR");
+					document.getElementById('newMessage').value = '';
+					loadMessages();
+					status.innerText = "已发送";
+				} catch (err) {
+					console.error(err);
+					status.innerText = "错误";
+				}
+			}
+			loadMessages();
+			messagesDiv.scrollTop = messagesDiv.scrollHeight;
+		</script>
+	</body>
+
+</html>

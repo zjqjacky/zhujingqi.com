@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>试卷传奇 - Zhujingqi</title>
+		<style>
+			body {
+				margin: 0;
+				background: linear-gradient(135deg, #b1f7d9, #00aaff);
+				overflow: hidden;
+				user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+			}
+
+			#game {
+				width: 100vw;
+				height: 100vh;
+				display: none;
+				justify-content: center;
+				align-items: center;
+				position: relative;
+			}
+
+			#desk {
+				width: 800px;
+				height: 400px;
+				background: #c27c4a;
+				border-radius: 30px;
+				position: relative;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+			}
+
+			a {
+				color: #666;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #888;
+				text-decoration: underline;
+			}
+
+			.item {
+				width: 80px;
+				height: 80px;
+				position: absolute;
+				cursor: pointer;
+				border-radius: 10px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: bold;
+				color: #fff;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+				transition: all 0.3s ease;
+				text-align: center;
+			}
+
+			.item:hover {
+				transform: scale(1.1);
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+			}
+
+			#folder {
+				top: 50px;
+				left: 50px;
+				background: #ff6f61;
+				width: 100px;
+				height: 140px;
+				border-radius: 20px;
+				padding: 10px;
+				box-sizing: border-box;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				font-weight: bold;
+				color: #fff;
+				justify-content: flex-start;
+			}
+
+			#music {
+				top: 50px;
+				left: 250px;
+				background: #88b04b;
+				border-radius: 10px;
+				width: 100px;
+				height: 60px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 12px;
+				text-align: center;
+			}
+
+			#snack {
+				top: 50px;
+				left: 400px;
+				background: #f7cac9;
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: #000;
+				font-weight: bold;
+				font-size: 12px;
+				text-align: center;
+			}
+
+			#shop-button {
+				top: 50px;
+				right: 50px;
+				width: 80px;
+				height: 80px;
+				background: #f28c28;
+				border-radius: 10px;
+				position: absolute;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: bold;
+				cursor: pointer;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+				transition: all 0.3s ease;
+			}
+
+			#shop-button:hover {
+				transform: scale(1.1);
+			}
+
+			#shop-title {
+				font-size: 25px;
+				font-weight: bold;
+				color: #fff;
+			}
+
+			#achievements-title {
+				font-size: 25px;
+				font-weight: bold;
+				color: #fff;
+			}
+
+			.paper {
+				width: 100px;
+				height: 140px;
+				background: #fff;
+				color: #000;
+				border: 2px solid #ccc;
+				border-radius: 5px;
+				position: absolute;
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-start;
+				align-items: center;
+				font-weight: bold;
+				cursor: pointer;
+				overflow: hidden;
+				margin-bottom: 10px;
+				transition: transform 0.3s ease;
+			}
+
+			.paper:hover {
+				transform: scale(1.1) rotate(-2deg);
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+			}
+
+			.progress-bar {
+				width: 90%;
+				height: 10px;
+				background: rgba(0, 0, 0, 0.2);
+				border-radius: 5px;
+				margin-top: 5px;
+				overflow: hidden;
+			}
+
+			.progress {
+				width: 0%;
+				height: 100%;
+				background: linear-gradient(to right, #ffff00, #b1f7d9);
+				transition: width 0.2s linear;
+			}
+
+			.ink {
+				position: absolute;
+				width: 4px;
+				height: 4px;
+				background: black;
+				border-radius: 50%;
+				pointer-events: none;
+				opacity: 0.8;
+			}
+
+			#stats {
+				position: absolute;
+				top: -50px;
+				left: 0;
+				width: 100%;
+				display: flex;
+				justify-content: space-around;
+			}
+
+			.bar-container {
+				width: 150px;
+				height: 20px;
+				background: rgba(255, 255, 255, 0.3);
+				border-radius: 10px;
+				overflow: hidden;
+			}
+
+			.bar {
+				height: 100%;
+				width: 0%;
+				border-radius: 10px;
+				background: linear-gradient(to right, #ffc371, #ff5f6d);
+				transition: width 0.5s ease;
+			}
+
+			#popup,
+			#shop,
+			#custom-alert,
+			#command {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: #ff6f61;
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+				display: none;
+				flex-direction: column;
+				align-items: center;
+				max-width: 400px;
+				z-index: 100;
+				opacity: 0;
+				transition: opacity 0.5s ease;
+			}
+
+			#popup.show,
+			#shop.show,
+			#custom-alert.show,
+			#command.show {
+				display: flex;
+				opacity: 1;
+			}
+
+			#popup.hiding,
+			#shop.hiding,
+			#custom-alert.hiding,
+			#command.hiding {
+				opacity: 0;
+				transform: translate(-50%, -60%) scale(0.85);
+			}
+
+			#popup button,
+			#shop button,
+			#custom-alert button,
+			#achievements button,
+			#save-btn,
+			#load-btn {
+				margin: 5px;
+				padding: 5px 10px;
+				border: none;
+				border-radius: 20px;
+				background: #fff;
+				color: #000;
+				cursor: pointer;
+				width: 100px;
+				text-align: center;
+				transition: 0.2s;
+			}
+
+			#popup button:hover,
+			#shop button:hover,
+			#custom-alert button:hover,
+			#achievements button:hover,
+			#save-btn:hover,
+			#load-btn:hover {
+				transform: scale(1.1);
+				background: #b1f7d9;
+			}
+
+			#shop-items {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+
+			.shop-item {
+				width: 80px;
+				height: 80px;
+				background: #ffcc5c;
+				margin: 5px;
+				border-radius: 20px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				font-size: 15px;
+				cursor: pointer;
+				transition: transform 0.3s ease;
+			}
+
+			.shop-item:hover {
+				transform: scale(1.1);
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+			}
+
+			#command input {
+				width: 200px;
+				padding: 5px;
+				border-radius: 10px;
+				border: none;
+			}
+
+			.shop-item.disabled {
+				background: #aaa !important;
+				color: #555 !important;
+				cursor: not-allowed !important;
+				filter: grayscale(100%);
+				opacity: 0.7;
+				box-shadow: none !important;
+				transform: none !important;
+			}
+
+			.shop-item.disabled:hover {
+				transform: none !important;
+				box-shadow: none !important;
+			}
+
+			.disabled {
+				pointer-events: auto;
+				cursor: not-allowed !important;
+			}
+
+			#popup,
+			#shop,
+			#custom-alert,
+			#command {
+				transition:
+					opacity 0.5s ease,
+					transform 0.5s ease;
+				transform: translate(-50%, -60%) scale(0.9);
+			}
+
+			#popup.show,
+			#shop.show,
+			#custom-alert.show,
+			#command.show {
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			#custom-alert {
+				background: #ff6f61;
+				animation: popAlert 0.4s ease;
+			}
+
+			@keyframes popAlert {
+				0% {
+					transform: translate(-50%, -60%) scale(0.6);
+					opacity: 0;
+				}
+
+				100% {
+					transform: translate(-50%, -50%) scale(1);
+					opacity: 1;
+				}
+			}
+
+			#shop {
+				animation: shopIn 0.4s ease;
+			}
+
+			@keyframes shopIn {
+				from {
+					opacity: 0;
+					transform: translate(-50%, -70%) scale(0.7);
+				}
+
+				to {
+					opacity: 1;
+					transform: translate(-50%, -50%) scale(1);
+				}
+			}
+
+			#popup {
+				animation: popupIn 0.35s ease;
+			}
+
+			@keyframes popupIn {
+				from {
+					opacity: 0;
+					transform: translate(-50%, -65%) scale(0.8);
+				}
+
+				to {
+					opacity: 1;
+					transform: translate(-50%, -50%) scale(1);
+				}
+			}
+
+			.shop-item:active {
+				transform: scale(0.95);
+			}
+
+			#achievements {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: #9c88ff;
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+				display: none;
+				flex-direction: column;
+				align-items: center;
+				max-width: 400px;
+				z-index: 100;
+				opacity: 0;
+				transition: opacity 0.5s ease, transform 0.5s ease;
+			}
+
+			#achievements.show {
+				display: flex;
+				opacity: 1;
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			#achievements.hiding {
+				opacity: 0;
+				transform: translate(-50%, -60%) scale(0.85);
+			}
+
+			#achievement-list {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 10px;
+			}
+
+			.achievement {
+				width: 80px;
+				height: 80px;
+				background: #ffcc5c;
+				border-radius: 20px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				font-size: 15px;
+				cursor: pointer;
+				position: relative;
+				transition: transform 0.3s ease;
+			}
+
+			.achievement:hover {
+				transform: scale(1.1);
+			}
+
+			.achievement-tooltip {
+				position: absolute;
+				bottom: 110%;
+				left: 50%;
+				transform: translateX(-50%);
+				background: rgba(0, 0, 0, 0.8);
+				color: #fff;
+				padding: 4px 8px;
+				border-radius: 10px;
+				font-size: 12px;
+				white-space: nowrap;
+				pointer-events: none;
+				opacity: 0;
+				transition: opacity 0.2s;
+			}
+
+			#achievements-button {
+				top: 150px;
+				right: 50px;
+				width: 80px;
+				height: 50px;
+				background: #9c88ff;
+				border-radius: 10px;
+				position: absolute;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: bold;
+				cursor: pointer;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+				transition: all 0.3s ease;
+			}
+
+			#achievements-button:hover {
+				transform: scale(1.1);
+			}
+
+			#achievement-toast {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: linear-gradient(135deg, #ffeaa7, #fd79a8, #a29bfe);
+				color: #000;
+				padding: 15px 25px;
+				border-radius: 20px;
+				font-weight: bold;
+				box-shadow: 0 15px 40px rgba(0, 0, 0, .4);
+				transform: translateX(150%) scale(.5) rotate(-10deg);
+				opacity: 0;
+				transition: .6s cubic-bezier(.2, 1.4, .4, 1);
+				z-index: 9999;
+			}
+
+			#achievement-toast.show {
+				transform: translateX(0) scale(1) rotate(0deg);
+				opacity: 1;
+			}
+
+			#achievement-toast.hide {
+				transform: translateX(150%) scale(.5) rotate(10deg);
+				opacity: 0;
+			}
+
+			#save-load {
+				position: absolute;
+				bottom: -50px;
+				left: 50%;
+				transform: translateX(-50%);
+				display: flex;
+				gap: 10px;
+				z-index: 10;
+			}
+
+			#chat-popup {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: #00c0ff;
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+				display: none;
+				flex-direction: column;
+				align-items: center;
+				width: 600px;
+				z-index: 100;
+				opacity: 0;
+				transition: opacity 0.5s ease, transform 0.5s ease;
+			}
+
+			#chat-popup.show {
+				display: flex;
+				opacity: 1;
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			#chat-popup input,
+			#chat-popup textarea {
+				width: 90%;
+				margin-top: 10px;
+				padding: 10px;
+				border-radius: 20px;
+				margin: 10px;
+				border: none;
+				font-family: sans-serif;
+			}
+
+			#chat-popup button {
+				margin: 5px;
+				padding: 5px 10px;
+				border-radius: 20px;
+				border: none;
+				background: #fff;
+				color: #000;
+				cursor: pointer;
+				width: 100px;
+				transition: 0.2s;
+			}
+
+			#chat-popup button:hover {
+				background: #b1f7d9;
+				transform: scale(1.1);
+			}
+
+			#chat-messages {
+				width: 90%;
+				height: 200px;
+				background: #fff;
+				overflow-y: auto;
+				padding: 10px;
+				margin: 10px;
+				border-radius: 20px;
+			}
+
+			#chat-button {
+				top: 220px;
+				right: 50px;
+				width: 80px;
+				height: 50px;
+				background: #00c0ff;
+				z-index: 10;
+			}
+
+			#title-screen {
+				background: linear-gradient(135deg, #b1f7d9, #00aaff);
+				width: 100vw;
+				height: 100vh;
+				margin: 0;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 10px;
+				opacity: 1;
+				transition: opacity 0.8s ease;
+			}
+
+			#title-screen.fade-out {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			#title-screen h1 {
+				font-size: 80px;
+				color: #eee;
+				text-shadow: 4px 4px 15px #000;
+				animation: titlePulse 1s infinite alternate;
+				margin-bottom: 40px;
+				text-align: center;
+			}
+
+			@keyframes titlePulse {
+				0% {
+					transform: scale(1);
+					text-shadow: 2px 2px 10px #000;
+				}
+
+				100% {
+					transform: scale(1.05);
+					text-shadow: 6px 6px 25px #000;
+				}
+			}
+
+			.menu-button {
+				font-size: 20px;
+				padding: 12px 50px;
+				margin: 15px;
+				width: 200px;
+				background: linear-gradient(135deg, #ff6f61, #f28c28);
+				border: none;
+				border-radius: 30px;
+				cursor: pointer;
+				color: #fff;
+				font-weight: bold;
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+				transition: all 0.3s ease;
+			}
+
+			.menu-button:hover {
+				transform: scale(1.1) rotate(-1deg);
+				box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+			}
+
+			#intro-popup {
+				display: none;
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(0, 0, 0, 0.8);
+				color: #fff;
+				padding: 30px;
+				border-radius: 20px;
+				max-width: 500px;
+				text-align: center;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+			}
+
+			#intro-popup.show {
+				opacity: 1;
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			#intro-popup.hiding {
+				opacity: 0;
+				transform: translate(-50%, -50%) scale(0.9);
+			}
+
+			#intro-popup button {
+				margin: 5px;
+				padding: 5px 10px;
+				border: none;
+				border-radius: 20px;
+				background: #fff;
+				color: #000;
+				cursor: pointer;
+				width: 100px;
+				text-align: center;
+				transition: 0.2s;
+			}
+
+			#intro-popup button:hover {
+				background: #b1f7d9;
+				transform: scale(1.1);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="title-screen">
+			<h1>试卷传奇</h1>
+			<button class="menu-button" id="start-btn">开始游戏</button>
+			<button class="menu-button" id="intro-btn">介绍</button>
+			<p><a href="https://zhujingqi.com">zhujingqi</a> · <a href="https://zhujingqi.com/game/">更多游戏</a> · <a href="https://zhujingqi.com/money.html">赞助</a>
+			</p>
+		</div>
+		<div id="intro-popup">
+			<h2>游戏介绍</h2>
+			<p>1. 点击文件夹获取试卷并完成试卷以获得经验！</p>
+			<p>2. 写完试卷后，你会更加疲劳，放松以降低疲劳度！</p>
+			<p>3. 使用经验在商店购买道具！</p>
+			<p>4. 许多成就等你解锁！</p>
+			<p>5. 和学霸们聊天！</p>
+			<p>6. 存档系统帮助你保存游戏记录！</p>
+			<button onclick="hideIntro()">关闭</button>
+		</div>
+		<div id="game">
+			<div id="desk">
+				<div id="stats">
+					<div>经验: <span id="xp-text">0</span></div>
+					<div>疲劳: <span id="fatigue-text">0</span>/100</div>
+					<div class="bar-container">
+						<div id="fatigue-bar" class="bar"></div>
+					</div>
+					<div>速度: <span id="speed-text">1</span></div>
+				</div>
+				<div id="folder" class="item">文件夹</div>
+				<div id="music" class="item">收音机<br />10</div>
+				<div id="snack" class="item">零食<br />(3/3)</div>
+				<div id="shop-button" class="item">商店</div>
+				<div id="achievements-button" class="item">成就</div>
+				<div id="chat-button" class="item">聊天</div>
+				<div id="save-load">
+					<button id="save-btn">保存存档</button>
+					<button id="load-btn">读取存档</button>
+					<input type="file" id="load-input" style="display:none;" accept=".txt" />
+				</div>
+			</div>
+		</div>
+		<div id="popup"></div>
+		<div id="achievement-toast"></div>
+		<div id="shop">
+			<h3 id="shop-title">商店</h3>
+			<div id="shop-items"></div>
+			<br />
+			<button id="shop-close">关闭</button>
+		</div>
+		<div id="achievements">
+			<h3 id="achievements-title">成就</h3>
+			<div id="achievement-list"></div>
+			<br />
+			<button id="achievements-close">关闭</button>
+		</div>
+		<div id="chat-popup">
+			<h3 id="chat-title">学霸群</h3>
+			<div id="chat-messages">加载中...</div>
+			<input type="text" id="chat-name" placeholder="名字">
+			<textarea id="chat-text" rows="3" placeholder="消息"></textarea>
+			<button id="chat-send">发送</button>
+			<button onclick="hide(chatPopup)">关闭</button>
+		</div>
+		<div id="custom-alert">
+			<div id="alert-text"></div>
+			<button onclick="closeAlert()">确定</button>
+		</div>
+		<div id="command">
+			<input type="text" />
+		</div>
+		<script>
+			document.getElementById('start-btn').onclick = () => {
+				const title = document.getElementById('title-screen');
+				title.classList.add('fade-out');
+				setTimeout(() => {
+					title.style.display = 'none';
+					document.getElementById('game').style.display = 'flex';
+				}, 800);
+			};
+			document.getElementById('intro-btn').onclick = () => {
+				document.getElementById('intro-popup').style.display = 'block';
+			}
+
+			function hideIntro() {
+				document.getElementById('intro-popup').style.display = 'none';
+			}
+			document.addEventListener('contextmenu', e => {
+				e.preventDefault();
+			});
+			let totalXP = 0,
+				fatigue = 0,
+				speedLevel = 1;
+			let snackCount = 3,
+				vipRemaining = 10;
+			let folderSlots = 1,
+				papers = [];
+			let subjects = ['语文', '数学', '英语'];
+			let autoPaperBought = false;
+			let boughtBrain = false;
+			let boughtConsole = false;
+			let consoleCooldown = 0;
+			const desk = document.getElementById('desk');
+			const folder = document.getElementById('folder');
+			const popup = document.getElementById('popup');
+			const shop = document.getElementById('shop');
+			const shopItems = document.getElementById('shop-items');
+			const shopBtn = document.getElementById('shop-button');
+			const xpText = document.getElementById('xp-text');
+			const fatigueText = document.getElementById('fatigue-text');
+			const speedText = document.getElementById('speed-text');
+			const fatigueBar = document.getElementById('fatigue-bar');
+			const snack = document.getElementById('snack');
+			const music = document.getElementById('music');
+			const alertBox = document.getElementById('custom-alert');
+			const alertText = document.getElementById('alert-text');
+			const achievementsBtn = document.getElementById('achievements-button');
+			achievementsBtn.onclick = () => {
+				renderAchievements();
+				show(achievementsPanel);
+			};
+			document.addEventListener('click', e => {
+				if (!popup.classList.contains('show')) return;
+				if (popup.contains(e.target)) return;
+				if (folder.contains(e.target)) return;
+				hide(popup);
+			});
+
+			function show(el) {
+				el.classList.remove('hiding');
+				el.style.display = 'flex';
+				el.offsetHeight;
+				el.classList.add('show');
+			}
+
+			function hide(el) {
+				if (!el.classList.contains('show')) return;
+				el.classList.add('hiding');
+				el.classList.remove('show');
+				setTimeout(() => {
+					el.classList.remove('hiding');
+					el.style.display = 'none';
+				}, 500);
+			}
+
+			function showAlert(msg) {
+				alertText.innerText = msg;
+				show(alertBox);
+			}
+
+			function closeAlert() {
+				hide(alertBox);
+			}
+
+			function updateStats() {
+				xpText.innerText = totalXP;
+				let f = Math.min(fatigue, 100);
+				fatigueText.innerText = f;
+				fatigueBar.style.width = f + '%';
+				speedText.innerText = speedLevel === 10 ? '10 (MAX)' : speedLevel;
+				snack.innerHTML = `零食<br>(${snackCount}/3)`;
+				music.innerHTML = `收音机<br>${vipRemaining}`;
+			}
+			folder.onclick = () => {
+				popup.innerHTML = '';
+				subjects.forEach(s => {
+					let b = document.createElement('button');
+					b.innerText = s;
+					b.onclick = () => {
+						if (papers.length >= folderSlots) {
+							showAlert('桌面已满！');
+							return;
+						}
+						addPaper(s);
+						hide(popup);
+					};
+					popup.appendChild(b);
+				});
+				show(popup);
+			};
+
+			function addPaper(sub, index) {
+				let p = document.createElement('div');
+				p.className = 'paper';
+				let pos = index !== undefined ? index : papers.length;
+				p.style.left = folder.offsetLeft + "px";
+				p.style.top = folder.offsetTop + "px";
+				p.style.opacity = 0;
+				p.style.transform = "scale(.3)";
+				p.innerHTML = `
+			${sub}试卷
+			<div class="progress-bar">
+			    <div class="progress"></div>
+			</div>
+			`;
+				desk.appendChild(p);
+				setTimeout(() => {
+					p.style.transition = "all .5s cubic-bezier(.2,1.4,.4,1)";
+					p.style.left = 50 + pos * 110 + 'px';
+					p.style.top = '210px';
+					p.style.opacity = 1;
+					p.style.transform = "scale(1)";
+				}, 10);
+				let obj = {
+					el: p,
+					writing: false
+				};
+				papers.splice(pos, 0, obj);
+				p.onclick = () => writePaper(obj);
+			}
+
+			function writePaper(obj) {
+				if (obj.writing || fatigue >= 100) return;
+				obj.writing = true;
+				let bar = obj.el.querySelector('.progress');
+				let inks = [];
+				let time = (10000 + Math.random() * 4000) / Math.pow(1.2, speedLevel - 1);
+				let start = Date.now();
+				let t = setInterval(() => {
+					let ink = document.createElement('div');
+					ink.className = 'ink';
+					let size = 4 + Math.random() * 3;
+					ink.style.width = size + 'px';
+					ink.style.height = size + 'px';
+					ink.style.left = (parseInt(obj.el.style.left) + 5 + Math.random() * 90) + 'px';
+					ink.style.top = (parseInt(obj.el.style.top) + 45 + Math.random() * (130 - 40)) + 'px';
+					desk.appendChild(ink);
+					inks.push(ink);
+					let p = (Date.now() - start) / time * 100;
+					if (p > 100) p = 100;
+					bar.style.width = p + '%';
+					if (p >= 100) {
+						clearInterval(t);
+						inks.forEach(i => i.remove());
+						totalXP += 20;
+						if (boughtBrain) totalXP += 10;
+						fatigue += 5 + Math.random() * 8 | 0;
+						papersWritten++;
+						if (obj.el.innerText.includes('数学')) mathPapersWritten++;
+						checkAchievements();
+						let index = papers.indexOf(obj);
+						if (index !== -1) papers.splice(index, 1);
+						obj.el.style.transition = "opacity .4s ease, transform .4s ease";
+						obj.el.style.opacity = 0;
+						obj.el.style.transform = "scale(.7)";
+						setTimeout(() => {
+							obj.el.remove();
+						}, 400);
+						papers = papers.filter(o => o !== obj);
+						obj.writing = false;
+						if (autoPaperBought) autoFill();
+						if (fatigue >= 100) {
+							totalXP = 0;
+							fatigue = 80;
+							showAlert('由于过度劳累，你的肾出现了问题，\n需要花费全部经验！记得及时放松。');
+						}
+						updateStats();
+					}
+				}, 100);
+			}
+
+			function autoFill() {
+				papers = papers.filter(p => p.writing);
+				let emptySlots = folderSlots - papers.length;
+				for (let i = 0; i < emptySlots; i++) {
+					let s = subjects[Math.random() * subjects.length | 0];
+					addPaper(s, i);
+				}
+				papers.forEach((p, i) => {
+					p.el.style.left = 50 + i * 110 + 'px';
+					p.el.style.top = '210px';
+				});
+			}
+			music.onclick = () => {
+				if (vipRemaining > 0) {
+					vipRemaining--;
+					fatigue = Math.max(0, fatigue - 10);
+					updateStats();
+				} else {
+					showAlert('听歌次数已用完，请在商店购买');
+				}
+			};
+			snack.onclick = () => {
+				if (snackCount > 0) {
+					snackCount--;
+					fatigue = Math.max(0, fatigue - 20);
+					updateStats();
+				} else {
+					showAlert('零食已吃完，请在商店购买');
+				}
+			};
+			shopBtn.onclick = () => {
+				loadShop();
+				show(shop);
+			};
+			const gameConsole = document.createElement('div');
+			gameConsole.id = 'game-console';
+			gameConsole.style.position = 'absolute';
+			gameConsole.style.width = '100px';
+			gameConsole.style.height = '50px';
+			gameConsole.style.borderRadius = '15px';
+			gameConsole.style.background = 'black';
+			gameConsole.style.left = '500px';
+			gameConsole.style.top = '50px';
+			gameConsole.style.display = 'none';
+			gameConsole.style.cursor = 'pointer';
+			gameConsole.style.zIndex = 10;
+			gameConsole.innerHTML = `
+			  <div style="position:absolute; left:0; top:0; width:20%; height:100%; background:blue; border-radius:15px 0 0 15px;"></div>
+			  <div style="position:absolute; right:0; top:0; width:20%; height:100%; background:red; border-radius:0 15px 15px 0;"></div>
+			  <div class="cooldown-bar" style="position:absolute; bottom:-10px; left:0; width:100%; height:5px; background:rgba(255,255,255,0.3); border-radius:5px; overflow:hidden;">
+			    <div style="width:0%; height:100%; background:linear-gradient(to right, #0f0,#b1f7d9);" id="console-cd"></div>
+			  </div>
+			`;
+			desk.appendChild(gameConsole);
+			gameConsole.onclick = () => {
+				if (consoleCooldown > 0) {
+					showAlert(`游戏机冷却中，请等待${Math.ceil(consoleCooldown/1000)}秒`);
+					return;
+				}
+				fatigue = 0;
+				updateStats();
+				consoleCooldown = 30000;
+				let cdBar = document.getElementById('console-cd');
+				cdBar.style.width = '100%';
+				let cdInterval = setInterval(() => {
+					consoleCooldown -= 100;
+					let percent = Math.max(consoleCooldown / 30000 * 100, 0);
+					cdBar.style.width = percent + '%';
+					if (consoleCooldown <= 0) {
+						clearInterval(cdInterval);
+					}
+				}, 100);
+			};
+
+			function loadShop() {
+				shopItems.innerHTML = '';
+				const speedPrice = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+				let items = [{
+						name: '零食',
+						price: 30,
+						info: '补满零食',
+						done: () => false,
+						buy() {
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							snackCount = 3;
+							updateStats();
+						}
+					},
+					{
+						name: '收音机',
+						price: 50,
+						info: '增加10次听歌次数',
+						done: () => false,
+						buy() {
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							vipRemaining += 10;
+							updateStats();
+						}
+					},
+					{
+						name: '速度',
+						get price() {
+							return speedPrice[speedLevel - 1];
+						},
+						info: '提升写试卷的速度',
+						done: () => speedLevel >= 10,
+						buy() {
+							if (this.done()) {
+								showAlert('已购买');
+								return;
+							}
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							speedLevel++;
+						}
+					},
+					{
+						name: '脑子',
+						price: 80,
+						info: '带上爱因斯坦的脑子，\n每次写完试卷能额外获得10经验',
+						done: () => boughtBrain,
+						buy() {
+							if (this.done()) {
+								showAlert('已购买');
+								return;
+							}
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							boughtBrain = true;
+							updateStats();
+						}
+					},
+					{
+						name: '栏位',
+						price: 150,
+						info: '增加1个放试卷的栏位，\n可以同时写多张试卷',
+						done: () => folderSlots >= 6,
+						buy() {
+							if (this.done()) {
+								showAlert('已购买');
+								return;
+							}
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							folderSlots++;
+						}
+					},
+					{
+						name: '游戏机',
+						price: 200,
+						info: '玩一下即可缓解全部疲劳，\n冷却30秒',
+						done: () => boughtConsole,
+						buy() {
+							if (this.done()) {
+								showAlert('已购买');
+								return;
+							}
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							boughtConsole = true;
+							gameConsole.style.display = 'block';
+							updateStats();
+						}
+					},
+					{
+						name: '自动填充',
+						price: 300,
+						info: '试卷自己从文件夹中飞出\n并放在桌面上，这简直是魔法',
+						done: () => autoPaperBought,
+						buy() {
+							if (this.done()) {
+								showAlert('已购买');
+								return;
+							}
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							autoPaperBought = true;
+							autoFill();
+						}
+					}
+				];
+				const allSubjects = [
+					'物理', '化学', '历史', '政治', '生物', '地理',
+					'西班牙语', '德语', '法语', '日语',
+					'修仙', '杰基教'
+				];
+				allSubjects.forEach(s => {
+					items.push({
+						name: s,
+						price: 30,
+						info: '解锁新科目',
+						done: () => subjects.includes(s),
+						buy() {
+							if (this.done()) {
+								showAlert('已购买');
+								return;
+							}
+							if (totalXP < this.price) {
+								showAlert('经验不足');
+								return;
+							}
+							totalXP -= this.price;
+							subjects.push(s);
+						}
+					});
+				});
+				items.forEach(it => {
+					let div = document.createElement('div');
+					div.className = 'shop-item';
+					let price = it.price;
+					div.innerHTML = `
+    <b>${it.name}</b>
+    <div>${price} XP</div>
+    `;
+					let info = document.createElement('div');
+					info.className = 'shop-tooltip';
+					info.innerText = it.info;
+					info.style.position = 'absolute';
+					info.style.background = 'rgba(0,0,0,0.8)';
+					info.style.color = '#fff';
+					info.style.padding = '4px 8px';
+					info.style.borderRadius = '10px';
+					info.style.fontSize = '15px';
+					info.style.whiteSpace = 'nowrap';
+					info.style.pointerEvents = 'none';
+					info.style.opacity = 0;
+					info.style.transition = 'opacity 0.2s';
+					info.style.zIndex = 9999;
+					div.appendChild(info);
+					div.addEventListener('mouseenter', () => {
+						info.style.opacity = 1;
+						info.style.top = '-10px';
+						info.style.left = '50%';
+						info.style.transform = 'translateX(-50%)';
+					});
+					div.addEventListener('mouseleave', () => {
+						info.style.opacity = 0;
+					});
+					if (it.done()) {
+						div.classList.add('disabled');
+						div.onclick = () => showAlert('已购买');
+					} else {
+						div.onclick = () => {
+							it.buy();
+							updateStats();
+							loadShop();
+						};
+					}
+					shopItems.appendChild(div);
+				});
+			}
+			document.getElementById('shop-close').onclick = () => hide(shop);
+			const achievementsPanel = document.getElementById('achievements');
+			const achievementList = document.getElementById('achievement-list');
+			document.getElementById('achievements-close').onclick = () => hide(achievementsPanel);
+			const achievementsData = [{
+					name: "我爱做题",
+					desc: "写完1张试卷",
+					unlocked: false,
+					check: () => papersWritten >= 1
+				},
+				{
+					name: "我超爱做题",
+					desc: "写完50张试卷",
+					unlocked: false,
+					check: () => papersWritten >= 50
+				},
+				{
+					name: "小学生",
+					desc: "达到200经验",
+					unlocked: false,
+					check: () => totalXP >= 200
+				},
+				{
+					name: "学者",
+					desc: "达到500经验",
+					unlocked: false,
+					check: () => totalXP >= 500
+				},
+				{
+					name: "资深学者",
+					desc: "达到888经验",
+					unlocked: false,
+					check: () => totalXP >= 888
+				},
+				{
+					name: "音乐爱好者",
+					desc: "将收音机剩余次数买至100次",
+					unlocked: false,
+					check: () => vipRemaining >= 100
+				},
+				{
+					name: "理性光辉",
+					desc: "累计写30张数学卷子",
+					unlocked: false,
+					check: () => mathPapersWritten >= 30
+				},
+				{
+					name: "全面发展",
+					desc: "解锁所有科目",
+					unlocked: false,
+					check: () => subjects.length >= 12
+				}
+			];
+			let papersWritten = 0;
+			let mathPapersWritten = 0;
+
+			function checkAchievements() {
+				achievementsData.forEach(a => {
+					if (!a.unlocked && a.check()) {
+						a.unlocked = true;
+						renderAchievements();
+						showAchievementToast(a.name);
+					}
+				});
+			}
+
+			function renderAchievements() {
+				achievementList.innerHTML = '';
+				achievementsData.forEach(a => {
+					let div = document.createElement('div');
+					div.className = 'achievement';
+					div.innerText = a.name;
+					if (!a.unlocked) {
+						div.style.filter = 'grayscale(100%)';
+						div.style.opacity = 0.5;
+					}
+					let tooltip = document.createElement('div');
+					tooltip.className = 'achievement-tooltip';
+					tooltip.innerText = a.desc;
+					div.appendChild(tooltip);
+					div.addEventListener('mouseenter', () => tooltip.style.opacity = 1);
+					div.addEventListener('mouseleave', () => tooltip.style.opacity = 0);
+					achievementList.appendChild(div);
+				});
+			}
+			const achievementToast = document.getElementById('achievement-toast');
+
+			function showAchievementToast(name) {
+				achievementToast.innerText = "🏆 成就解锁：" + name;
+				achievementToast.classList.remove('hide');
+				achievementToast.classList.add('show');
+				setTimeout(() => {
+					achievementToast.classList.remove('show');
+					achievementToast.classList.add('hide');
+				}, 2000);
+			}
+			const saveBtn = document.getElementById('save-btn');
+			const loadBtn = document.getElementById('load-btn');
+			const loadInput = document.getElementById('load-input');
+
+			function saveGame() {
+				const saveData = {
+					totalXP,
+					fatigue,
+					speedLevel,
+					subjects,
+					snackCount,
+					vipRemaining,
+					folderSlots,
+					boughtBrain,
+					boughtConsole,
+					autoPaperBought,
+					papersWritten,
+					mathPapersWritten,
+					achievements: achievementsData.map(a => a.unlocked)
+				};
+				const blob = new Blob([JSON.stringify(saveData)], {
+					type: 'text/plain'
+				});
+				const now = new Date();
+				const yyyy = now.getFullYear();
+				const mm = String(now.getMonth() + 1).padStart(2, '0');
+				const dd = String(now.getDate()).padStart(2, '0');
+				const hh = String(now.getHours()).padStart(2, '0');
+				const min = String(now.getMinutes()).padStart(2, '0');
+				const ss = String(now.getSeconds()).padStart(2, '0');
+				const filename = `试卷游戏存档_${yyyy}-${mm}-${dd}_${hh}-${min}-${ss}.txt`;
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = filename;
+				a.click();
+				URL.revokeObjectURL(url);
+			}
+
+			function loadGame(file) {
+				const reader = new FileReader();
+				reader.onload = e => {
+					try {
+						const data = JSON.parse(e.target.result);
+						totalXP = data.totalXP || 0;
+						fatigue = data.fatigue || 0;
+						speedLevel = data.speedLevel || 1;
+						subjects = data.subjects || ['语文', '数学', '英语'];
+						snackCount = data.snackCount ?? 3;
+						vipRemaining = data.vipRemaining ?? 10;
+						folderSlots = data.folderSlots ?? 1;
+						boughtBrain = data.boughtBrain || false;
+						boughtConsole = data.boughtConsole || false;
+						autoPaperBought = data.autoPaperBought || false;
+						papersWritten = data.papersWritten || 0;
+						mathPapersWritten = data.mathPapersWritten || 0;
+						if (data.achievements && Array.isArray(data.achievements)) {
+							achievementsData.forEach((a, i) => {
+								a.unlocked = data.achievements[i] || false;
+							});
+						}
+						updateStats();
+						renderAchievements();
+						if (boughtConsole) gameConsole.style.display = 'block';
+						showAlert('存档加载成功！');
+					} catch (err) {
+						showAlert('存档读取失败，文件可能损坏！');
+					}
+				};
+				reader.readAsText(file);
+			}
+			saveBtn.onclick = saveGame;
+			loadBtn.onclick = () => loadInput.click();
+			loadInput.onchange = e => {
+				if (e.target.files.length > 0) {
+					loadGame(e.target.files[0]);
+					e.target.value = '';
+				}
+			};
+			const chatButton = document.getElementById('chat-button');
+			const chatPopup = document.getElementById('chat-popup');
+			const chatMessages = document.getElementById('chat-messages');
+			const chatSend = document.getElementById('chat-send');
+			const chatName = document.getElementById('chat-name');
+			const chatText = document.getElementById('chat-text');
+			const chatDBKey = 'zhujingqihomeworkgamechat';
+			const chatDBRead = 'https://textdb.online/' + chatDBKey;
+			const chatDBWrite = 'https://api.textdb.online/update/';
+			chatButton.onclick = () => {
+				loadChat();
+				show(chatPopup);
+			};
+			async function loadChat() {
+				try {
+					const res = await fetch(chatDBRead);
+					const text = await res.text();
+					chatMessages.innerHTML = text || "没有消息";
+					chatMessages.scrollTop = chatMessages.scrollHeight;
+				} catch (e) {
+					chatMessages.textContent = "加载失败！️";
+				}
+			}
+
+			chatSend.onclick = async () => {
+				const name = chatName.value.trim() || "没写名字0分";
+				const msg = chatText.value.trim();
+				if (!msg) return alert("请输入消息！");
+				const time = new Date().toLocaleString();
+				const entry = `<span style="color:gray;">[${time}]</span><br><strong>${name}</strong>: ${msg}<br>\n`;
+				try {
+					const res = await fetch(chatDBRead);
+					const oldText = await res.text();
+					const params = new URLSearchParams();
+					params.append('key', chatDBKey);
+					params.append('value', oldText + entry);
+					const updateRes = await fetch(chatDBWrite, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: params.toString()
+					});
+					const result = await updateRes.json();
+					if (result.status !== 1) throw new Error('API错误');
+					chatText.value = '';
+					loadChat();
+				} catch (err) {
+					console.error(err);
+					alert("发送失败！");
+				}
+			};
+			const command = document.getElementById('command');
+			const input = command.querySelector('input');
+			window.addEventListener('keydown', e => {
+				if (e.key === '/' && !command.classList.contains('show')) {
+					e.preventDefault();
+					show(command);
+					input.focus();
+				}
+			});
+			input.addEventListener('keydown', e => {
+				if (e.key === 'Enter') {
+					let v = e.target.value.split(' ');
+					if (v[0] === 'xp') {
+						let n = parseInt(v[1]);
+						if (!isNaN(n)) totalXP = n;
+					}
+					if (v[0] === 'speed') {
+						let n = parseInt(v[1]);
+						if (!isNaN(n)) speedLevel = Math.min(n, 10);
+					}
+					hide(command);
+					e.target.value = '';
+					updateStats();
+				}
+			});
+			updateStats();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Windows 蓝屏</title>
+		<style>
+			body {
+				background-color: #0000AA;
+				color: white;
+				font-family: "Courier New", monospace;
+				font-size: 18px;
+				text-align: left;
+				padding: 50px;
+				margin: 0px;
+				white-space: pre-line;
+				cursor: none;
+			}
+
+			.container {
+				max-width: 800px;
+				margin: auto;
+			}
+		</style>
+		<script>
+			function goFullscreen() {
+				document.documentElement.requestFullscreen();
+			}
+			window.onload = function() {
+				setTimeout(goFullscreen, 2000);
+			};
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			A problem has been detected and Windows has been shut down to prevent damage to your computer.<br>
+			UNMOUNTABLE_BOOT_VOLUME<br>
+			If this is the first time you've seen this error screen, restart your computer. If this screen appears again, follow these steps:<br>
+			Check to make sure any new hardware or software is properly installed.<br>
+			If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.<br>
+			If problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing.<br>
+			If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then Select Safe Mode.<br>
+			Technical Information<br>
+			*** STOP: 0X00000ED (0X0000000, 0X0000000, 0X00000000, 0X00000000)<br>
+			But is it all true?<br>
+			No! Everything is just a prank! This is a fake blue death in fullscreen mode! :)<br>
+			Press F11 and go to <a href="https://zhujingqi.com" style="color: white; text-decoration: none;">zhujingqi.com</a>!!!<br>
+		</div>
+	</body>
+</html>

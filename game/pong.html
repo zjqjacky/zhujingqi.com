@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Pong - Zhujingqi</title>
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/bar.css" />
+		<style>
+			body {
+				margin: 0;
+				background: black;
+			}
+
+			canvas {
+				background: #111;
+				border: 5px solid white;
+				border-radius: 5px;
+			}
+
+
+			.pongtext {
+				background-color: #111111;
+				color: #eee;
+				border-radius: 20px;
+				padding: 20px;
+				margin: 10px;
+				transition: 0.2s;
+			}
+
+			.pongtext:hover {
+				background-color: #161616;
+				transition: 0.2s;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="/game/">回到游戏中心</a>
+			<a><b>Pong</b></a>
+		</div>
+		<br><br>
+		<center>
+			<canvas id="pong" width="800" height="500"></canvas>
+		</center>
+		<br><br>
+		<div class="pongtext">
+			<h2>Pong</h2>
+			左边玩家：W向上移动，S向下移动。<br>
+			右边玩家：↑向上移动，↓向下移动。<br>
+			<br>
+			喜欢这个游戏？别忘了<a href="/money.html" style="color: #ffff7f; ">赞助</a>！
+		</div>
+		<script>
+			const canvas = document.getElementById('pong');
+			const ctx = canvas.getContext('2d');
+			const ps = 10; // paddle size
+			const pw = 16; // paddle width
+			const ph = 120; // paddle height
+			const bs = 20; // ball size
+			const pX = 20; // player X
+			const oX = canvas.width - pX - pw; // opponent X
+			let pY = (canvas.height - ph) / 2; // player Y
+			let oY = (canvas.height - ph) / 2; // opponent Y
+			let bX = canvas.width / 2 - bs / 2; // ball X
+			let bY = canvas.height / 2 - bs / 2; // ball Y
+			let bsX = 5; // ball speed X
+			let bsY = 4; // ball speed Y
+			let pSc = 0; // player score
+			let oSc = 0; // opponent score
+			const keys = {};
+			document.addEventListener('keydown', e => keys[e.key] = true);
+			document.addEventListener('keyup', e => keys[e.key] = false);
+
+			function drR(x, y, w, h, color, radius = 10) { // draw rectangle
+				ctx.fillStyle = color;
+				ctx.beginPath();
+				ctx.moveTo(x + radius, y);
+				ctx.lineTo(x + w - radius, y);
+				ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+				ctx.lineTo(x + w, y + h - radius);
+				ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+				ctx.lineTo(x + radius, y + h);
+				ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+				ctx.lineTo(x, y + radius);
+				ctx.quadraticCurveTo(x, y, x + radius, y);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			function drT(text, x, y, size, color) { // draw text
+				ctx.fillStyle = color;
+				ctx.font = `${size}px monospace`;
+				ctx.fillText(text, x, y);
+			}
+
+			function collide(x, y, w, h, bx, by, bs) {
+				return (
+					x < bx + bs &&
+					x + w > bx &&
+					y < by + bs &&
+					y + h > by
+				);
+			}
+
+			function resetBall() {
+				bX = canvas.width / 2 - bs / 2;
+				bY = canvas.height / 2 - bs / 2;
+				bsX = (Math.random() < 0.5 ? 1 : -1) * 5;
+				bsY = (Math.random() < 0.5 ? 1 : -1) * 4;
+			}
+
+			function movePlayers() {
+				if (keys["w"]) pY -= ps;
+				if (keys["s"]) pY += ps;
+
+				if (keys["ArrowUp"]) oY -= ps;
+				if (keys["ArrowDown"]) oY += ps;
+
+				pY = Math.max(0, Math.min(canvas.height - ph, pY));
+				oY = Math.max(0, Math.min(canvas.height - ph, oY));
+			}
+
+			function update() {
+				movePlayers();
+				bX += bsX;
+				bY += bsY;
+				if (bY <= 0 || bY + bs >= canvas.height) {
+					bsY *= -1;
+				}
+				if (collide(pX, pY, pw, ph, bX, bY, bs)) {
+					bsX = Math.abs(bsX);
+					const deltaY = (bY + bs / 2) - (pY + ph / 2);
+					bsY = deltaY * 0.25;
+				}
+				if (collide(oX, oY, pw, ph, bX, bY, bs)) {
+					bsX = -Math.abs(bsX);
+					const deltaY = (bY + bs / 2) - (oY + ph / 2);
+					bsY = deltaY * 0.25;
+				}
+				if (bX < 0) {
+					oSc++;
+					resetBall();
+				} else if (bX + bs > canvas.width) {
+					pSc++;
+					resetBall();
+				}
+			}
+
+			function render() {
+				drR(0, 0, canvas.width, canvas.height, '#111');
+				for (let i = 0; i < canvas.height; i += 35) {
+					drR(canvas.width / 2 - 2, i, 4, 20, '#333', 5);
+				}
+				drR(pX, pY, pw, ph, '#fff');
+				drR(oX, oY, pw, ph, '#fff');
+				ctx.fillStyle = '#fff';
+				ctx.beginPath();
+				ctx.arc(bX + bs / 2, bY + bs / 2, bs / 2, 0, Math.PI * 2);
+				ctx.fill();
+				drT(pSc, canvas.width / 2 - 80, 50, 48, '#00aaff');
+				drT(oSc, canvas.width / 2 + 50, 50, 48, '#b7f1d9');
+			}
+
+			function gameLoop() {
+				update();
+				render();
+				requestAnimationFrame(gameLoop);
+			}
+			resetBall();
+			gameLoop();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>GraF - Function Graphics</title>
+
+		<!-- Tailwind -->
+		<script src="https://cdn.tailwindcss.com"></script>
+
+		<!-- Font Awesome -->
+		<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+		<!-- Chart.js -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+		<!-- math.js -->
+		<script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
+
+		<style>
+			html,
+			body {
+				height: 100%;
+			}
+
+			button {
+				border-radius: 20px;
+			}
+
+			#point-tooltip {
+				position: fixed;
+				pointer-events: none;
+				z-index: 60;
+				background: rgba(0, 0, 0, 0.85);
+				color: #fff;
+				padding: 6px 8px;
+				border-radius: 10px;
+				font-size: 13px;
+				line-height: 1;
+				transform: translate(-50%, -120%);
+				white-space: nowrap;
+				display: none;
+			}
+
+			#chart-container {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+		<header class="bg-white shadow-sm">
+			<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+				<div class="flex items-center space-x-2">
+					<i class="fa fa-line-chart text-blue-600 text-2xl"></i>
+					<h1 class="text-xl font-bold text-blue-600">GraF 函数图象绘制工具</h1>
+				</div>
+				<div class="flex items-center space-x-4">
+					<button id="help-button" class="p-2 hover:bg-gray-100"><i
+							class="fa fa-question-circle text-gray-600"></i></button>
+				</div>
+			</div>
+		</header>
+
+		<main class="flex-1 container mx-auto px-4 py-4">
+			<div class="flex flex-col lg:flex-row gap-6 h-full">
+
+				<aside class="w-full lg:w-1/3 bg-white rounded-xl shadow-sm p-4 flex flex-col"
+					style="max-height: calc(100vh - 120px);">
+					<div>
+						<h2 class="text-lg font-semibold mb-3 flex items-center">
+							<i class="fa fa-plus-circle text-blue-600 mr-2"></i> ADD
+						</h2>
+
+						<div class="bg-gray-50 rounded-lg p-4 mb-4">
+							<div class="flex items-center gap-2 mb-3">
+								<span class="text-gray-600">f(x) =</span>
+								<input id="function-input"
+									class="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+									placeholder="例如：x^2 或 sin(x)" />
+								<button id="insert-function" class="text-gray-500 hover:text-blue-600 px-2"><i
+										class="fa fa-chevron-down"></i></button>
+							</div>
+
+							<div class="flex justify-end">
+								<button id="add-function"
+									class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 flex items-center">
+									<i class="fa fa-plus mr-2"></i>ADD</button>
+							</div>
+						</div>
+
+						<h3 class="text-sm font-medium text-gray-500 mb-2">ADDED</h3>
+						<div id="function-list" class="overflow-y-auto pr-2" style="max-height: calc(100vh - 300px);">
+						</div>
+					</div>
+
+					<div class="mt-auto pt-4 text-xs text-gray-400">
+						提示：滚动图象显示区域即可缩放。一些函数可能会有显示问题。Made by <a href="https://zhujingqi.com" style="text-decoration: underline;">Zhujingqi</a>
+					</div>
+				</aside>
+
+				<section class="w-full lg:w-2/3 flex flex-col">
+					<div class="bg-white rounded-xl shadow-sm p-4 flex flex-col flex-1 overflow-hidden"
+						style="min-height: calc(100vh - 120px);">
+						<div class="flex justify-between items-center mb-4">
+							<h2 class="text-lg font-semibold flex items-center">
+								<i class="fa fa-area-chart text-blue-600 mr-2"></i> 图象
+							</h2>
+							<div class="flex space-x-2">
+								<button id="reset-view"
+									class="px-3 py-1 text-sm border border-gray-300 hover:bg-gray-50 flex items-center">
+									<i class="fa fa-refresh mr-1"></i> 重置视图
+								</button>
+								<button id="download-image"
+									class="px-3 py-1 text-sm border border-gray-300 hover:bg-gray-50 flex items-center">
+									<i class="fa fa-download mr-1"></i> 下载图像
+								</button>
+							</div>
+						</div>
+
+						<div class="relative flex-1 border border-gray-200 rounded-lg overflow-hidden">
+							<div id="chart-container">
+								<canvas id="function-chart" style="width:100%; height:100%; display:block;"></canvas>
+							</div>
+
+							<div id="loading-indicator"
+								class="absolute inset-0 bg-white/80 flex items-center justify-center hidden">
+								<div class="flex flex-col items-center">
+									<div
+										class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin">
+									</div>
+									<p class="mt-2 text-gray-600">绘制中...</p>
+								</div>
+							</div>
+
+							<div id="error-message"
+								class="absolute inset-0 bg-white/90 flex items-center justify-center hidden">
+								<div class="text-center p-6 max-w-md">
+									<div
+										class="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+										<i class="fa fa-exclamation-triangle text-red-500 text-2xl"></i>
+									</div>
+									<h3 class="text-lg font-semibold text-gray-900 mb-2">绘制出错</h3>
+									<p id="error-details" class="text-gray-600 mb-4"></p>
+									<button id="dismiss-error"
+										class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700">重试</button>
+								</div>
+							</div>
+
+							<div id="point-tooltip"></div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<div id="help-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+			<div class="bg-white rounded-xl max-w-3xl w-full max-h-[80vh] overflow-y-auto p-6 mx-4">
+				<div class="flex justify-between items-center mb-4">
+					<h2 class="text-xl font-bold text-gray-900">HELP</h2>
+					<button id="close-help" class="text-gray-500 hover:text-gray-700"><i
+							class="fa fa-times text-xl"></i></button>
+				</div>
+
+				<div class="space-y-4 text-gray-700">
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-2">基本使用</h3>
+						<ol class="list-decimal list-inside space-y-1">
+							<li>在输入框中输入函数表达式，例如 <code class="bg-gray-100 px-1 rounded">x^2</code> 或 <code
+									class="bg-gray-100 px-1 rounded">sin(x)</code></li>
+							<li>点击 "ADD" 按钮</li>
+							<li>函数图象将显示在图表区域</li>
+						</ol>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-2">支持的函数</h3>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<p class="font-medium">基本运算</p>
+								<ul class="list-disc list-inside">
+									<li>加法: <code class="bg-gray-100 px-1 rounded">x + y</code></li>
+									<li>减法: <code class="bg-gray-100 px-1 rounded">x - y</code></li>
+									<li>乘法: <code class="bg-gray-100 px-1 rounded">x * y</code></li>
+									<li>除法: <code class="bg-gray-100 px-1 rounded">x / y</code></li>
+									<li>幂运算: <code class="bg-gray-100 px-1 rounded">x^y</code></li>
+								</ul>
+							</div>
+
+							<div>
+								<p class="font-medium">三角函数</p>
+								<ul class="list-disc list-inside">
+									<li>正弦: <code class="bg-gray-100 px-1 rounded">sin(x)</code></li>
+									<li>余弦: <code class="bg-gray-100 px-1 rounded">cos(x)</code></li>
+									<li>正切: <code class="bg-gray-100 px-1 rounded">tan(x)</code></li>
+									<li>反正弦: <code class="bg-gray-100 px-1 rounded">asin(x)</code></li>
+									<li>反余弦: <code class="bg-gray-100 px-1 rounded">acos(x)</code></li>
+									<li>反正切: <code class="bg-gray-100 px-1 rounded">atan(x)</code></li>
+								</ul>
+							</div>
+
+							<div>
+								<p class="font-medium">其他函数</p>
+								<ul class="list-disc list-inside">
+									<li>自然对数: <code class="bg-gray-100 px-1 rounded">log(x)</code></li>
+									<li>以10为底的对数: <code class="bg-gray-100 px-1 rounded">log10(x)</code></li>
+									<li>平方根: <code class="bg-gray-100 px-1 rounded">sqrt(x)</code></li>
+									<li>绝对值: <code class="bg-gray-100 px-1 rounded">abs(x)</code></li>
+									<li>阶乘: <code class="bg-gray-100 px-1 rounded">x!</code></li>
+								</ul>
+							</div>
+
+							<div>
+								<p class="font-medium">常数</p>
+								<ul class="list-disc list-inside">
+									<li>&pi;: <code class="bg-gray-100 px-1 rounded">pi</code></li>
+									<li>e: <code class="bg-gray-100 px-1 rounded">e</code></li>
+									<li>∞: <code class="bg-gray-100 px-1 rounded">inf</code></li>
+									<li>NaN: <code class="bg-gray-100 px-1 rounded">nan</code></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-2">坐标系</h3>
+						<p>滚动以缩放坐标系！</p>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-2">功能</h3>
+						<ul class="list-disc list-inside">
+							<li>鼠标滚轮: 缩放图表（以原点为中心）</li>
+							<li>重置视图: 重置视图（重置为初始比例）</li>
+							<li>悬停在曲线上: 显示点的坐标</li>
+							<li>下载图象: 下载PNG格式的图片</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-2">警告</h3>
+						<p>某些函数，如
+							<code class="bg-gray-100 px-1 rounded">tan(x)</code>,
+							<code class="bg-gray-100 px-1 rounded">cot(x)</code>,
+							<code class="bg-gray-100 px-1 rounded">floor(x)</code>
+							等会有显示问题（极大值和极小值连起来了），请忽略它。<br>
+							同理，某些渐近线可能会有某些显示问题，忽略即可。
+						</p>
+					</div>
+				</div>
+
+				<div class="mt-6 pt-4 border-t border-gray-200">
+					<button id="close-help-btn"
+						class="w-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700">我知道了</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="function-dropdown"
+			class="absolute bg-white shadow-lg rounded-md border border-gray-200 py-1 z-50 hidden max-h-60 overflow-y-auto">
+			<div class="px-3 py-2 text-xs text-gray-500 border-b">点击插入函数</div>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">sin(x)</button>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">cos(x)</button>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">tan(x)</button>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">log(x)</button>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">sqrt(x)</button>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">abs(x)</button>
+			<button class="dropdown-fn px-3 py-1.5 text-sm hover:bg-gray-100 w-full text-left">x!</button>
+		</div>
+
+		<script>
+			const functionInput = document.getElementById('function-input');
+			const addBtn = document.getElementById('add-function');
+			const functionList = document.getElementById('function-list');
+			const insertFnBtn = document.getElementById('insert-function');
+			const dropdown = document.getElementById('function-dropdown');
+			const dropdownFns = document.querySelectorAll('.dropdown-fn');
+
+			const helpBtn = document.getElementById('help-button');
+			const helpModal = document.getElementById('help-modal');
+			const closeHelp = document.getElementById('close-help');
+			const closeHelpBtn = document.getElementById('close-help-btn');
+
+			const resetBtn = document.getElementById('reset-view');
+			const downloadBtn = document.getElementById('download-image');
+
+			const loadingIndicator = document.getElementById('loading-indicator');
+			const errorMessage = document.getElementById('error-message');
+			const errorDetails = document.getElementById('error-details');
+			const dismissError = document.getElementById('dismiss-error');
+
+			const pointTooltip = document.getElementById('point-tooltip');
+
+			let functionsArr = [];
+			let functionCounter = 0;
+			let chart = null;
+
+			const FIXED_SAMPLE_MIN = -200;
+			const FIXED_SAMPLE_MAX = 200;
+			const SAMPLE_COUNT = 10000;
+
+			const colors = ['#1a56db', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#6366f1',
+				'#f97316'
+			];
+
+			let baseRange = {
+				x: 10,
+				y: 10
+			};
+
+			document.addEventListener('DOMContentLoaded', () => {
+				initChart();
+				setupEvents();
+				functionInput.focus();
+			});
+
+			function initChart() {
+				const ctx = document.getElementById('function-chart').getContext('2d');
+				chart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						datasets: []
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						animation: {
+							duration: 0
+						},
+						scales: {
+							x: {
+								type: 'linear',
+								position: 'center',
+								min: -baseRange.x,
+								max: baseRange.x,
+								grid: {
+									color: function(context) {
+										return 'rgba(156,163,175,0.08)';
+									}
+								},
+								ticks: {
+									color: '#334155'
+								},
+								title: {
+									display: true,
+									text: 'x',
+									color: '#334155'
+								}
+							},
+							y: {
+								type: 'linear',
+								position: 'center',
+								min: -baseRange.y,
+								max: baseRange.y,
+								grid: {
+									color: 'rgba(156,163,175,0.08)'
+								},
+								ticks: {
+									color: '#334155'
+								},
+								title: {
+									display: true,
+									text: 'y',
+									color: '#334155'
+								}
+							}
+						},
+						plugins: {
+							legend: {
+								display: false
+							},
+							tooltip: {
+								enabled: false
+							}
+						},
+						elements: {
+							point: {
+								radius: 0,
+								hoverRadius: 4
+							},
+							line: {
+								tension: 0,
+								borderWidth: 2
+							}
+						}
+					}
+				});
+
+				const canvas = chart.canvas;
+				canvas.addEventListener('wheel', onWheelZoom, {
+					passive: false
+				});
+				canvas.addEventListener('mousemove', onMouseMoveOverChart);
+				canvas.addEventListener('mouseleave', () => {
+					pointTooltip.style.display = 'none';
+				});
+			}
+
+			function onWheelZoom(e) {
+				e.preventDefault();
+				const delta = e.deltaY;
+				const factor = delta > 0 ? 1.12 : 0.88;
+				baseRange.x = clamp(baseRange.x * factor, 0.0001, 1e6);
+				baseRange.y = clamp(baseRange.y * factor, 0.0001, 1e6);
+
+				chart.options.scales.x.min = -baseRange.x;
+				chart.options.scales.x.max = baseRange.x;
+				chart.options.scales.y.min = -baseRange.y;
+				chart.options.scales.y.max = baseRange.y;
+
+				chart.update('none');
+			}
+
+			function clamp(v, min, max) {
+				return Math.max(min, Math.min(max, v));
+			}
+
+			function onMouseMoveOverChart(evt) {
+				if (!chart) return;
+				const canvasRect = chart.canvas.getBoundingClientRect();
+				const pos = {
+					x: evt.clientX - canvasRect.left,
+					y: evt.clientY - canvasRect.top
+				};
+
+				const elements = chart.getElementsAtEventForMode(evt, 'nearest', {
+					intersect: false
+				}, false);
+				if (!elements || elements.length === 0) {
+					pointTooltip.style.display = 'none';
+					return;
+				}
+				const el = elements[0];
+				if (!el) {
+					pointTooltip.style.display = 'none';
+					return;
+				}
+
+				const dataset = chart.data.datasets[el.datasetIndex];
+				const dataPoint = dataset.data[el.index];
+				const px = el.element.x;
+				const py = el.element.y;
+				const dx = pos.x - px;
+				const dy = pos.y - py;
+				const dist = Math.hypot(dx, dy);
+				const THRESH = 10;
+				if (dist <= THRESH && dataPoint && typeof dataPoint.x !== 'undefined') {
+					pointTooltip.innerHTML = `x: ${formatNumber(dataPoint.x)} &nbsp; y: ${formatNumber(dataPoint.y)}`;
+					pointTooltip.style.display = 'block';
+					pointTooltip.style.left = (evt.clientX) + 'px';
+					pointTooltip.style.top = (evt.clientY - 12) + 'px';
+				} else {
+					pointTooltip.style.display = 'none';
+				}
+			}
+
+			function formatNumber(n) {
+				if (n === null || typeof n === 'undefined') return '—';
+				if (!isFinite(n)) return String(n);
+				const absN = Math.abs(n);
+				if (absN >= 1e6 || (absN !== 0 && absN < 1e-6)) return n.toExponential(3);
+				return parseFloat(Number(n.toFixed(6))).toString();
+			}
+
+			function setupEvents() {
+				addBtn.onclick = () => addFromInput();
+				functionInput.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter') addFromInput();
+				});
+
+				insertFnBtn.onclick = (e) => {
+					e.stopPropagation();
+					const r = insertFnBtn.getBoundingClientRect();
+					dropdown.style.left = r.left + 'px';
+					dropdown.style.top = r.bottom + 'px';
+					dropdown.classList.toggle('hidden');
+				};
+				dropdownFns.forEach(b => b.onclick = () => {
+					insertAtCursor(b.textContent);
+					dropdown.classList.add('hidden');
+				});
+				document.addEventListener('click', () => dropdown.classList.add('hidden'));
+
+				helpBtn.onclick = () => helpModal.classList.remove('hidden');
+				closeHelp.onclick = () => helpModal.classList.add('hidden');
+				closeHelpBtn.onclick = () => helpModal.classList.add('hidden');
+				document.getElementById('close-help-btn').onclick = () => helpModal.classList.add('hidden');
+
+				resetBtn.onclick = () => resetView();
+				downloadBtn.onclick = () => downloadImage();
+				dismissError.onclick = () => errorMessage.classList.add('hidden');
+
+				window.addEventListener('resize', () => {
+					if (chart) chart.resize();
+				});
+			}
+
+			function insertAtCursor(text) {
+				const input = functionInput;
+				const s = input.selectionStart,
+					e = input.selectionEnd;
+				input.value = input.value.slice(0, s) + text + input.value.slice(e);
+				input.focus();
+				input.selectionStart = input.selectionEnd = s + text.length;
+			}
+
+			function addFromInput() {
+				const expr = functionInput.value.trim();
+				if (!expr) return;
+				addFunction(expr);
+				functionInput.value = '';
+			}
+
+			function addFunction(expression) {
+				try {
+					math.parse(expression);
+				} catch (err) {
+					showError('表达式 "' + expression + '" 无效: ' + err.message);
+					return;
+				}
+
+				const color = colors[functionCounter % colors.length];
+				functionCounter++;
+				const obj = {
+					id: 'f' + functionCounter,
+					expression,
+					label: `f${functionCounter}(x) = ${expression}`,
+					color
+				};
+				functionsArr.push(obj);
+				updateFunctionList();
+				plotFunctions();
+			}
+
+			function updateFunctionList() {
+				functionList.innerHTML = '';
+				if (functionsArr.length === 0) {
+					functionList.innerHTML = '<p class="text-sm text-gray-500 italic">暂无函数，请添加函数</p>';
+					return;
+				}
+				functionsArr.forEach((f, idx) => {
+					const item = document.createElement('div');
+					item.className = 'flex items-center justify-between py-2 border-b border-gray-100';
+					item.innerHTML = `
+      <div class="flex items-center">
+        <div class="w-4 h-4 rounded-full mr-2" style="background:${f.color}"></div>
+        <span class="text-sm truncate max-w-[220px]">${f.label}</span>
+      </div>
+      <div class="flex space-x-2">
+        <button class="edit-btn p-1 text-gray-500 hover:text-blue-600" data-index="${idx}"><i class="fa fa-pencil"></i></button>
+        <button class="remove-btn p-1 text-gray-500 hover:text-red-600" data-index="${idx}"><i class="fa fa-trash"></i></button>
+      </div>
+    `;
+					functionList.appendChild(item);
+				});
+
+				document.querySelectorAll('.remove-btn').forEach(btn => {
+					btn.onclick = () => {
+						const i = parseInt(btn.dataset.index);
+						functionsArr.splice(i, 1);
+						updateFunctionList();
+						plotFunctions();
+					};
+				});
+				document.querySelectorAll('.edit-btn').forEach(btn => {
+					btn.onclick = () => {
+						const i = parseInt(btn.dataset.index);
+						functionInput.value = functionsArr[i].expression;
+						functionsArr.splice(i, 1);
+						updateFunctionList();
+						plotFunctions();
+						functionInput.focus();
+					};
+				});
+			}
+
+			function plotFunctions() {
+				if (!chart) return;
+				loadingIndicator.classList.remove('hidden');
+				setTimeout(() => {
+					try {
+						chart.data.datasets = [];
+						const fixedMin = FIXED_SAMPLE_MIN,
+							fixedMax = FIXED_SAMPLE_MAX;
+						const step = (fixedMax - fixedMin) / SAMPLE_COUNT;
+
+						functionsArr.forEach(f => {
+							const compiled = math.compile(f.expression);
+							const data = [];
+							for (let i = 0; i <= SAMPLE_COUNT; i++) {
+								const x = fixedMin + i * step;
+								let y = null;
+								try {
+									y = compiled.evaluate({
+										x
+									});
+									if (!isFinite(y) || Math.abs(y) > 1e6) {
+										y = null;
+									}
+								} catch {
+									y = null;
+								}
+								data.push({
+									x,
+									y
+								});
+							}
+							chart.data.datasets.push({
+								label: f.label,
+								data,
+								borderColor: f.color,
+								backgroundColor: f.color + '20',
+								borderWidth: 2,
+								spanGaps: false,
+								pointRadius: 0
+							});
+						});
+
+						chart.options.scales.x.min = -baseRange.x;
+						chart.options.scales.x.max = baseRange.x;
+						chart.options.scales.y.min = -baseRange.y;
+						chart.options.scales.y.max = baseRange.y;
+						chart.update();
+					} catch (err) {
+						showError('绘制出错: ' + err.message);
+					} finally {
+						loadingIndicator.classList.add('hidden');
+					}
+				}, 10);
+			}
+
+			function downloadImage() {
+				try {
+					const link = document.createElement('a');
+					link.download = 'function-plot.png';
+					link.href = chart.toBase64Image();
+					link.click();
+				} catch (err) {
+					showError('下载失败: ' + err.message);
+				}
+			}
+
+			function resetView() {
+				baseRange = {
+					x: 10,
+					y: 10
+				};
+				chart.options.scales.x.min = -baseRange.x;
+				chart.options.scales.x.max = baseRange.x;
+				chart.options.scales.y.min = -baseRange.y;
+				chart.options.scales.y.max = baseRange.y;
+				plotFunctions();
+			}
+
+			function showError(msg) {
+				errorDetails.textContent = msg;
+				errorMessage.classList.remove('hidden');
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>3D Runner</title>
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+				background: #fff;
+			}
+
+			#score {
+				position: fixed;
+				top: 20px;
+				left: 20px;
+				font-size: 20px;
+				color: #000;
+			}
+
+			#coins {
+				position: fixed;
+				top: 50px;
+				left: 20px;
+				font-size: 20px;
+				color: #000;
+			}
+
+			#restartBtn {
+				width: 200px;
+				margin: 10px 0;
+				padding: 10px 5px;
+				font-size: 22px;
+				font-weight: bold;
+				border-radius: 40px;
+				border: none;
+				background: linear-gradient(135deg, #b7f1d9, #0087d8);
+				color: #000;
+				cursor: pointer;
+				transition: 0.25s ease;
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+			}
+
+			#restartBtn:hover {
+				transform: translateY(-4px) scale(1.05);
+				box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+			}
+
+			#startScreen,
+			#pauseScreen {
+				position: fixed;
+				inset: 0;
+				background: rgba(255, 255, 255, 0.95);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				z-index: 20;
+			}
+
+			#startScreen a {
+				color: #adadad;
+			}
+
+			.menuBtn {
+				width: 200px;
+				margin: 10px 0;
+				padding: 10px 5px;
+				font-size: 22px;
+				font-weight: bold;
+				border-radius: 40px;
+				border: none;
+				background: linear-gradient(135deg, #b7f1d9, #0087d8);
+				color: #000;
+				cursor: pointer;
+				transition: 0.25s ease;
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+			}
+
+			.menuBtn:hover {
+				transform: translateY(-4px) scale(1.05);
+				box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+			}
+
+			#gameTitle {
+				font-size: 80px;
+				font-weight: 900;
+				letter-spacing: 4px;
+				color: #1a1a1a;
+				/*text-transform: uppercase;*/
+				text-shadow:
+					0 1px 0 #ccc,
+					0 2px 0 #bbb,
+					0 3px 0 #aaa,
+					0 4px 0 #999,
+					0 6px 10px rgba(0, 0, 0, 0.3),
+					0 10px 20px rgba(0, 0, 0, 0.2);
+				animation: titleFloat 2.5s ease-in-out infinite;
+			}
+
+			@keyframes titleFloat {
+
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+
+				50% {
+					transform: translateY(-12px);
+				}
+			}
+
+			#pauseScreen {
+				display: none;
+				background: rgba(0, 0, 0, 0.6);
+				color: white;
+			}
+
+			#pauseScreen a {
+				color: #adadad;
+			}
+
+			#gameOverScreen {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.75);
+				color: white;
+				display: none;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				z-index: 30;
+			}
+
+			#gameOverScreen a {
+				color: #adadad;
+			}
+
+			#jumpboost {
+				position: fixed;
+				top: 80px;
+				left: 20px;
+				font-size: 20px;
+				color: #000;
+			}
+
+			#msgBox {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%) translateY(-100%);
+				background-color: #ffaa00;
+				color: #000;
+				padding: 15px 30px;
+				border-radius: 20px;
+				font-size: 18px;
+				font-weight: bold;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+				opacity: 0;
+				z-index: 9999;
+				transition: all 0.4s ease;
+			}
+
+			#msgBox.show {
+				transform: translateX(-50%) translateY(0);
+				opacity: 1;
+			}
+
+			.overlayScreen {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.85);
+				color: white;
+				z-index: 50;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+			}
+
+			.fade {
+				opacity: 0;
+				transform: scale(0.95);
+				transition:
+					opacity 0.6s ease,
+					transform 0.6s ease;
+				pointer-events: none;
+			}
+
+			.fade.show {
+				opacity: 1;
+				transform: scale(1);
+				pointer-events: auto;
+			}
+
+			#rankListContainer {
+				width: 300px;
+				max-height: 400px;
+				overflow-y: auto;
+				margin: 0 auto 20px;
+				border: 2px solid #fff;
+				border-radius: 10px;
+				padding: 10px;
+				background: rgba(0, 0, 0, 0.4);
+			}
+
+			.rankItem {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 6px 10px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+				color: #fff;
+				font-size: 18px;
+				font-weight: bold;
+			}
+
+			.rankItem:last-child {
+				border-bottom: none;
+			}
+
+			.rankItem span:first-child {
+				max-width: 220px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			#namePopup {
+				position: fixed;
+				inset: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 1000;
+				background: rgba(0, 0, 0, 0.85);
+			}
+
+			#namePopup.fade {
+				opacity: 0;
+				transform: scale(0.95);
+				transition: opacity 0.3s, transform 0.3s;
+			}
+
+			#namePopup.fade.show {
+				opacity: 1;
+				transform: scale(1);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="score"></div>
+		<div id="coins"></div>
+		<div id="jumpboost"></div>
+		<div id="msgBox"></div>
+		<div id="startScreen" class="fade show">
+			<div id="gameTitle">3D Runner</div>
+			<div style="height:40px"></div>
+			<button class="menuBtn" id="startBtn"
+				style="height: 70px; background: linear-gradient(135deg, #b7f1d9, #ffee88);">RUN</button>
+			<button class="menuBtn" id="ruleBtn">Rule</button>
+			<button class="menuBtn" id="rankBtn">Leaderboard</button>
+			<div style="margin-top:30px">
+				<a href="https://zhujingqi.com/game/">More Games</a><br>
+				<a href="https://zhujingqi.com/money.html">Sponsor Me</a><br>
+				<a href="https://github.com/zhujingqi/">Made by zhujingqi</a>
+			</div>
+		</div>
+		<div id="ruleScreen" class="overlayScreen fade" style="display:none">
+			<h1>RULE</h1>
+			<p>←/A →/D Move</p>
+			<p>↑/W/Space Jump</p>
+			<p>↓/S Crouch to pass a sign</p>
+			<p><span style="background: #33f; border-radius: 15px;">&emsp;</span>&emsp;Player</p>
+			<p><span style="background: #f00; border-radius: 15px;">&emsp;</span>&emsp;Train</p>
+			<p><span style="background: #d33; border-radius: 15px;">&emsp;</span>&emsp;Moving Train</p>
+			<p><span style="background: #fa0; border-radius: 15px;">&emsp;</span>&emsp;Block</p>
+			<p><span style="background: #a0f; border-radius: 15px;">&emsp;</span>&emsp;Moving Block</p>
+			<p><span style="background: #f80; border-radius: 15px;">&emsp;</span>&emsp;Sign</p>
+			<p><span style="background: #0f0; border-radius: 15px;">&emsp;</span>&emsp;Jump Pad (onto a train)</p>
+			<p><span style="background: #0cf; border-radius: 15px;">&emsp;</span>&emsp;Jump Boost (Let's jump high in
+				the sky!)</p>
+			<p><span style="background: #ff0; border-radius: 15px;">&emsp;</span>&emsp;Coin</p>
+			<button class="menuBtn" onclick="closeOverlay()">← BACK</button>
+		</div>
+		<div id="rankScreen" class="overlayScreen fade" style="display:none">
+			<h1>LEADERBOARD</h1>
+			<div id="rankListContainer">
+				<div id="rankList"></div>
+			</div>
+			<button class="menuBtn" onclick="closeOverlay()">← BACK</button>
+		</div>
+		<div id="pauseScreen">
+			<h1>Paused</h1>
+			<p>Press P or ESC to resume</p>
+			<p onclick="location.reload()" style="cursor: pointer;"><b>Back To Title</b></p>
+			<a href="https://zhujingqi.com/game/">More Games</a><br>
+			<a href="https://github.com/zhujingqi/">Made by zhujingqi</a>
+		</div>
+		<div id="gameOverScreen">
+			<h1>Game Over</h1>
+			<p id="finalScore"></p><br>
+			<button class="menuBtn" id="updateRank">Upload Score</button>
+			<button onclick="location.reload()" id="restartBtn">Back to Title</button><br>
+			<a href="https://zhujingqi.com/game/">More Games</a><br>
+			<a href="https://github.com/zhujingqi/">Made by zhujingqi</a>
+		</div>
+		<div id="namePopup" class="overlayScreen fade" style="display:none; background: rgba(0,0,0,0.8);">
+			<div
+				style="background: rgba(0,0,0,0.8); padding: 20px; border-radius: 15px; min-width: 250px; text-align: center;">
+				<h2>Your Name:</h2>
+				<input type="text" id="playerNameInput" placeholder="Your Name"
+					style="width: 90%; padding: 8px; margin: 10px 0; font-size:16px; background: rgba(0,0,0,0.8); border-radius: 20px; color: #eee;"
+					autofocus>
+				<div style="margin-top:10px;">
+					<button id="submitNameBtn" class="menuBtn" style="width: 100px;">Submit</button>
+					<button id="cancelNameBtn" class="menuBtn" style="width: 100px; margin-left:10px;">Cancel</button>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+		<script>
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color(0xffffff);
+			const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+			camera.position.set(0, 5, 10);
+			const renderer = new THREE.WebGLRenderer({
+				antialias: true
+			});
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+			scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+			const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+			dirLight.position.set(5, 10, 5);
+			scene.add(dirLight);
+			const ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 1000), new THREE.MeshStandardMaterial({
+				color: 0xf2f2f2
+			}));
+			ground.rotation.x = -Math.PI / 2;
+			ground.position.z = -400;
+			scene.add(ground);
+			const player = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial({
+				color: 0x3333ff
+			}));
+			player.position.y = 1;
+			player.position.x = 0;
+			scene.add(player);
+			let lane = 1;
+			let ySpeed = 0;
+			let isGrounded = true;
+			let isCrouching = false;
+			const lanes = [-3, 0, 3];
+			let speed = 0.5;
+			const obstacles = [];
+			const scenery = [];
+			const shadowMat = new THREE.MeshBasicMaterial({
+				color: 0x000000,
+				transparent: true,
+				opacity: 0.2
+			});
+			const shadowGeo = new THREE.CircleGeometry(0.88, 32);
+			shadowGeo.scale(1.1, 1, 1);
+			shadowGeo.rotateX(-Math.PI / 2);
+			const playerShadow = new THREE.Mesh(shadowGeo, shadowMat);
+			playerShadow.position.y = 0.01;
+			scene.add(playerShadow);
+
+			function spawnObstacle() {
+				const minZDistance = 10;
+				let zPos = -200 - Math.random() * 50;
+				if (obstacles.length) {
+					const lastZ = obstacles[obstacles.length - 1].position.z;
+					if (zPos > lastZ - minZDistance) zPos = lastZ - minZDistance;
+				}
+				const r = Math.random();
+				let type = "block";
+				if (r < 0.02) type = "supershoe";
+				else if (r < 0.12) type = "mover";
+				else if (r < 0.22) type = "mtrain";
+				else if (r < 0.4) type = "train";
+				else if (r < 0.6) type = "sign";
+				if (type === "supershoe") {
+					const shoe = new THREE.Mesh(
+						new THREE.BoxGeometry(1, 0.4, 1),
+						new THREE.MeshStandardMaterial({
+							color: 0x00ccff
+						})
+					);
+					shoe.position.x = lanes[Math.floor(Math.random() * 3)];
+					shoe.position.y = 0.6;
+					shoe.position.z = zPos;
+					shoe.userData.type = "supershoe";
+					scene.add(shoe);
+					obstacles.push(shoe);
+					return;
+				} else if (type === "mover") {
+					const mover = new THREE.Mesh(
+						new THREE.BoxGeometry(1.4, 1.4, 1.4),
+						new THREE.MeshStandardMaterial({
+							color: 0xaa00ff
+						})
+					);
+					mover.position.x = 0;
+					mover.position.y = 0.7;
+					mover.position.z = zPos;
+					mover.userData = {
+						type: "mover",
+						dir: Math.random() < 0.5 ? -1 : 1,
+						speed: 0.05 + Math.random() * 0.03
+					};
+					scene.add(mover);
+					obstacles.push(mover);
+				} else if (type === "train") {
+					const TRAIN_SAFE_DISTANCE = 18;
+					const laneIndex = Math.floor(Math.random() * 3);
+					const sections = Math.floor(Math.random() * 5) + 1;
+					let zStart = zPos;
+					if (Math.random() < 0.3) {
+						const jump = new THREE.Mesh(
+							new THREE.BoxGeometry(2, 0.5, 2),
+							new THREE.MeshStandardMaterial({
+								color: 0x00ff00
+							})
+						);
+						jump.position.x = lanes[laneIndex];
+						jump.position.y = 0.25;
+						const jumpLead = 9 + speed * 6;
+						jump.position.z = zStart + jumpLead;
+						jump.userData = {
+							type: "jump"
+						};
+						scene.add(jump);
+						obstacles.push(jump);
+					}
+					for (let i = 0; i < sections; i++) {
+						const train = new THREE.Mesh(
+							new THREE.BoxGeometry(2, 2.5, 8),
+							new THREE.MeshStandardMaterial({
+								color: 0xff4444
+							})
+						);
+						train.position.x = lanes[laneIndex];
+						train.position.y = 1.25;
+						train.position.z = zStart;
+						train.userData = {
+							type: "train"
+						};
+						scene.add(train);
+						obstacles.push(train);
+						zStart -= 8;
+					}
+					zPos += TRAIN_SAFE_DISTANCE;
+				} else if (type === "mtrain") {
+					const sections = Math.floor(Math.random() * 4) + 2;
+					const laneIndex = Math.floor(Math.random() * 3);
+					let zStart = zPos;
+					for (let i = 0; i < sections; i++) {
+						const train = new THREE.Mesh(
+							new THREE.BoxGeometry(2, 2.5, 8),
+							new THREE.MeshStandardMaterial({
+								color: 0xdd3333
+							})
+						);
+						train.position.x = lanes[laneIndex];
+						train.position.y = 1.25;
+						train.position.z = zStart;
+						train.userData = {
+							type: "mtrain",
+							driveSpeed: 0.4 + Math.random() * 0.15
+						};
+						scene.add(train);
+						obstacles.push(train);
+						zStart -= 8;
+					}
+				} else if (type === "sign") {
+					const sign = new THREE.Group();
+					const mat = new THREE.MeshStandardMaterial({
+						color: 0xff8800
+					});
+					const topBarHeight = 1.5;
+					const topBar = new THREE.Mesh(
+						new THREE.BoxGeometry(1.6, topBarHeight, 0.4),
+						mat
+					);
+					topBar.position.y = 2.0;
+					sign.add(topBar);
+					const postHeight = 2.2;
+					const leftPost = new THREE.Mesh(
+						new THREE.BoxGeometry(0.25, postHeight, 0.4),
+						mat
+					);
+					leftPost.position.set(-0.7, postHeight / 2, 0);
+					sign.add(leftPost);
+					const rightPost = leftPost.clone();
+					rightPost.position.x = 0.7;
+					sign.add(rightPost);
+					sign.position.x = lanes[Math.floor(Math.random() * 3)];
+					sign.position.y = 0;
+					sign.position.z = zPos;
+					sign.userData.type = "sign";
+					scene.add(sign);
+					obstacles.push(sign);
+				} else {
+					const geo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+					const mat = new THREE.MeshStandardMaterial({
+						color: 0xffaa00
+					});
+					const yPos = 0.75;
+					const obj = new THREE.Mesh(geo, mat);
+					obj.position.x = lanes[Math.floor(Math.random() * 3)];
+					obj.position.y = yPos;
+					obj.position.z = zPos;
+					obj.userData.type = "block";
+					scene.add(obj);
+					obstacles.push(obj);
+				}
+			}
+			const coins = [];
+			const trees = [];
+			const TREE_MIN_DIST = 4;
+
+			let lastTreeZ = -20;
+
+			function spawnTreeAt(zPos = null) {
+				const ROAD_HALF = 10;
+				const TREE_H = 3 + Math.random() * 2;
+				const TREE_RADIUS = 0.5 + Math.random() * 0.3;
+				if (zPos === null) {
+					zPos = lastTreeZ - TREE_MIN_DIST - Math.random() * 2;
+				}
+				lastTreeZ = zPos;
+				for (const side of [-1, 1]) {
+					const trunk = new THREE.Mesh(
+						new THREE.CylinderGeometry(0.2, 0.2, TREE_H * 0.6),
+						new THREE.MeshStandardMaterial({
+							color: 0x8B4513,
+							transparent: true,
+							opacity: 0.5
+						})
+					);
+					trunk.position.y = TREE_H * 0.3;
+					const crown = new THREE.Mesh(
+						new THREE.SphereGeometry(TREE_RADIUS, 12, 8),
+						new THREE.MeshStandardMaterial({
+							color: 0x228B22,
+							transparent: true,
+							opacity: 0.5
+						})
+					);
+					crown.position.y = TREE_H * 0.6 + TREE_RADIUS;
+					const tree = new THREE.Group();
+					tree.add(trunk);
+					tree.add(crown);
+					tree.position.x = side * (ROAD_HALF - 1);
+					tree.position.z = zPos;
+					scene.add(tree);
+					trees.push(tree);
+				}
+			}
+
+			function initTrees() {
+				let z = -20;
+				while (z > -500) {
+					spawnTreeAt(z);
+					z -= TREE_MIN_DIST + Math.random() * 2;
+				}
+			}
+			initTrees();
+
+			function spawnCoin() {
+				const minZDistance = 4;
+				let zPos = -200 - Math.random() * 50;
+				if (coins.length) {
+					const lastZ = coins[coins.length - 1].position.z;
+					if (zPos > lastZ - minZDistance) zPos = lastZ - minZDistance;
+				}
+				const coinGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 16);
+				const coinMat = new THREE.MeshStandardMaterial({
+					color: 0xffff00
+				});
+				const coin = new THREE.Mesh(coinGeo, coinMat);
+				coin.rotation.x = Math.PI / 2;
+				coin.position.x = lanes[Math.floor(Math.random() * 3)];
+				coin.position.y = 1;
+				coin.position.z = zPos;
+				scene.add(coin);
+				coins.push(coin);
+			}
+			let score = 0;
+			let coinCount = 0;
+			let onTrain = false;
+			let isGameOver = false;
+			let gameStarted = false;
+			let isPaused = false;
+			let animationId = null;
+			let superShoeTimer = 0;
+			window.addEventListener("keydown", e => {
+				if (isGameOver) return;
+				if (e.key === "a" || e.key === "ArrowLeft") lane = Math.max(0, lane - 1);
+				if (e.key === "d" || e.key === "ArrowRight") lane = Math.min(2, lane + 1);
+				if ((e.key === "w" || e.key === " " || e.key === "ArrowUp") && isGrounded) {
+					ySpeed = superShoeTimer > 0 ? 0.45 : 0.35;
+					isGrounded = false;
+				}
+				if ((e.key === "s" || e.key === "ArrowDown") && isGrounded && !onTrain) {
+					if (isCrouching) return;
+					isCrouching = true;
+					player.scale.y = 0.5;
+					player.position.y = (2.3 * 0.5) / 2;
+				}
+			});
+			window.addEventListener("keyup", e => {
+				if (e.key === "s" || e.key === "ArrowDown") {
+					isCrouching = false;
+					player.scale.y = 1;
+					player.position.y = 1;
+				}
+			});
+			document.getElementById("restartBtn").addEventListener("click", () => {
+				location.reload();
+			});
+
+			let spawnTimer = 0;
+			const jumpBoostEl = document.getElementById("jumpboost");
+
+			function boostmsg() {
+				const msgBox = document.getElementById("msgBox");
+				msgBox.innerText = "Got a Jump Boost!";
+				msgBox.classList.add("show");
+				setTimeout(() => {
+					msgBox.classList.remove("show");
+				}, 2000);
+			}
+
+			function animate() {
+				if (!gameStarted) return;
+				requestAnimationFrame(animate);
+				if (isPaused || isGameOver) return;
+				speed = 0.5 * (1 + score / 600);
+				spawnTimer += speed;
+				if (spawnTimer > 20) {
+					spawnObstacle();
+					spawnCoin();
+					spawnTimer = 0;
+				}
+				if (superShoeTimer > 0) {
+					superShoeTimer--;
+					jumpBoostEl.innerText = "Jump Boost Time: " + Math.ceil(superShoeTimer / 60) + "s";
+				} else {
+					jumpBoostEl.innerText = "";
+				}
+				onTrain = false;
+				if (isGameOver) return;
+				player.position.x += (lanes[lane] - player.position.x) * 0.15;
+				ySpeed -= 0.02;
+				player.position.y += ySpeed;
+				if (player.position.y < (isCrouching ? 0.5 : 1)) {
+					player.position.y = isCrouching ? 0.5 : 1;
+					ySpeed = 0;
+					isGrounded = true;
+				}
+				obstacles.forEach(o => o.position.z += speed);
+				for (const o of obstacles) {
+					if (o.userData.type === "mover") {
+						o.position.x += o.userData.dir * o.userData.speed;
+						if (o.position.x > 3) {
+							o.position.x = 3;
+							o.userData.dir = -1;
+						}
+						if (o.position.x < -3) {
+							o.position.x = -3;
+							o.userData.dir = 1;
+						}
+					} else if (o.userData.type === "mtrain") {
+						o.position.z += o.userData.driveSpeed;
+					}
+				}
+				coins.forEach(c => c.position.z += speed);
+				trees.forEach(t => t.position.z += speed);
+				for (const o of obstacles) {
+					const dx = Math.abs(o.position.x - player.position.x);
+					const dz = Math.abs(o.position.z - player.position.z);
+					const dy = player.position.y - o.position.y;
+					if (o.userData.type === "train" || o.userData.type === "mtrain") {
+						const topY = o.position.y + 2.3;
+						if (dx < 1 && dz < 4) {
+							if (
+								ySpeed <= 0 &&
+								player.position.y >= topY - 0.05 &&
+								player.position.y <= topY + 0.5
+							) {
+								player.position.y = topY;
+								isGrounded = true;
+								ySpeed = 0;
+								onTrain = true;
+							} else if (player.position.y < topY - 0.05) {
+								gameOver("Hit a train");
+							}
+						}
+					} else if (o.userData.type === "jump") {
+						const topY = o.position.y + 0.25;
+						if (dx < 1 && dz < 1.5 && player.position.y >= topY - 0.1 && player.position.y <= topY + 0.5 &&
+							isGrounded && ySpeed <= 0) {
+							ySpeed = 0.45;
+							isGrounded = false;
+						}
+					} else if (o.userData.type === "sign") {
+						if (dx < 1 && dz < 1.5 && player.position.y < 4 && !isCrouching) {
+							gameOver("Hit a sign");
+						}
+					} else if (o.userData.type === "block") {
+						if (dx < 1 && dz < 1.5 && Math.abs(dy) < 1.5) gameOver("Hit a block");
+					} else if (o.userData.type === "mover") {
+						if (dx < 1 && dz < 1.5 && Math.abs(dy) < 1.5) {
+							gameOver("Hit a moving block");
+						}
+					} else if (o.userData.type === "supershoe") {
+						if (dx < 1 && dz < 1.5) {
+							boostmsg();
+							superShoeTimer = 600;
+							scene.remove(o);
+							o.position.z = 9999;
+						}
+						continue;
+					}
+				}
+				for (let i = coins.length - 1; i >= 0; i--) {
+					const c = coins[i];
+					if (Math.abs(c.position.x - player.position.x) < 1 && Math.abs(c.position.z - player.position.z) < 1) {
+						coinCount++;
+						scene.remove(c);
+						coins.splice(i, 1);
+					}
+				}
+				while (obstacles.length && obstacles[0].position.z > 10) {
+					scene.remove(obstacles.shift());
+				}
+				while (coins.length && coins[0].position.z > 10) {
+					scene.remove(coins.shift());
+				}
+				while (trees.length && trees[0].position.z > 20) {
+					scene.remove(trees.shift());
+					spawnTreeAt();
+				}
+				camera.position.z += (player.position.z + 10 - camera.position.z) * 0.1;
+				camera.position.x += (player.position.x - camera.position.x) * 0.9;
+				camera.position.y += ((player.position.y + 3) - camera.position.y) * 0.8;
+				camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+				playerShadow.position.x = player.position.x;
+				playerShadow.position.z = player.position.z;
+				score += 0.1;
+				document.getElementById("score").innerText = "Distance: " + Math.floor(score) + "m";
+				document.getElementById("coins").innerText = "Coins: " + coinCount;
+				renderer.render(scene, camera);
+			}
+
+			function gameOver(msg) {
+				isGameOver = true;
+				isPaused = true;
+				cancelAnimationFrame(animationId);
+				document.getElementById("finalScore").innerText =
+					msg + " | Distance: " + Math.floor(score);
+				document.getElementById("gameOverScreen").style.display = "flex";
+				const localBest = Number(localStorage.getItem(LOCAL_BEST_KEY) || 0);
+				if (final > localBest) {
+					localStorage.setItem(LOCAL_BEST_KEY, final);
+					setTimeout(() => {
+						if (confirm("New Record! Upload to leaderboard?")) {
+							uploadScore(final);
+						}
+					}, 300);
+				}
+			}
+			animate();
+			window.addEventListener("resize", () => {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			});
+			window.addEventListener("keydown", e => {
+				if (isGameOver || !gameStarted) return;
+				if (e.key === "p" || e.key === "Escape") {
+					isPaused = !isPaused;
+					document.getElementById("pauseScreen").style.display =
+						isPaused ? "flex" : "none";
+				}
+			});
+			document.getElementById("startBtn").addEventListener("click", () => {
+				const startScreen = document.getElementById("startScreen");
+				startScreen.classList.remove("show");
+				setTimeout(() => {
+					startScreen.style.display = "none";
+					gameStarted = true;
+					animate();
+				}, 300);
+			});
+			document.getElementById("ruleBtn").onclick = () => {
+				const r = document.getElementById("ruleScreen");
+				r.style.display = "flex";
+				requestAnimationFrame(() => r.classList.add("show"));
+			};
+			document.getElementById("rankBtn").onclick = () => {
+				const r = document.getElementById("rankScreen");
+				r.style.display = "flex";
+				requestAnimationFrame(() => r.classList.add("show"));
+			};
+
+			function closeOverlay() {
+				const ra = document.getElementById("rankScreen");
+				ra.classList.remove("show");
+				setTimeout(() => ra.style.display = "none", 300);
+				const ru = document.getElementById("ruleScreen");
+				ru.classList.remove("show");
+				setTimeout(() => ru.style.display = "none", 300);
+			}
+			/* ===== LEADERBOARD ===== */
+			const RANK_KEY = 'zhujingqi3drunnerrank';
+			const RANK_API = 'https://api.textdb.online/update/';
+			const LOCAL_BEST_KEY = 'zhujingqi3drunnerbest';
+			const rankList = document.getElementById('rankList');
+			const updateRankBtn = document.getElementById('updateRank');
+			async function loadRank() {
+				try {
+					const r = await fetch(`https://textdb.online/${RANK_KEY}`);
+					if (r.ok) {
+						const t = await r.text();
+						return t ? JSON.parse(t) : [];
+					}
+				} catch (e) {}
+				return [];
+			}
+			async function saveRank(list) {
+				await fetch(
+					`${RANK_API}?key=${RANK_KEY}&value=${encodeURIComponent(JSON.stringify(list))}`
+				);
+			}
+			const namePopup = document.getElementById("namePopup");
+			const playerNameInput = document.getElementById("playerNameInput");
+			const submitNameBtn = document.getElementById("submitNameBtn");
+			const cancelNameBtn = document.getElementById("cancelNameBtn");
+			async function upload(score) {
+				namePopup.style.display = "flex";
+				requestAnimationFrame(() => namePopup.classList.add("show"));
+				playerNameInput.value = "";
+				playerNameInput.focus();
+				return new Promise((resolve) => {
+					const submitHandler = async () => {
+						const name = playerNameInput.value.trim();
+						if (!name) return;
+						namePopup.classList.remove("show");
+						setTimeout(() => namePopup.style.display = "none", 300);
+						let list = await loadRank();
+						const old = list.find(i => i.name === name);
+						if (old) {
+							if (old.max >= score) return resolve();
+							old.max = score;
+						} else {
+							list.push({
+								name,
+								max: score
+							});
+						}
+						list.sort((a, b) => b.max - a.max);
+						list = list.slice(0, 50);
+						await saveRank(list);
+						resolve();
+					};
+					const cancelHandler = () => {
+						namePopup.classList.remove("show");
+						setTimeout(() => namePopup.style.display = "none", 300);
+						resolve();
+					};
+					submitNameBtn.onclick = submitHandler;
+					cancelNameBtn.onclick = cancelHandler;
+					playerNameInput.onkeydown = (e) => {
+						if (e.key === "Enter") submitHandler();
+					};
+				});
+			}
+			updateRankBtn.onclick = async () => {
+				if (!isGameOver) return;
+				await upload(Math.floor(score));
+			};
+			document.getElementById("rankBtn").onclick = async () => {
+				const r = document.getElementById("rankScreen");
+				const rankList = document.getElementById("rankList");
+				rankList.innerHTML = "Loading...";
+				r.style.display = "flex";
+				requestAnimationFrame(() => r.classList.add("show"));
+				const list = await loadRank();
+				rankList.innerHTML = "";
+				list.forEach((item, i) => {
+					const d = document.createElement("div");
+					d.className = "rankItem";
+					d.innerHTML = `
+			            <span>${i+1}&emsp;${item.name}</span>
+			            <span>${item.max} m</span>
+			        `;
+					rankList.appendChild(d);
+				});
+			};
+			document.addEventListener("contextmenu", e => {
+				e.preventDefault();
+			});
+
+			function isMobile() {
+				const user = navigator.userAgent;
+				const agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod'];
+				let flag = false;
+				for (let i = 0; i < agents.length; i++) {
+					if (user.indexOf(agents[i]) > 0) {
+						flag = true;
+						break;
+					}
+				}
+				return flag;
+			}
+			if (isMobile()) {
+				alert('由于需要键盘操作，3D Runner游戏暂不支持手机操作，请用PC以游玩！');
+				location.reload();
+			}
+		</script>
+	</body>
+</html>

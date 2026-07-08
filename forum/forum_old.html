@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>留言 - Zhujingqi</title>
+		<link id="maincss" rel="stylesheet" href="/css/main.css">
+		<link id="barcss" rel="stylesheet" href="/css/bar.css">
+		<style>
+			.msgdiv {
+				max-width: 800px;
+				margin: auto;
+			}
+
+			#messages {
+				white-space: pre-wrap;
+				background: #fff;
+				padding: 1em;
+				border-radius: 8px;
+				border: 1px solid #ccc;
+				height: 400px;
+				overflow-y: auto;
+				margin-bottom: 1em;
+			}
+
+			input,
+			textarea,
+			button {
+				display: block;
+				width: 100%;
+				margin-top: 0.5em;
+				font-size: 1em;
+			}
+
+			input,
+			textarea {
+				padding: 0.5em;
+				border-radius: 6px;
+				border: 1px solid #ccc;
+			}
+
+			button {
+				background-color: #b7f1d9;
+				color: #000000;
+				border: none;
+				padding: 0.7em;
+				border-radius: 6px;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: #b7ecec;
+			}
+
+			.status {
+				margin-top: 1em;
+				color: gray;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="#">旧版评论区</a>
+      <a href="/forum/index.html">前往新版 Jacky 论坛</a>
+		</div>
+		<div class="text">
+			<div class="msgdiv">
+				<div id="messages">Loading...</div>
+				<label for="nickname">名字</label>
+				<input type="text" id="nickname" placeholder="你的名字">
+				<label for="newMessage">内容</label>
+				<textarea id="newMessage" rows="3" placeholder="评论内容"></textarea>
+				<button onclick="submitMessage()">发表评论</button>
+				<div class="status" id="statusText"></div>
+			</div>
+		</div>
+		<div class="text">
+			注意事项<br>
+			1. 数据更新速度可能较慢，请勿频繁操作。<br>
+			2. 严禁发表不良、非法评论！<br>
+		</div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			<a href="/about.html">关于</a>
+			<a href="/money.html">赞助</a>
+		</div>
+		<noscript>
+			<style>
+				body {
+					display: none;
+				}
+			</style>
+			您的浏览器未启用或不支持 JavaScript，本站无法正常运行。
+		</noscript>
+		<script>
+			const dbKey = 'zhujingqicomtextdbonline'; // TextDB.online key
+			const dbReadURL = 'https://textdb.online/' + dbKey;
+			const dbWriteURL = 'https://api.textdb.online/update/';
+			const messagesDiv = document.getElementById('messages');
+			const status = document.getElementById('statusText');
+			// Load
+			async function loadMessages() {
+				try {
+					const res = await fetch(dbReadURL);
+					const text = await res.text();
+					messagesDiv.innerHTML = text || "还没有人留言，快来留言吧！";
+					status.innerText = "✅ Loaded.";
+				} catch (err) {
+					messagesDiv.textContent = "⚠️ ERROR";
+					status.innerText = "❌ Please check your network.";
+				}
+			}
+			// Summit
+			async function submitMessage() {
+				const name = document.getElementById('nickname').value.trim() || "匿名";
+				const message = document.getElementById('newMessage').value.trim();
+				if (!message) {
+					alert("请填写留言内容！");
+					return;
+				}
+				const timestamp = new Date().toLocaleString();
+				const newEntry =
+					`<span style="color: gray;">[${timestamp}]</span><br><strong>${name}</strong>: ${message}<br>\n`;
+				try {
+					const res = await fetch(dbReadURL);
+					const oldText = await res.text();
+					const params = new URLSearchParams();
+					params.append('key', dbKey);
+					params.append('value', oldText + newEntry);
+					const updateRes = await fetch(dbWriteURL, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						body: params.toString()
+					});
+					const result = await updateRes.json();
+					if (result.status !== 1) throw new Error("API ERROR");
+					document.getElementById('newMessage').value = '';
+					loadMessages();
+					status.innerText = "✅ Sent！";
+				} catch (err) {
+					console.error(err);
+					status.innerText = "❌ ERROR";
+				}
+			}
+			loadMessages();
+			messagesDiv.scrollTop = messagesDiv.scrollHeight;
+		</script>
+	</body>
+</html>

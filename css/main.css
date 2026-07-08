@@ -1,0 +1,111 @@
+body {
+	margin: 0px;
+	background-color: #ffffff;
+}
+
+*::selection {
+	background-color: #b7f1d9;
+	color: #000000;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:link {
+	color: darkblue;
+}
+
+a:visited {
+	color: darkblue;
+}
+
+a:hover {
+	color: royalblue;
+	text-decoration: underline;
+}
+
+a:active {
+	color: orangered;
+	text-decoration: underline wavy;
+}
+
+.zjq {
+	background-color: #ffe93e;
+}
+
+.text {
+	background-color: #f3f3f3;
+	color: black;
+	border-radius: 20px;
+	padding: 20px;
+	margin: 10px;
+	transition: 0.2s;
+}
+
+.text:hover {
+	background-color: #f6f6f6;
+	transition: 0.2s;
+}
+
+.msg {
+	position: fixed;
+	right: 20px;
+	top: 60px;
+	border-radius: 30px;
+	background-color: #f3f3f3;
+	color: #000000;
+	border: 5px solid #00aaff;
+	padding: 5px 20px 5px 20px;
+	z-index: 999;
+	animation: slide 1s ease-in-out;
+}
+
+@keyframes slide {
+	0% {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+
+	80% {
+		transform: translateX(-20px);
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+.msgclosebtn {
+	font-size: 20px;
+	color: #000000;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.msgclosebtn:hover {
+	color: #ff0000;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.bottom {
+	background-color: #f3f3f3;
+	color: #999999;
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.bottom a {
+	color: #999999;
+	text-decoration: none;
+	margin-right: 15px;
+}
+
+.bottom a:hover {
+	color: #888888;
+}

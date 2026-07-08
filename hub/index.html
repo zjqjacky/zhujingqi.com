@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>社区 - Zhujingqi</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<meta name="description" content="Zhujingqi Community Hub" />
+		<meta name="author" content="Jacky Zhu" />
+		<link id="maincss" rel="stylesheet" href="/css/main.css" />
+		<link id="barcss" rel="stylesheet" href="/css/bar.css" />
+		<link id="mobilecss" rel="stylesheet" href="/css/mobile.css">
+		<link rel="icon" type="image/x-icon" href="/img/zjq.svg" />
+		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<style>
+			:root {
+				--bg: #f6f7f9;
+				--panel: #ffffff;
+				--text: #111827;
+				--sub: #6b7280;
+				--line: #e5e7eb;
+				--shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+				overflow: hidden;
+			}
+
+			.card a {
+				color: #0055ff !important;
+				text-decoration: none;
+				transition: 0.2s;
+			}
+
+			.card a:hover {
+				color: #00aaff !important;
+				text-decoration: underline;
+			}
+
+			.page {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.main {
+				flex: 1;
+				min-height: 0;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.wrap {
+				flex: 1;
+				min-height: 0;
+				width: 100%;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 14px;
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+
+			.hero h1 {
+				margin: 0;
+				font-size: clamp(32px, 5vw, 52px);
+				font-weight: 900;
+				letter-spacing: -0.05em;
+			}
+
+			.hero p {
+				margin: 4px 0 0;
+				font-size: 14px;
+				color: var(--sub);
+			}
+
+			.grid {
+				flex: 1;
+				min-height: 0;
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				grid-template-rows: repeat(2, minmax(0, 1fr));
+				gap: 12px;
+			}
+
+			.card {
+				background: var(--panel);
+				border-radius: 20px;
+				padding: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+				overflow: hidden;
+				box-shadow: var(--shadow);
+				transition: 0.2s;
+			}
+
+			.card h2 {
+				margin: 10px;
+				font-size: clamp(24px, 3vw, 38px);
+				line-height: 1;
+			}
+
+			.sub {
+				font-size: 14px;
+				color: var(--sub);
+			}
+
+			.metaGrid {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 8px;
+			}
+
+			.meta {
+				padding: 12px;
+				border-radius: 16px;
+				background: #f9fafb;
+				border: 1px solid var(--line);
+			}
+
+			.meta b {
+				display: block;
+				font-size: 22px;
+				line-height: 1;
+			}
+
+			.meta span {
+				display: block;
+				margin-top: 6px;
+				font-size: 12px;
+				color: var(--sub);
+			}
+
+			.sectionTitle {
+				font-size: 13px;
+				font-weight: 700;
+				color: var(--sub);
+			}
+
+			@media (max-width: 760px) {
+				.wrap {
+					padding: 10px;
+				}
+
+				.grid {
+					gap: 10px;
+				}
+
+				.card {
+					padding: 14px;
+					border-radius: 18px;
+				}
+
+				.card h2 {
+					font-size: 24px;
+				}
+
+				.metaGrid {
+					display: flex;
+					flex-direction: row;
+					margin: 0px;
+				}
+
+				.meta {
+					padding: 5px;
+				}
+
+				.meta b {
+					font-size: 18px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page">
+			<div class="topbar">
+				<div class="bar">
+					<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+					<a href="/hub/"
+						style="background:linear-gradient(135deg,#ffb36b 0%,#ff935c 22%,#ff7a59 42%,#ff5f6d 65%,#ff7e8a 82%,#ffb38a 100%);color:#fff;">社区</a>
+					<a href="/me/">介绍</a>
+					<a href="/game/">游戏</a>
+					<a href="/tool/">工具</a>
+				</div>
+			</div>
+			<div class="main">
+				<div class="wrap">
+					<div class="hero">
+						<h1>社区</h1>
+					</div>
+					<div class="grid">
+						<div class="card forum">
+							<div class="cardHead">
+								<div>
+									<h2><a href="/forum/">Jacky Forum</a></h2>
+								</div>
+							</div>
+							<div class="metaGrid">
+								<div class="meta">
+									<b id="forumUsers">—</b>
+									<span>用户数</span>
+								</div>
+								<div class="meta">
+									<b id="forumPosts">—</b>
+									<span>帖子数</span>
+								</div>
+								<div class="meta">
+									<b id="forumComments">—</b>
+									<span>评论数</span>
+								</div>
+							</div>
+							<div class="sectionTitle">最新帖子</div>
+							<div class="feed" id="forumLatestBox">
+								<div class="feedItem"><span>加载中...</span></div>
+							</div>
+						</div>
+						<div class="card chat">
+							<div class="cardHead">
+								<div>
+									<h2><a href="/chat/">Jacky Chat</a></h2>
+								</div>
+							</div>
+							<div class="metaGrid">
+								<div class="meta">
+									<b id="chatMessages">—</b>
+									<span>总消息数</span>
+								</div>
+								<div class="meta">
+									<b id="chatContacts">—</b>
+									<span>总好友对数</span>
+								</div>
+							</div>
+						</div>
+						<div class="card pedia">
+							<div class="cardHead">
+								<div>
+									<h2><a href="/pedia">Jackypedia</a></h2>
+									<div class="sub">即将推出，敬请期待！</div>
+								</div>
+							</div>
+						</div>
+						<div class="card review">
+							<div class="cardHead">
+								<div>
+									<h2><a href="/pedia">评分系统</a></h2>
+									<div class="sub">即将推出，敬请期待！</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="bottom">
+					<a href="/index.html"><b>Zhujingqi</b></a>
+					<a href="/about.html">关于</a>
+					<a href="/money.html">赞助</a>
+				</div>
+			</div>
+		</div>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const SUPABASE_URL = "https://hxlhrrllhvvazyhiuhvb.supabase.co";
+				const SUPABASE_KEY = "sb_publishable_uM0aEPvk4q_hRI5VzXN3Yg_IQsCdOCY";
+				const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+				const $ = (id) => document.getElementById(id);
+
+				function escapeHtml(str) {
+					return String(str ?? "")
+						.replace(/&/g, "&amp;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;")
+						.replace(/"/g, "&quot;")
+						.replace(/'/g, "&#39;");
+				}
+
+				function stripTags(text) {
+					return String(text ?? "").replace(/<[^>]*>/g, "");
+				}
+
+				function stripBgPrefix(text) {
+					return String(text ?? "").replace(/^\[\[bg:(.+?)\]\]/, "");
+				}
+
+				function truncate(text, len = 96) {
+					const s = String(text ?? "");
+					return s.length > len ? s.slice(0, len) + "..." : s;
+				}
+
+				function fmt(n) {
+					return Number(n || 0).toLocaleString("zh-CN");
+				}
+
+				function setText(id, value) {
+					const el = $(id);
+					if (el) el.textContent = value;
+				}
+
+				function setHTML(id, value) {
+					const el = $(id);
+					if (el) el.innerHTML = value;
+				}
+
+				function showBox(id, text) {
+					setHTML(id,
+						`<div class="feedItem"><span>${escapeHtml(text)}</span></div>`
+					);
+				}
+
+				async function countExact(table, builder = (q) => q) {
+					try {
+						let q = supabase.from(table).select("id", {
+							count: "exact",
+							head: true
+						});
+						q = builder(q);
+						const {
+							count,
+							error
+						} = await q;
+						if (error) return null;
+						return count || 0;
+					} catch {
+						return null;
+					}
+				}
+
+				async function loadForum() {
+					const [users, posts, comments] = await Promise.all([
+						countExact("users"),
+						countExact("posts"),
+						countExact("comments")
+					]);
+					setText("forumUsers", users === null ? "—" : fmt(users));
+					setText("forumPosts", posts === null ? "—" : fmt(posts));
+					setText("forumComments", comments === null ? "—" : fmt(comments));
+					try {
+						const {
+							data,
+							error
+						} = await supabase
+							.from("posts")
+							.select("id, content, users:author(id, name, coins)")
+							.order("id", {
+								ascending: false
+							})
+							.limit(1);
+						if (error || !data || !data.length) {
+							showBox("forumLatestBox", "暂无最新帖子");
+							return;
+						}
+						const p = data[0];
+						const author = escapeHtml(p.users?.name || "未知");
+						const text = escapeHtml(truncate(stripTags(stripBgPrefix(p.content)), 86));
+						setHTML(
+							"forumLatestBox",
+							`
+								<div class="feedItem"><span><b>${author}</b>：${text}</span></div>
+							`
+						);
+					} catch {
+						showBox("forumLatestBox", "论坛最新帖子读取失败");
+					}
+				}
+				async function loadChat() {
+					const [messages, contacts] = await Promise.all([
+						countExact("messages"),
+						countExact("contact")
+					]);
+					setText("chatMessages", messages === null ? "—" : fmt(messages));
+					setText("chatContacts", contacts === null ? "—" : fmt(contacts));
+				}
+
+				async function loadAll() {
+					await Promise.all([loadForum(), loadChat()]);
+				}
+
+				loadAll().catch((err) => {
+					console.error(err);
+					showBox("forumLatestBox", "论坛数据读取失败");
+				});
+			});
+		</script>
+	</body>
+</html>

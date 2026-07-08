@@ -1,0 +1,4322 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>Jacky 论坛 - Zhujingqi</title>
+		<link rel="icon" type="image/png" href="icon.svg">
+		<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="icon.png">
+		<style>
+			:root {
+				--bg: #eee;
+				--card: #fff;
+				--text: #111;
+				--sub: #666;
+				--green: #0a0;
+				--grad: #0a0;
+				--active: #0a0;
+				font-size: 18px;
+			}
+
+			body.dark {
+				--bg: #111;
+				--card: #222;
+				--text: #eee;
+				--sub: #aaa;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+			}
+
+			body::-webkit-scrollbar {
+				width: 10px;
+			}
+
+			body::-webkit-scrollbar-thumb {
+				background-color: #ccc;
+				border-radius: 5px;
+			}
+
+			body.dark::-webkit-scrollbar-thumb {
+				background-color: #333;
+			}
+
+			button {
+				border: 0;
+				padding: 0 12px;
+				border-radius: 20px;
+				cursor: pointer;
+				background: var(--card);
+				color: var(--text);
+				transition: .2s;
+				box-sizing: border-box;
+				height: 42px;
+				font-size: 18px;
+				user-select: none;
+			}
+
+			button:hover {
+				background: var(--grad);
+				color: #fff;
+			}
+
+			input,
+			textarea {
+				width: 100%;
+				padding: 12px;
+				margin: 6px 0;
+				border-radius: 20px;
+				border: 1px solid #ccc;
+				background: var(--card);
+				color: var(--text);
+				box-sizing: border-box;
+				height: 42px;
+				font-size: 18px;
+				overflow: auto;
+			}
+
+			textarea {
+				height: 120px;
+				resize: none;
+			}
+
+			a {
+				color: var(--green);
+			}
+
+			.center {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+			}
+
+			.card {
+				background: var(--card);
+				padding: 30px;
+				border-radius: 20px;
+				box-shadow: 0 10px 40px rgba(0, 0, 0, .15);
+				width: 340px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.big {
+				font-size: 36px;
+				font-weight: bold;
+				margin-bottom: 20px;
+				text-align: center;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			#main,
+			#profilePage,
+			#userListPage {
+				margin-top: 0px;
+				padding-bottom: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				width: 100%;
+				height: 100vh;
+			}
+
+			#posts,
+			#userPosts {
+				width: 100%;
+				max-width: 800px;
+				overflow-y: auto;
+				overflow-x: hidden;
+				flex: 1;
+				padding-bottom: 20px;
+			}
+
+			#pname {
+				font-size: 40px;
+			}
+
+			.post {
+				background: var(--card);
+				margin: 14px auto;
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, .1);
+				width: 80%;
+				max-width: 800px;
+				word-wrap: break-word;
+				font-size: 18px;
+				white-space: pre-wrap;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.postHeader {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 8px;
+			}
+
+			.time {
+				font-size: 14px;
+				color: var(--sub);
+				margin-left: 6px;
+			}
+
+			.postActions {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+			}
+
+			.voteGroup {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.like,
+			.dislike {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				cursor: pointer;
+				user-select: none;
+				color: #888;
+				transition: .2s;
+			}
+
+			.voteIcon {
+				width: 18px;
+				height: 18px;
+				fill: currentColor;
+				flex: 0 0 auto;
+			}
+
+			.like.liked {
+				color: #f66;
+				font-weight: 700;
+			}
+
+			.dislike.disliked {
+				color: #0055ff;
+				font-weight: 700;
+			}
+
+			.like:hover,
+			.dislike:hover {
+				transform: translateY(-1px);
+			}
+
+			.commentRow {
+				display: flex;
+				margin-top: 5px;
+			}
+
+			.commentRow input {
+				flex: 1;
+				margin-right: 5px;
+				height: 40px;
+				margin: 0;
+			}
+
+			.commentRow button {
+				margin-left: 5px;
+				height: 40px;
+			}
+
+			.deleteBtn {
+				margin-left: 15px;
+			}
+
+			.bottom {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				display: flex;
+				height: 40px;
+				margin: 0;
+				z-index: 2000;
+			}
+
+			.bottom button {
+				flex: 1;
+				text-align: center;
+				padding: 0px;
+				font-size: 18px;
+				border-radius: 0;
+				border-top: 3px solid transparent;
+			}
+
+			.bottom button.active {
+				background: var(--active);
+				color: #fff;
+				border-top-color: var(--green);
+			}
+
+			.modal {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .4);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 99999;
+			}
+
+			.modalBox {
+				background: var(--card);
+				padding: 30px;
+				border-radius: 20px;
+				width: 300px;
+				text-align: center;
+			}
+
+			.userLink {
+				cursor: pointer;
+				color: var(--green);
+			}
+
+			.userItem {
+				width: 90%;
+				max-width: 800px;
+				padding: 20px;
+				border-bottom: 1px solid #aaa;
+				font-size: 20px;
+				cursor: pointer;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.userItem:last-child {
+				border-bottom: none;
+			}
+
+			#userDescription {
+				text-align: left;
+				font-size: 18px;
+				color: var(--text);
+				background: var(--card);
+				border-radius: 20px;
+				margin: 14px auto;
+				padding: 20px;
+				width: 80%;
+				max-width: 800px;
+				word-wrap: break-word;
+			}
+
+			.tagBar {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-bottom: 10px;
+			}
+
+			.tag {
+				padding: 4px 12px;
+				border-radius: 20px;
+				background: var(--bg);
+				cursor: pointer;
+				font-size: 14px;
+				border: 1px solid #ccc;
+				transition: .2s;
+			}
+
+			.tag:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			.tag.active {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+			}
+
+			.postBgRow {
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+
+			.postBgRow button {
+				width: 100%;
+			}
+
+			.post.custom-bg {
+				position: relative;
+				overflow: hidden;
+				background: none !important;
+				z-index: 0;
+			}
+
+			.post.custom-bg::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: var(--custom-bg);
+				background-size: cover;
+				background-position: center;
+				z-index: -1;
+				transition: filter 0.3s ease;
+			}
+
+			body.dark .post.custom-bg {}
+
+			body.dark .post.custom-bg::before {
+				filter: brightness(0.3) saturate(2);
+			}
+
+			.bgPickerGrid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 8px;
+				margin-top: 12px;
+			}
+
+			.bgOption {
+				border-radius: 12px;
+				height: 50px;
+				border: 2px solid transparent;
+				cursor: pointer;
+			}
+
+			.bgOption.active {
+				border-color: var(--green);
+				transform: scale(1.05);
+			}
+
+			.postTag {
+				padding: 4px 12px;
+				border-radius: 20px;
+				background: var(--green);
+				color: #eee;
+				cursor: pointer;
+				font-size: 14px;
+				border: none;
+			}
+
+			.postHeaderTop {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin: 0;
+				padding: 0;
+			}
+
+			.postHeaderTop .userInfo {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin: 0;
+			}
+
+			.postHeaderTop .userLink {
+				font-weight: bold;
+				color: var(--green);
+				cursor: pointer;
+				margin-bottom: 5px;
+			}
+
+			.postHeaderTop .time {
+				font-size: 14px;
+				color: var(--sub);
+			}
+
+			.postContent {
+				margin: 4px 0 8px 0;
+			}
+
+			.comment {
+				font-size: 16px;
+				display: flex;
+				justify-content: flex-start;
+				align-items: flex-start;
+				margin-top: 5px;
+				gap: 6px;
+			}
+
+			.comment b {
+				color: var(--green);
+			}
+
+			.comment button {
+				margin-left: auto;
+			}
+
+			.commentDel {
+				font-size: 16px;
+				height: auto;
+			}
+
+			::-webkit-scrollbar {
+				width: 10px;
+				background: transparent;
+				border-radius: 10px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background-color: #aaa;
+				border-radius: 10px;
+				border: 2px solid transparent;
+				background-clip: content-box;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background-color: #888;
+			}
+
+			#backBtn,
+			#postBackBtn {
+				position: absolute;
+				left: 20px;
+				top: 20px;
+				background: var(--card);
+				color: var(--text);
+				border: none;
+				padding: 10px 20px;
+				border-radius: 20px;
+				cursor: pointer;
+				transition: 0.2s;
+				z-index: 100;
+			}
+
+			#backBtn:hover,
+			#postBackBtn:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			#newUsers {
+				position: absolute;
+				right: 40px;
+				top: 40px;
+				width: 150px;
+				background: var(--card);
+				padding: 20px;
+				border-radius: 20px;
+				margin: 0 auto 20px auto;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.newUserItem {
+				display: flex;
+				justify-content: space-between;
+				padding: 8px 0;
+				border-bottom: 1px solid #ccc;
+				cursor: pointer;
+			}
+
+			.newUserItem:last-child {
+				border-bottom: none;
+			}
+
+			.newUserItem:hover {
+				color: var(--green);
+			}
+
+			#notice {
+				position: absolute;
+				left: 20px;
+				top: 20%;
+				width: 150px;
+				background: var(--card);
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+				transition: all 0.4s ease;
+				z-index: 100;
+			}
+
+			#notice.collapsed {
+				left: -150px;
+				padding: 20px 10px 20px 40px;
+			}
+
+			.helpBtn {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				border: none;
+				font-size: 14px;
+				cursor: pointer;
+			}
+
+			.helpBtn:hover {
+				background: #f0f0f0;
+			}
+
+			#coinMsg {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #0a0;
+				color: #fff;
+				padding: 10px 20px;
+				border-radius: 20px;
+				font-weight: bold;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.5s;
+				z-index: 9999;
+			}
+
+			.userLevel {
+				font-size: 14px;
+				color: #888;
+				margin-left: 1px;
+			}
+
+			body.dark .userLevel {
+				color: #aaa;
+			}
+
+			.verifiedBadge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 16px;
+				padding: 0 6px;
+				margin-left: 1px;
+				border-radius: 999px;
+				font-size: 10px;
+				font-weight: 700;
+				background-color: #00aaff;
+				color: #fff;
+				border: none;
+				vertical-align: middle;
+				user-select: none;
+				title: "官方用户";
+			}
+
+			.verifiedBadge::before {
+				content: "V";
+				line-height: 1;
+			}
+
+			#fortuneBox {
+				text-align: center;
+				position: absolute;
+				right: 2%;
+				bottom: 40px;
+				width: 10%;
+				background: var(--card);
+				padding: 20px;
+				border-radius: 20px;
+				margin: 0 auto 20px auto;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			#fortuneBtn {
+				font-size: 14px;
+			}
+
+			#fortuneLevel {
+				font-size: 25px;
+				font-weight: bold;
+			}
+
+			.fortuneList {
+				margin: 6px 0;
+				font-size: 15px;
+			}
+
+			.pager {
+				width: 100%;
+				max-width: 800px;
+				margin: 10px auto 20px auto;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 6px;
+				flex-wrap: wrap;
+				padding-bottom: 25px;
+			}
+
+			.pager .pageBtn,
+			.pager .navBtn {
+				min-width: 40px;
+				height: 40px;
+				padding: 0 12px;
+				border-radius: 12px;
+				border: 1px solid transparent;
+				background: var(--card);
+				color: var(--text);
+				font-size: 16px;
+				cursor: pointer;
+				transition: .2s;
+			}
+
+			.pager .pageBtn:hover,
+			.pager .navBtn:hover {
+				border-color: var(--green);
+				color: var(--green);
+			}
+
+			.pager .pageBtn.active {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+				font-weight: bold;
+			}
+
+			.pager .pageBtn:disabled,
+			.pager .navBtn:disabled {
+				opacity: .4;
+				cursor: not-allowed;
+			}
+
+			.pager .ellipsis {
+				padding: 0 4px;
+				color: var(--sub);
+				user-select: none;
+			}
+
+			.zoomable {
+				width: 100%;
+				border-radius: 10px;
+				cursor: zoom-in;
+			}
+
+			#viewer {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, .9);
+				justify-content: center;
+				align-items: center;
+				z-index: 99999;
+				cursor: zoom-out;
+			}
+
+			#viewer img {
+				max-width: 90%;
+				max-height: 90%;
+			}
+
+			.loadingMask {
+				position: fixed;
+				inset: 0;
+				background: var(--bg);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 99999;
+				transition: opacity .35s ease;
+			}
+
+			.loadingMask.fadeOut {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.loadingBox {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 14px;
+			}
+
+			.loadingLogo {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				font-size: 28px;
+				font-weight: bold;
+				color: var(--green);
+			}
+
+			.loadingLogo img {
+				width: 56px;
+				height: 56px;
+			}
+
+			.loadingText {
+				font-size: 16px;
+				color: var(--sub);
+				letter-spacing: 1px;
+			}
+
+			.dot {
+				display: inline-block;
+				animation: loadingDot 1.2s infinite;
+			}
+
+			.dot1 {
+				animation-delay: 0s;
+			}
+
+			.dot2 {
+				animation-delay: .2s;
+			}
+
+			.dot3 {
+				animation-delay: .4s;
+			}
+
+			.postFilterBar {
+				width: 100%;
+				max-width: 800px;
+				padding: 0 20px 10px 20px;
+				box-sizing: border-box;
+				margin: 0 auto 10px auto;
+			}
+
+			.postSearch {
+				width: 100%;
+				margin: 0 0 10px 0;
+				height: 42px;
+				border-radius: 20px;
+				border: 1px solid #ccc;
+				padding: 0 14px;
+				background: var(--card);
+				color: var(--text);
+				box-sizing: border-box;
+				transition: 0.2s;
+			}
+
+			.postTagBar {
+				display: flex;
+				flex-wrap: nowrap;
+				gap: 8px;
+				overflow-x: auto;
+				padding-bottom: 4px;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.postTagBar::-webkit-scrollbar {
+				display: none;
+			}
+
+			.postTagChip {
+				padding: 6px 14px;
+				border-radius: 999px;
+				background: var(--card);
+				border: 1px solid #ccc;
+				cursor: pointer;
+				user-select: none;
+				white-space: nowrap;
+				font-size: 14px;
+				transition: .2s;
+			}
+
+			.postTagChip:hover {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+			}
+
+			.postTagChip.active {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+			}
+
+			.searchRow {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 10px;
+			}
+
+			.searchRow .postSearch {
+				flex: 1;
+				margin: 0;
+			}
+
+			.searchRow button {
+				flex-shrink: 0;
+			}
+
+			.toggleLongPost.inline {
+				margin-left: 8px;
+				padding: 2px 8px;
+				font-size: 14px;
+				height: 24px;
+				line-height: 20px;
+				border-radius: 999px;
+				vertical-align: middle;
+				float: right;
+			}
+
+			.postContent {
+				line-height: 1.7;
+				word-break: break-word;
+			}
+
+			.longPostText {
+				display: inline;
+			}
+
+			.postWarnGate {
+				padding: 10px 12px;
+				border-radius: 12px;
+				background: rgba(255, 85, 0, 0.1);
+				border: 1px solid var(--bg);
+				line-height: 1.3;
+			}
+
+			.postWarnGate button {
+				width: 100%;
+				margin-top: 10px;
+			}
+
+			#logoRow {
+				width: 100%;
+				max-width: 800px;
+				padding: 20px 20px 8px 20px;
+				box-sizing: border-box;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+
+			#logo {
+				font-size: 40px;
+				font-weight: bold;
+				color: var(--green);
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 0;
+				text-align: left;
+			}
+
+			#logo img {
+				width: 80px;
+				height: 80px;
+			}
+
+			#onlineMini {
+				height: 36px;
+				padding: 0 14px;
+				border-radius: 999px;
+				background: var(--card);
+				color: var(--text);
+				border: 1px solid #ccc;
+				font-size: 14px;
+				white-space: nowrap;
+			}
+
+			#onlineMini:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			.onlineUser {
+				padding: 8px 10px;
+				border-radius: 10px;
+				cursor: pointer;
+				margin-bottom: 4px;
+				transition: .15s;
+			}
+
+			.onlineUser:hover {
+				background: var(--bg);
+			}
+
+			.onlineAvatar {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex-shrink: 0;
+			}
+
+			.sensitiveWrap {
+				margin-top: 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.sensitiveRow {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			.warnText {
+				width: 100%;
+				height: 36px;
+				font-size: 14px;
+				margin: 0;
+				display: none;
+			}
+
+			.warnText.show {
+				display: block;
+			}
+
+			.voteWhoRow {
+				display: flex;
+				gap: 10px;
+				margin-top: 6px;
+				font-size: 12px;
+				color: var(--sub);
+				flex-wrap: wrap;
+			}
+
+			.voteWhoLink {
+				cursor: pointer;
+				user-select: none;
+			}
+
+			.voteWhoLink:hover {
+				color: var(--green);
+			}
+
+			.avatar {
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex: 0 0 auto;
+				background: var(--bg);
+				border: 1px solid rgba(0, 0, 0, 0.08);
+			}
+
+			.avatar.big {
+				width: 120px;
+				height: 120px;
+				border-width: 2px;
+			}
+
+			.comment .avatar {
+				width: 20px;
+				height: 20px;
+				vertical-align: middle;
+			}
+
+			.userLinkWithAvatar {
+				display: inline-flex;
+				align-items: center;
+				gap: 1px;
+			}
+
+			.profileAvatarWrap {
+				display: flex;
+				justify-content: center;
+				margin: 10px 0 16px 0;
+			}
+
+			#profileAvatar {
+				cursor: zoom-in;
+			}
+
+			.discoverGrid {
+				width: 100%;
+				box-sizing: border-box;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 16px;
+				padding: 20px;
+			}
+
+			.discoverCard {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				min-height: 180px;
+				padding: 28px;
+				box-sizing: border-box;
+				background: var(--card);
+				border-radius: 24px;
+				text-decoration: none;
+				color: inherit;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+				transition: all .2s ease;
+			}
+
+			.discoverCard:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+			}
+
+			.discoverIcon {
+				font-size: 42px;
+				margin-bottom: 14px;
+			}
+
+			.discoverCard h3 {
+				margin: 0 0 8px 0;
+				font-size: 24px;
+			}
+
+			.discoverCard p {
+				margin: 0;
+				color: var(--sub);
+				font-size: 15px;
+				line-height: 1.5;
+			}
+
+			.rankAvatar {
+				width: 28px;
+				height: 28px;
+				flex: 0 0 auto;
+			}
+
+			#fortuneToggleBtn {
+				display: none;
+			}
+
+			.musicCard {
+				margin: 8px 0 10px 0;
+				padding: 10px;
+				border-radius: 16px;
+				background: rgba(0, 0, 0, 0.04);
+				border: 1px solid rgba(0, 0, 0, 0.08);
+				overflow: hidden;
+			}
+
+			body.dark .musicCard {
+				background: rgba(255, 255, 255, 0.06);
+				border-color: rgba(255, 255, 255, 0.08);
+			}
+
+			.musicIframe {
+				display: block;
+				border-radius: 12px;
+				overflow: hidden;
+			}
+
+			#notifBtn {
+				height: 36px;
+				padding: 0 14px;
+				border-radius: 999px;
+				background: var(--card);
+				color: var(--text);
+				border: 1px solid #ccc;
+				font-size: 14px;
+				white-space: nowrap;
+			}
+
+			#notifBtn:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			#notifBadge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 18px;
+				height: 18px;
+				padding: 0 5px;
+				margin-left: 6px;
+				border-radius: 999px;
+				background: #ff3b30;
+				color: #fff;
+				font-size: 12px;
+				font-weight: 700;
+			}
+
+			.mentionLink {
+				color: var(--green);
+				font-weight: 700;
+				cursor: pointer;
+			}
+
+			.mentionBox {
+				position: fixed;
+				z-index: 100000;
+				background: var(--card);
+				border: 1px solid rgba(0, 0, 0, .12);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+				border-radius: 14px;
+				overflow: hidden;
+				min-width: 220px;
+				max-width: min(320px, calc(100vw - 20px));
+			}
+
+			.mentionBox.hidden {
+				display: none;
+			}
+
+			.mentionItem {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 10px;
+				cursor: pointer;
+			}
+
+			.mentionItem:hover,
+			.mentionItem.active {
+				background: var(--bg);
+			}
+
+			.mentionItem .avatar {
+				width: 22px;
+				height: 22px;
+			}
+
+			#posts.denseLayout {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+				width: min(100%, 1100px);
+				max-width: 1100px;
+				margin: 0 auto;
+				gap: 10px;
+				padding: 0 12px 20px;
+				box-sizing: border-box;
+				align-items: stretch;
+			}
+
+			#posts.denseLayout .post {
+				width: 100%;
+				margin: 0;
+				padding: 14px;
+				border-radius: 18px;
+				font-size: 15px;
+				box-sizing: border-box;
+			}
+
+			#posts.denseLayout .postHeaderTop {
+				align-items: flex-start;
+			}
+
+			#posts.denseLayout .postContent {
+				margin: 6px 0;
+				line-height: 1.6;
+			}
+
+			#posts.denseLayout .postActions {
+				margin-top: 8px;
+			}
+
+			#posts.denseLayout .commentList .comment {
+				font-size: 13px;
+				line-height: 1.3;
+			}
+
+			.profileBtnGrid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+				gap: 10px;
+				width: 100%;
+				max-width: 600px;
+				margin: 16px auto 40px auto;
+				padding: 0 20px;
+				box-sizing: border-box;
+			}
+
+			.profileBtnGrid .pbtn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0 12px;
+				border-radius: 20px;
+				background: var(--card);
+				color: var(--text);
+				border: none;
+				cursor: pointer;
+				font-size: 15px;
+				text-align: center;
+				transition: .2s;
+				height: 44px;
+				user-select: none;
+			}
+
+			.profileBtnGrid .pbtn:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			.themeRow {
+				display: flex;
+				gap: 8px;
+				grid-column: 1 / -1;
+			}
+
+			.themeRow button {
+				flex: 1;
+				height: 42px;
+			}
+
+			@keyframes postFadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px) scale(.98)
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0) scale(1)
+				}
+			}
+
+			.post.postEnter {
+				animation: postFadeIn .32s ease both;
+			}
+
+			#posts.denseLayout .post.postEnter {
+				animation: postFadeIn .32s ease both;
+			}
+
+			@keyframes loadingDot {
+
+				0%,
+				80%,
+				100% {
+					opacity: .2;
+					transform: translateY(0);
+				}
+
+				40% {
+					opacity: 1;
+					transform: translateY(-2px);
+				}
+			}
+
+			@media (max-width: 800px) {
+				.bottom {
+					bottom: 0;
+					height: 60px;
+				}
+
+				.bottom button {
+					height: 100%;
+					padding-bottom: 40px;
+				}
+
+				.profileBtnGrid {
+					margin-bottom: 70px;
+				}
+
+				#pname {
+					font-size: 30px;
+				}
+
+				.big {
+					font-size: 28px;
+				}
+
+				.post,
+				.userItem {
+					font-size: 14px;
+				}
+
+				button,
+				input,
+				textarea {
+					font-size: 14px;
+				}
+
+				.comment {
+					font-size: 13px;
+				}
+
+				.tag,
+				.postTag,
+				.time {
+					font-size: 12px;
+				}
+
+				#toggleNoticeBtn,
+				#fortuneToggleBtn {
+					display: none !important;
+				}
+
+				#mobileSideBtn {
+					display: flex;
+					position: fixed;
+					right: 12px;
+					bottom: 72px;
+					width: 46px;
+					height: 46px;
+					border-radius: 50%;
+					align-items: center;
+					justify-content: center;
+					background: var(--card);
+					box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+					z-index: 4000;
+					font-size: 18px;
+				}
+
+				#notice,
+				#fortuneBox {
+					display: block;
+					position: fixed;
+					top: 70px;
+					z-index: 3000;
+					transition: transform .28s ease, opacity .28s ease;
+					will-change: transform, opacity;
+					opacity: 0;
+					pointer-events: none;
+				}
+
+				#notice {
+					left: 0;
+					width: min(72vw, 280px);
+					max-height: calc(100vh - 140px);
+					overflow: auto;
+					border-radius: 0 18px 18px 0;
+					padding: 14px 12px;
+					transform: translateX(calc(-100% + 16px));
+				}
+
+				#fortuneBox {
+					right: 0;
+					width: min(50vw, 100px);
+					max-height: 140px;
+					overflow: hidden;
+					border-radius: 18px 0 0 18px;
+					padding: 10px 10px 12px 10px;
+					text-align: left;
+					transform: translateX(calc(100% - 16px));
+					bottom: auto;
+				}
+
+				#notice.mobile-open,
+				#fortuneBox.mobile-open {
+					opacity: 1;
+					pointer-events: auto;
+					transform: translateX(0);
+					font-size: 14px;
+				}
+
+				#fortuneBtn {
+					width: 100%;
+					height: 34px;
+					font-size: 13px;
+					margin-top: 8px;
+					box-sizing: border-box;
+				}
+
+				#fortuneResult {
+					margin-top: 6px;
+				}
+
+				#fortuneLevel {
+					font-size: 18px;
+				}
+
+				.fortuneList {
+					font-size: 12px;
+					margin: 3px 0;
+				}
+
+				#newUsers {
+					display: none;
+				}
+
+				#tagBar {
+					display: none !important;
+				}
+
+				#editorPage .card {
+					width: 80% !important;
+					max-width: 500px !important;
+				}
+
+				.postActions button[data-del] {
+					font-size: 14px;
+				}
+
+				.commentDel {
+					font-size: 12px;
+				}
+
+				#backBtn {
+					padding: 6px 12px;
+					font-size: 14px;
+				}
+				.pager {
+					gap: 4px;
+					padding-bottom: 60px;
+					margin: 8px auto 14px auto;
+				}
+
+				.pager .pageBtn,
+				.pager .navBtn {
+					min-width: 30px;
+					height: 30px;
+					padding: 0 8px;
+					border-radius: 10px;
+					font-size: 12px;
+				}
+
+				.pager .ellipsis {
+					font-size: 12px;
+					padding: 0 2px;
+				}
+
+				.bgPickerGrid {
+					grid-template-columns: repeat(4, 1fr);
+					gap: 6px;
+				}
+
+				.bgOption {
+					height: 40px;
+					border-radius: 10px;
+				}
+
+				.searchRow {
+					gap: 6px;
+				}
+
+				.searchRow .postSearch {
+					height: 34px;
+					font-size: 14px;
+					padding: 0 10px;
+				}
+
+				.searchRow button {
+					height: 34px;
+					padding: 0 10px;
+					font-size: 12px;
+				}
+
+				.postSearch {
+					font-size: 14px;
+				}
+
+				.postTagChip {
+					font-size: 12px;
+				}
+
+				#logoRow {
+					padding: 16px 12px 6px 12px;
+				}
+
+				#logo {
+					font-size: 30px;
+				}
+
+				#logo img {
+					width: 50px;
+					height: 50px;
+				}
+
+				#onlineMini,
+				#notifBtn {
+					height: 32px;
+					font-size: 12px;
+					padding: 0 10px;
+				}
+
+				#notifBtn {
+					min-width: 0;
+				}
+
+				#notifBtn span:first-child {
+					max-width: 56px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				.onlineAvatar {
+					width: 18px;
+					height: 18px;
+				}
+
+				.warnText {
+					height: 34px;
+					font-size: 13px;
+					padding: 0 10px;
+				}
+
+				.sensitiveRow {
+					align-items: flex-start;
+				}
+
+				.sensitiveRow label {
+					font-size: 12px;
+				}
+
+				.voteWhoRow {
+					font-size: 11px;
+				}
+
+				.avatar {
+					width: 26px;
+					height: 26px;
+				}
+
+				.avatar.big {
+					width: 92px;
+					height: 92px;
+				}
+
+				.discoverGrid {
+					grid-template-columns: 1fr;
+					padding: 12px;
+					gap: 12px;
+				}
+
+				.discoverCard {
+					min-height: 140px;
+					padding: 22px;
+				}
+
+				.discoverCard h3 {
+					font-size: 22px;
+				}
+
+				.discoverIcon img {
+					width: 50px;
+					height: 50px;
+				}
+
+				.discoverIcon {
+					margin-bottom: -5px;
+				}
+
+				.rankAvatar {
+					width: 22px;
+					height: 22px;
+				}
+
+				#layoutBtn {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bottom hidden" id="nav">
+			<button id="homeBtn">首页</button>
+			<button id="editorBtn">发布</button>
+			<button id="showUsersBtn">排行</button>
+			<button id="discoverBtn">探索</button>
+			<button id="profileBtn">我的</button>
+		</div>
+		<div id="welcomePage" class="center">
+			<div class="big">
+				<img src="icon.svg" />
+				Jacky 论坛
+			</div>
+			<div class="card">
+				<input id="loginUser" placeholder="用户名" autofocus>
+				<input id="loginPass" type="password" placeholder="密码">
+				<button id="loginBtn">登录</button>
+				<div style="text-align:center;margin-top:10px">
+					<span style="color:var(--green);cursor:pointer" id="goRegister">没有账号？点击注册</span>
+				</div>
+				<span style="text-align:center; color:#aaa; font-size: 12px;">
+					<br>
+					账号体系已与 <b><a href="https://zhujingqi.com/chat/">Jacky Chat</a></b> 互通
+					<br>
+					<a href="#">Jacky 论坛</a> · <a href="#">Jacky Chat</a> ·
+					<a href="https://zhujingqi.com">Zhujingqi</a>
+					<br>
+					© Jacky Forum. All rights reserved.
+				</span>
+			</div>
+		</div>
+		<div id="registerPage" class="center hidden">
+			<div class="big">注册 Jacky 账号</div>
+			<div class="card">
+				<input id="regUser" placeholder="用户名">
+				<input id="regPass" type="password" placeholder="密码">
+				<input id="regPass2" type="password" placeholder="再次输入密码">
+				<button id="registerBtn">注册</button>
+				<h6 style="text-align:center;">
+					注册即代表您同意 <a id="termsBtn" style="cursor:pointer;">用户协议</a><br>
+					请牢记用户名和密码。如无法注册，请联系管理员。
+				</h6>
+				<div style="text-align:center;margin-top:10px">
+					<span style="color:var(--green);cursor:pointer" id="backLogin">已有帐号？返回登录</span>
+				</div>
+			</div>
+		</div>
+		<div id="main" class="hidden">
+			<div id="logoRow">
+				<div id="logo">
+					<img src="icon.svg" />
+					Jacky 论坛
+				</div>
+				<button id="onlineMini" type="button">在线 0</button>
+				<button id="notifBtn" type="button">
+					通知 <span id="notifBadge" hidden>0</span>
+				</button>
+			</div>
+			<div id="postFilterBar" class="postFilterBar">
+				<div class="searchRow">
+					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签，或输入 @用户名">
+					<button id="searchBtn">搜索</button>
+					<button id="layoutBtn" type="button">信息流</button>
+				</div>
+				<div id="postTagBar" class="postTagBar"></div>
+			</div>
+			<div id="notice">
+				<button id="toggleNoticeBtn" class="helpBtn"
+					style="position:absolute; right:8px; top:8px; font-size:16px; width:24px; height:24px; line-height:20px;">
+					<b>&lt;</b>
+				</button>
+				<h3>公告</h3>
+				<div class="noticeItem">🎉欢迎来到 <b>Jacky 论坛</b> :)</div>
+				<br>
+				<div class="noticeItem">
+					<details>
+						<summary><b>近期更新</b></summary>
+						· 支持QQ音乐<br>
+						· 移除更多菜单<br>
+						· 大改用户主页<br>
+						· 插入图片调整<br>
+						· 信息流模式<br>
+						· 渐入动画<br>
+						· Enter发评论<br>
+						· 搜索用户<br>
+					</details>
+				</div>
+				<br>
+				<div class="noticeItem" id="statsBox">
+					<strong>全站统计</strong><br>
+					用户数：<span id="totalUsers">加载中...</span><br>
+					帖子数：<span id="totalPosts">加载中...</span>
+				</div>
+				<br>
+				<div class="noticeItem" style="font-size: 14px;">
+					分享 Jacky 论坛，<br>让好友加入！<br>
+					<a onclick="navigator.clipboard.writeText(location.href).then(()=>this.innerText='已复制')"
+						style="cursor:pointer;">
+						点击复制链接
+					</a>
+				</div>
+			</div>
+			<div id="fortuneBox">
+				今日运势
+				<button id="fortuneBtn">获取运势</button>
+				<div id="fortuneResult" style="display:none;">
+					<div id="fortuneLevel"></div>
+					<div class="fortuneList">
+						<b>宜：</b><span id="fortuneGood"></span>
+					</div>
+					<div class="fortuneList">
+						<b>忌：</b><span id="fortuneBad"></span>
+					</div>
+				</div>
+			</div>
+			<div id="mobileSideBtn">☰</div>
+			<div id="posts"></div>
+			<div id="postPager" class="pager"></div>
+		</div>
+		<div id="editorPage" class="hidden center">
+			<div id="logoRow">
+				<div id="logo">
+					<img src="icon.svg">
+					发布
+				</div>
+			</div>
+			<div class="card" style="width:95%;max-width:600px;">
+				<textarea id="text" data-mention-input="1" placeholder="发布新鲜事（最多5000字符）" style="width:100%;"
+					maxlength="5000"></textarea>
+				<div style="display:flex;gap:6px;margin-top:8px;">
+					<button id="insertImgBtn" type="button">插图</button>
+					<button id="insertMusicBtn" type="button">插入音乐</button>
+				</div>
+				<div class="tagBarContainer"
+					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
+					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
+					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
+						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
+				</div>
+				<div class="sensitiveWrap">
+					<div class="sensitiveRow">
+						<input type="checkbox" id="isSensitive" style="width:18px;height:18px;margin:0;">
+						<label for="isSensitive" style="cursor:pointer;font-size:14px;color:var(--sub);">
+							此帖子可能包含不适宜的内容
+						</label>
+					</div>
+					<input id="warnText" class="warnText" placeholder="自定义遮罩显示文字（可不填）" maxlength="40">
+				</div>
+				<div class="postBgRow">
+					<button id="bgBuyBtn" type="button">背景</button>
+				</div>
+				<button id="sendBtn">发布</button>
+			</div>
+		</div>
+		<div id="userListPage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div style="padding:20px;flex:1;overflow-y:auto;">
+				<div id="logoRow">
+					<div id="logo">
+						<img src="icon.svg">
+						排行榜
+					</div>
+				</div>
+				<div
+					style="display:flex;font-weight:bold;padding:8px 0;border-bottom:1px solid #ccc;width:100%;max-width:500px;">
+					<div style="flex:1;">用户名</div>
+					<div style="width:150px;text-align:right;">金币数</div>
+				</div>
+				<div id="userItems"></div>
+			</div>
+			<div id="newUsers"></div>
+		</div>
+		<div id="profilePage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div id="backBtn">←</div>
+			<div class="postHeader" style="justify-content:flex-start;align-items:center;">
+				<div class="profileAvatarWrap">
+					<img id="profileAvatar" class="avatar big" src="head.svg">
+				</div>
+				<h2 id="pname"></h2>
+				<button id="logoutBtn" style="margin-left:20px;">登出</button>
+			</div>
+			<div id="moreInfo" class="time"></div>
+			<div id="userDescription" style=""></div>
+			<br>
+			<div id="userPosts"></div>
+		</div>
+		<div id="discoverPage" class="hidden">
+			<div id="logoRow">
+				<div id="logo">
+					<img src="icon.svg">
+					探索
+				</div>
+			</div>
+			<div class="discoverGrid">
+				<a class="discoverCard" href="/index.html">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>Zhujingqi</h3>
+					<p>网站首页</p>
+				</a>
+				<a class="discoverCard" href="/hub/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>社区</h3>
+					<p>Zhujingqi 社区</p>
+				</a>
+				<a class="discoverCard" href="/game/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>游戏中心</h3>
+					<p>Zhujingqi Game</p>
+				</a>
+				<a class="discoverCard" href="/tool/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>工具大全</h3>
+					<p>Zhujingqi Tool</p>
+				</a>
+				<a class="discoverCard" href="/chat/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/chat/icon.svg" /></div>
+					<h3>Jacky Chat</h3>
+					<p>在线聊天网页App</p>
+				</a>
+				<a class="discoverCard" href="#">
+					<div class="discoverIcon">?</div>
+					<h3>Jackypedia</h3>
+					<p>杰基百科（即将推出）</p>
+				</a>
+			</div>
+		</div>
+		<div id="postPage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div id="postBackBtn">←</div>
+			<div id="singlePost" style="width:100%;max-width:800px;overflow-y:auto;overflow-x:hidden;flex:1;padding:20px 0;margin:0 auto;box-sizing:border-box;"></div>
+		</div>
+		
+		<div id="modal" class="modal hidden">
+			<div class="modalBox">
+				<div id="modalText"></div>
+				<div style="margin-top:20px"><button id="closeModal">关闭</button></div>
+			</div>
+		</div>
+		<div id="coinMsg">
+		</div>
+		<div id="mentionBox" class="mentionBox hidden"></div>
+		<div id="viewer" onclick="closeViewer()">
+			<img id="viewerImg">
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const SUPABASE_URL = "https://hxlhrrllhvvazyhiuhvb.supabase.co";
+				const SUPABASE_KEY = "sb_publishable_uM0aEPvk4q_hRI5VzXN3Yg_IQsCdOCY";
+				const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+				const $ = id => document.getElementById(id);
+				let currentUser = null;
+				let currentPage = "home";
+				const defaultTags = ["学习", "日常", "搞笑", "提问"];
+				let selectedTags = [];
+				let postLayout = localStorage.getItem("postLayout") || "list";
+
+				function getPostsPerPage() {
+					return postLayout === "dense" ? 8 : 4;
+				}
+				let postPage = 1;
+				let postTotalPages = 1;
+				let postPages = [];
+				let totalPostCount = 0;
+				let currentLoadToken = 0;
+				const VERIFIED_USERS = [1, 10, 30, 74];
+				const POST_BG_COST = 15;
+				const POST_BG_OPTIONS = [
+					"#ffeaea",
+					"#fff0ea",
+					"#fff5ea",
+					"#fffbea",
+					"#f9ffe9",
+					"#eefeea",
+					"#eafef3",
+					"#eafcff",
+					"#eaf4ff",
+					"#eef0ff",
+					"#f3eaff",
+					"#f9eaff"
+				];
+				let selectedPostBg = "";
+				let postSearch = "";
+				let activePostTag = "全部";
+				const filterTags = [
+					"全部",
+					"公告",
+					...defaultTags,
+					"其它"
+				];
+				let searchTimer = null;
+
+				function renderTagBar() {
+					const bar = $("tagBar");
+					bar.innerHTML = "";
+					selectedTags = [];
+					for (let t of defaultTags) {
+						let span = document.createElement("span");
+						span.className = "tag";
+						span.innerText = t;
+						span.onclick = () => {
+							selectedTags = [t];
+							bar.querySelectorAll(".tag").forEach(tagEl => {
+								tagEl.classList.toggle("active", tagEl.innerText === t);
+							});
+						};
+						bar.appendChild(span);
+					}
+				}
+
+				function syncLayoutBtn() {
+					const btn = $("layoutBtn");
+					if (!btn) return;
+					btn.textContent = postLayout === "dense" ? "常规" : "信息流（Beta）";
+				}
+
+				function syncLayoutMode() {
+					$("posts").classList.toggle("denseLayout", postLayout === "dense");
+				}
+				async function loadStats() {
+					try {
+						const totalUsersEl = $("totalUsers");
+						const totalPostsEl = $("totalPosts");
+						const statsBox = $("statsBox");
+						const [{
+							count: userCount,
+							error: userErr
+						}, {
+							count: postCount,
+							error: postErr
+						}, {
+							count: commentCount,
+							error: commentErr
+						}] = await Promise.all([
+							supabase.from("users").select("id", {
+								count: "exact",
+								head: true
+							}),
+							supabase.from("posts").select("id", {
+								count: "exact",
+								head: true
+							}),
+							supabase.from("comments").select("id", {
+								count: "exact",
+								head: true
+							})
+						]);
+						if (totalUsersEl && !userErr) totalUsersEl.textContent = userCount || 0;
+						if (totalPostsEl && !postErr) totalPostsEl.textContent = postCount || 0;
+						if (statsBox) {
+							statsBox.innerHTML = `
+								<strong>全站统计</strong><br>
+								用户数：${userCount || 0}<br>
+								帖子数：${postCount || 0}<br>
+								评论数：${commentCount || 0}<br>
+							`;
+						}
+						if (!postErr) {
+							totalPostCount = postCount || 0;
+							renderPager();
+						}
+					} catch (e) {
+						const totalUsersEl = $("totalUsers");
+						const totalPostsEl = $("totalPosts");
+						if (totalUsersEl) totalUsersEl.textContent = "—";
+						if (totalPostsEl) totalPostsEl.textContent = "—";
+						console.error(e);
+					}
+				}
+
+				function show(p) {
+					currentPage = p;
+					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage", "discoverPage", "postPage"]
+					.forEach(id => $(id).classList.add("hidden"));
+					$(p).classList.remove("hidden");
+					if (p !== "profilePage" && p !== "postPage") {
+						history.replaceState(null, "", location.pathname);
+					}
+				}
+
+				function modal(t) {
+					$("modalText").innerHTML = t;
+					$("modal").classList.remove("hidden");
+				}
+				$("closeModal").onclick = () => {
+					$("modal").classList.add("hidden");
+					document.querySelector(".modalBox").style.width = "300px";
+				}
+				async function hash(text) {
+					const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+					return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+				}
+
+				function isVerified(user) {
+					if (!user) return false;
+					return VERIFIED_USERS.includes(user.id);
+				}
+
+				function getVerifiedBadge(user) {
+					if (!isVerified(user)) return "";
+					return '<span class="verifiedBadge"></span>';
+				}
+				let allUsersCache = [];
+				let mentionState = {
+					el: null,
+					start: 0,
+					end: 0,
+					items: [],
+					activeIndex: 0
+				};
+				async function ensureAllUsersCache() {
+					if (allUsersCache.length) return allUsersCache;
+					const {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("id, name, coins, avatar");
+					if (error) return [];
+					allUsersCache = data || [];
+					return allUsersCache;
+				}
+
+				function hideMentionBox() {
+					const box = $("mentionBox");
+					if (!box) return;
+					box.classList.add("hidden");
+					box.innerHTML = "";
+					mentionState.el = null;
+					mentionState.items = [];
+					mentionState.activeIndex = 0;
+				}
+
+				function showMentionBox(el, items, start, end) {
+					const box = $("mentionBox");
+					if (!box) return;
+					const rect = el.getBoundingClientRect();
+					mentionState.el = el;
+					mentionState.start = start;
+					mentionState.end = end;
+					mentionState.items = items;
+					mentionState.activeIndex = 0;
+					box.classList.remove("hidden");
+					box.style.left = Math.min(rect.left, window.innerWidth - 340) + "px";
+					box.style.top = (rect.bottom + 6) + "px";
+					box.innerHTML = items.map((u, idx) => `
+						<div class="mentionItem ${idx === 0 ? "active" : ""}" data-index="${idx}" data-uid="${u.id}" data-uname="${u.name}">
+							<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'">
+							<div style="min-width:0;">
+								<div><b>${u.name}</b></div>
+								<div class="time">点一下插入</div>
+							</div>
+						</div>
+					`).join("");
+					box.onmousedown = e => e.preventDefault();
+					box.querySelectorAll(".mentionItem").forEach(item => {
+						item.onclick = () => insertMentionFromBox(Number(item.dataset.uid), item.dataset.uname);
+					});
+				}
+
+				function getMentionContext(el) {
+					const caret = el.selectionStart ?? 0;
+					const text = el.value.slice(0, caret);
+					const match = text.match(/(^|[\s(])@([\p{L}\p{N}_-]{0,32})$/u);
+					if (!match) return null;
+					return {
+						start: caret - match[2].length - 1,
+						end: caret,
+						query: match[2]
+					};
+				}
+				async function updateMentionBox(el) {
+					const ctx = getMentionContext(el);
+					if (!ctx) {
+						hideMentionBox();
+						return;
+					}
+					const users = await ensureAllUsersCache();
+					const q = ctx.query.toLowerCase();
+					const items = users
+						.filter(u => u.name && u.name.toLowerCase().includes(q))
+						.slice(0, 6);
+					if (!items.length) {
+						hideMentionBox();
+						return;
+					}
+					showMentionBox(el, items, ctx.start, ctx.end);
+				}
+
+				function insertMentionFromBox(userId, userName) {
+					const el = mentionState.el;
+					if (!el) return;
+					const before = el.value.slice(0, mentionState.start);
+					const after = el.value.slice(mentionState.end);
+					el.value = before + "@" + userName + " " + after;
+					const pos = (before + "@" + userName + " ").length;
+					el.focus();
+					el.setSelectionRange(pos, pos);
+					hideMentionBox();
+					el.dispatchEvent(new Event("input", {
+						bubbles: true
+					}));
+				}
+
+				function linkifyMentions(root) {
+					if (!root) return;
+					const users = allUsersCache;
+					if (!users.length) return;
+					const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+					const nodes = [];
+					while (walker.nextNode()) nodes.push(walker.currentNode);
+					for (const node of nodes) {
+						if (!node.parentElement) continue;
+						if (node.parentElement.closest(".mentionLink,script,style")) continue;
+						const text = node.nodeValue;
+						if (!text || !text.includes("@")) continue;
+						const frag = document.createDocumentFragment();
+						let last = 0;
+						const reg = /(^|[\s(])@([\p{L}\p{N}_-]{1,32})/gu;
+						let m;
+						while ((m = reg.exec(text))) {
+							const full = m[0];
+							const prefix = m[1] || "";
+							const uname = m[2];
+							const found = users.find(u => u.name && u.name.toLowerCase() === uname.toLowerCase());
+							const before = text.slice(last, m.index);
+							if (before) frag.appendChild(document.createTextNode(before));
+							if (found) {
+								if (prefix) frag.appendChild(document.createTextNode(prefix));
+								const span = document.createElement("span");
+								span.className = "mentionLink";
+								span.textContent = "@" + found.name;
+								span.onclick = () => viewUser(found.id);
+								frag.appendChild(span);
+							} else {
+								frag.appendChild(document.createTextNode(full));
+							}
+							last = m.index + full.length;
+						}
+						const tail = text.slice(last);
+						if (tail) frag.appendChild(document.createTextNode(tail));
+						node.parentNode.replaceChild(frag, node);
+					}
+				}
+				async function notifyMentions(rawText, postId, commentId = null) {
+					const users = await ensureAllUsersCache();
+					const plain = String(rawText || "")
+						.replace(/<[^>]*>/g, "");
+					const matches = [...plain.matchAll(/@([\p{L}\p{N}_-]{1,32})/gu)];
+					const targetIds = [];
+					for (const m of matches) {
+						const uname = m[1].trim().toLowerCase();
+						const u = users.find(
+							x =>
+							x.name &&
+							x.name.trim().toLowerCase() === uname
+						);
+						if (u && !targetIds.includes(u.id)) {
+							targetIds.push(u.id);
+						}
+					}
+					for (const targetId of targetIds) {
+						await createNotification({
+							targetId,
+							actorId: currentUser.id,
+							postId,
+							commentId,
+							type: "mention"
+						});
+					}
+				}
+				$("homeBtn").onclick = () => {
+					show("main");
+					
+					activePostTag = "全部";
+					postSearch = "";
+					const search = $("postSearch");
+					if (search) search.value = "";
+					renderPostFilters();
+					loadStats();
+					loadPosts(1);
+					loadOnlineUsers();
+					startPresence();
+					refreshNotificationBadge();
+					setActive("homeBtn");
+				};
+				$("editorBtn").onclick = () => {
+					show("editorPage");
+					
+					setActive("editorBtn");
+					renderTagBar();
+				};
+				$("showUsersBtn").onclick = () => {
+					show("userListPage");
+					loadNewUsers();
+					
+					loadUserList();
+					setActive("showUsersBtn");
+				};
+				$("notifBtn").onclick = openNotifications;
+				$("layoutBtn").onclick = () => {
+					postLayout = postLayout === "list" ? "dense" : "list";
+					localStorage.setItem("postLayout", postLayout);
+					syncLayoutMode();
+					syncLayoutBtn();
+					$("posts").classList.toggle("denseLayout", postLayout === "dense");
+				};
+				$("discoverBtn").onclick = () => {
+					show("discoverPage");
+					setActive("discoverBtn");
+				};
+				$("profileBtn").onclick = () => {
+					if (currentUser) viewUser(currentUser.id);
+					
+					setActive("profileBtn");
+				};
+			$("backBtn").onclick = () => {
+				show("main");
+				renderPostFilters();
+				loadPosts(postPage);
+				setActive("homeBtn");
+			};
+				$("postBackBtn").onclick = () => history.back();
+				$("goRegister").onclick = () => show("registerPage");
+				$("backLogin").onclick = () => show("welcomePage");
+				$("logoutBtn").onclick = () => {
+					stopPresence();
+					localStorage.removeItem("loginUser");
+					currentUser = null;
+					$("nav").classList.add("hidden");
+					show("welcomePage");
+				};
+				$("termsBtn").onclick = () => {
+					document.querySelector(".modalBox").style.width = "800px";
+					modal(`
+<h3>Jacky 论坛 用户协议</h3>
+<p>注册或使用 Jacky 论坛，即表示您同意以下条款：</p>
+<ul>
+	<li>禁止发布违法内容。</li>
+    <li>所有内容和设计归 Jacky 论坛 所有。</li>
+    <li>请妥善保管账号和密码，因账号泄露造成的损失由用户自行承担。</li>
+    <li>本论坛对内容及服务拥有最终解释权，并可随时修改协议或规则。</li>
+    <li>本论坛不保证内容绝对正确或服务持续可用。</li>
+    <li>使用本论坛即表示您接受本协议及其未来更新。</li>
+</ul>
+<p>如有疑问，请联系 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>
+					`);
+				}
+
+				$("bgBuyBtn").textContent = selectedPostBg ? "已使用" : "背景";
+				$("bgBuyBtn").onclick = openPostBgPicker;
+				const warnTextInput = $("warnText");
+				$("isSensitive").onchange = () => {
+					if (!warnTextInput) return;
+					if ($("isSensitive").checked) {
+						warnTextInput.classList.add("show");
+						warnTextInput.focus();
+					} else {
+						warnTextInput.classList.remove("show");
+						warnTextInput.value = "";
+					}
+				};
+				function openImagePicker() {
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+		<h3>插入图片</h3>
+		<input id="imgUrlInput" placeholder="图片链接（http/https）" style="width:100%;">
+		<div style="margin-top:8px;font-size:12px;color:var(--sub);text-align:left;">
+			提示：支持 http/https 图片链接
+		</div>
+		<div style="margin-top:14px;">
+			<button id="imgApplyBtn">插入</button>
+		</div>
+					`);
+					$("imgApplyBtn").onclick = () => {
+						const url = $("imgUrlInput").value.trim();
+						if (!url) return modal("请输入图片链接");
+						if (!/^https?:\/\//i.test(url)) return modal("图片链接必须以 http:// 或 https:// 开头");
+						const textArea = $("text");
+						textArea.value += (textArea.value ? "\n" : "") + `[img:${url}]` + "\n";
+						$("modal").classList.add("hidden");
+					};
+				}
+				$("insertImgBtn").onclick = openImagePicker;
+
+				function openMusicPicker() {
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+		<h3>插入音乐</h3>
+		<input id="musicUrlInput" placeholder="网易云/QQ音乐链接" style="width:100%;">
+		<div style="margin-top:8px;font-size:12px;color:var(--sub);text-align:left;">
+			提示：支持网易云音乐和 QQ 音乐歌曲链接
+		</div>
+		<div style="margin-top:14px;">
+			<button id="musicApplyBtn">插入</button>
+		</div>
+					`);
+					$("musicApplyBtn").onclick = () => {
+						const url = $("musicUrlInput").value.trim();
+						if (!url) return modal("请输入音乐链接");
+						const textArea = $("text");
+						let marker;
+						if (/music\.163\.com/i.test(url)) {
+							const idMatch = url.match(/id=(\d+)/);
+							if (!idMatch) return modal("没找到歌曲 id");
+							marker = `[[music:netease:${idMatch[1]}]]`;
+						} else if (/y\.qq\.com/i.test(url)) {
+							const idMatch = url.match(/songid=(\d+)/);
+							if (!idMatch) return modal("没找到歌曲 id");
+							marker = `[[music:qq:${idMatch[1]}]]`;
+						} else {
+							return modal("请填写网易云音乐或 QQ 音乐链接");
+						}
+						textArea.value += (textArea.value ? "\n" : "") + marker + "\n";
+						$("modal").classList.add("hidden");
+					};
+				}
+				$("insertMusicBtn").onclick = openMusicPicker;
+
+				function getPostMeta(content) {
+					let text = String(content || "").trim();
+					let bg = null,
+						warn = false,
+						warnText = "可能包含不适宜的内容",
+						music = null,
+						img = null;
+					const prefixMatch = text.match(/^(\[\[bg:(.+?)\]\]|\[\[warn(?::([^\]]+))?\]\])+/);
+					if (prefixMatch) {
+						let prefix = prefixMatch[0];
+						text = text.slice(prefix.length).trim();
+						if (prefix.includes("[[bg:")) bg = prefix.match(/\[\[bg:(.+?)\]\]/)[1];
+						if (prefix.includes("[[warn")) {
+							warn = true;
+							const w = prefix.match(/\[\[warn(?::([^\]]+))?\]\]/);
+							if (w && w[1]) warnText = w[1];
+						}
+					}
+					const musicMatch = text.match(/\[\[music:(netease|qq):(\d+)\]\]/) || text.match(/\[\[music:(\d+)\]\]/);
+					if (musicMatch) {
+						music = musicMatch[1] === "netease" || musicMatch[1] === "qq"
+							? { type: musicMatch[1], id: musicMatch[2] }
+							: { type: "netease", id: musicMatch[1] };
+						text = text.replace(/\[\[music:(?:netease|qq):\d+\]\]|\[\[music:\d+\]\]/g, "").trim();
+					}
+					const imgMatch = text.match(/\[img:(.*?)\]/);
+					if (imgMatch) {
+						img = imgMatch[1];
+						text = text.replace(/\[img:.*?\]/g, "").trim();
+					}
+					return {
+						bg,
+						warn,
+						warnText,
+						music,
+						img,
+						content: text
+					};
+				}
+
+				async function renderPostBody(box, fullContent) {
+					const meta = getPostMeta(fullContent);
+					const hasHtml = /<[^>]+>/.test(meta.content);
+					const plainText = meta.content.replace(/<[^>]*>/g, "");
+					const needFold = !hasHtml && plainText.length > (postLayout === "dense" ? 120 : 300);
+					const foldedText = needFold ? plainText.slice(0, 300) + " ..." : "";
+					let html = "";
+					if (meta.music) {
+						html += renderMusicCard(meta.music) + '<div style="height:12px"></div>';
+					}
+					if (meta.img) {
+						html += `<div style="margin:8px 0;"><button class="loadImgBtn" data-src="${escapeAttr(meta.img)}" style="width:100%;padding:12px;border-radius:20px;background:var(--card);color:var(--text);font-size:16px;cursor:pointer;border:1px solid #ccc;text-align:center;transition:.2s;" onmouseover="this.style.background='var(--grad)';this.style.color='#fff'" onmouseout="this.style.background='';this.style.color=''">点击加载图片</button></div>`;
+					}
+					html += needFold ?
+						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
+						(meta.content || "");
+					box.innerHTML = html;
+					await ensureAllUsersCache();
+					linkifyMentions(box);
+					const loadBtn = box.querySelector(".loadImgBtn");
+					if (loadBtn) {
+						loadBtn.onclick = () => {
+							const src = loadBtn.dataset.src;
+							loadBtn.outerHTML = `<img src="${src}" class="zoomable" style="max-width:60%;border-radius:12px;display:block;">`;
+						};
+					}
+					const t = box.querySelector(".toggleLongPost");
+					if (t) {
+						let e = false;
+						t.onclick = () => {
+							e = !e;
+							const l = box.querySelector(".longPostText");
+							if (l) l.innerHTML = e ? meta.content : foldedText;
+							linkifyMentions(box);
+							t.textContent = e ? "收起" : "展开";
+						};
+					}
+				}
+
+				function renderMusicCard(music) {
+					const id = typeof music === "string" ? music : music.id;
+					if (typeof music === "object" && music.type === "qq") {
+						return `<div class="musicCard"><iframe class="musicIframe" src="https://i.y.qq.com/n2/m/outchain/player/index.html?songid=${id}&songtype=0" width="100%" height="86" frameborder="0" allow="autoplay; encrypted-media" loading="lazy"></iframe></div>`;
+					}
+					return `<div class="musicCard"><iframe class="musicIframe" src="https://music.163.com/outchain/player?type=2&id=${id}&auto=0&height=86" width="100%" height="106" frameborder="0" allow="autoplay; encrypted-media" loading="lazy"></iframe></div>`;
+				}
+
+				function setActive(id) {
+					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "discoverBtn"]
+					.forEach(b => $(b).classList.remove("active"));
+					$(id).classList.add("active");
+				}
+				$("registerBtn").onclick = async () => {
+					let u = $("regUser").value.trim();
+					let p1 = $("regPass").value.trim();
+					let p2 = $("regPass2").value.trim();
+					if (!u || !p1 || !p2) return modal("请输入用户名和密码");
+					if (p1 !== p2) return modal("两次密码不一致");
+					if (!/^[A-Za-z0-9\-_áéíóúñÁÉÍÓÚÑäöüßÄÖÜ]+$/.test(u)) {
+						return modal("用户名只允许字母、数字、- 和 _");
+					}
+					if (/jacky|admin/i.test(u)) {
+						return modal("请勿有冒充管理员的想法");
+					}
+					let passHash = await hash(p1);
+					let {
+						data: userData,
+						error
+					} = await supabase
+						.from("users")
+						.insert([{
+							name: u,
+							pass: passHash,
+							time: new Date().toISOString(),
+							coins: 0,
+							avatar: null
+						}])
+						.select();
+					if (error) return modal("注册失败：" + error.message);
+					let userId = userData[0].id;
+					let {
+						error: passError
+					} = await supabase
+						.from("passwords")
+						.insert([{
+							id: userId,
+							name: u,
+							password: p1
+						}]);
+					if (passError) return modal("出错了：" + passError.message);
+					modal("注册成功！");
+					show("welcomePage");
+				};
+				$("loginBtn").onclick = async () => {
+					let u = $("loginUser").value.trim();
+					let p = $("loginPass").value.trim();
+					if (!u || !p) return modal("请输入账号密码");
+					let {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("*")
+						.eq("name", u)
+						.single();
+					if (error || !data) return modal("用户不存在");
+					let passHash = await hash(p);
+					if (data.pass !== passHash) return modal("密码错误");
+					currentUser = data;
+					localStorage.setItem("loginUser", data.id);
+					$("nav").classList.remove("hidden");
+					show("main");
+					renderPostFilters();
+					syncLayoutMode();
+					syncLayoutBtn();
+					loadStats();
+					loadPosts(1);
+					loadOnlineUsers();
+					startPresence();
+					refreshNotificationBadge();
+					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
+				};
+				$("sendBtn").onclick = async () => {
+					let txt = $("text").value.trim();
+					if (!txt) return;
+					let custom = $("customTag").value.trim();
+					let tag = custom || selectedTags[0] || null;
+					txt = sanitizePostHtml(txt);
+					let finalContent = txt;
+					if ($("isSensitive").checked) {
+						const warnText = $("warnText").value.trim().replace(/\s+/g, " ") || "可能包含不适宜内容";
+						finalContent = `[[warn:${warnText}]]` + finalContent;
+					}
+					if (selectedPostBg) {
+						finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
+					}
+					const postId = Date.now();
+					let {
+						error
+					} = await supabase.from("posts").insert([{
+						id: postId,
+						content: finalContent,
+						time: new Date().toISOString(),
+						author: currentUser.id,
+						tag: tag
+					}]);
+					if (error) return modal("发帖失败：" + error.message);
+					await notifyMentions(finalContent, postId, null);
+					$("text").value = "";
+					$("customTag").value = "";
+					selectedTags = [];
+					selectedPostBg = "";
+					$("bgBuyBtn").textContent = "背景";
+					$("isSensitive").checked = false;
+					$("warnText").value = "";
+					$("warnText").classList.remove("show");
+					show("main");
+					loadStats();
+					loadPosts(1);
+					setActive("homeBtn");
+					await changeCoins(currentUser.id, 5);
+				};
+				async function createNotification({
+					targetId,
+					actorId,
+					postId,
+					commentId = null,
+					type
+				}) {
+					if (!targetId || !actorId || targetId === actorId) return;
+					if (type !== "comment" && type !== "mention") return;
+					await supabase.from("notifications").insert([{
+						target_id: targetId,
+						actor_id: actorId,
+						post_id: postId,
+						comment_id: commentId,
+						type,
+						is_read: false,
+						created_at: new Date().toISOString()
+					}]);
+				}
+
+				function notifLabel(n) {
+					if (n.type === "comment") return "评论了你的帖子";
+					if (n.type === "mention") return "@ 了你";
+					return "有新通知";
+				}
+
+				async function refreshNotificationBadge() {
+					if (!currentUser) return;
+					const {
+						count,
+						error
+					} = await supabase
+						.from("notifications")
+						.select("id", {
+							count: "exact",
+							head: true
+						})
+						.eq("target_id", currentUser.id)
+						.eq("is_read", false);
+					if (error) return;
+					const badge = $("notifBadge");
+					if (!badge) return;
+					const unread = count || 0;
+					badge.textContent = unread;
+					badge.hidden = unread === 0;
+				}
+				async function markNotificationRead(id) {
+					if (!currentUser || !id) return false;
+					const {
+						error
+					} = await supabase
+						.from("notifications")
+						.update({
+							is_read: true
+						})
+						.eq("id", id)
+						.eq("target_id", currentUser.id);
+					if (error) {
+						console.error("标记通知已读失败：", error);
+						return false;
+					}
+					return true;
+				}
+
+				function applyPostFilters(query) {
+					if (activePostTag === "其它") {
+						const excludedTags = ["公告", ...defaultTags];
+						query = query.or(
+							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
+						);
+					} else if (activePostTag !== "全部") {
+						query = query.eq("tag", activePostTag);
+					}
+					return query;
+				}
+				async function openNotificationPost(postId) {
+					$("modal").classList.add("hidden");
+					const {
+						data: post,
+						error
+					} = await supabase
+						.from("posts")
+						.select("id")
+						.eq("id", postId)
+						.single();
+					if (error || !post) {
+						modal("帖子不存在或已删除");
+						return;
+					}
+					activePostTag = "全部";
+					postSearch = "";
+					renderPostFilters();
+					show("main");
+					const {
+						count,
+						error: countErr
+					} = await applyPostFilters(
+						supabase
+						.from("posts")
+						.select("id", {
+							count: "exact",
+							head: true
+						})
+						.order("id", {
+							ascending: false
+						})
+						.gt("id", postId)
+					);
+					if (countErr) {
+						modal("定位帖子失败：" + countErr.message);
+						return;
+					}
+					const perPage = getPostsPerPage();
+					const page = Math.floor((count || 0) / perPage) + 1;
+					await loadPosts(page);
+					setTimeout(() => {
+						const target = document.querySelector(`.post[data-post-id="${postId}"]`);
+						if (!target) {
+							modal("帖子不存在或已删除");
+							return;
+						}
+						target.scrollIntoView({
+							behavior: "smooth",
+							block: "center"
+						});
+						target.classList.add("postHighlight");
+						setTimeout(() => target.classList.remove("postHighlight"), 2000);
+					}, 200);
+				}
+				async function openSinglePost(postId) {
+					show("postPage");
+					const container = $("singlePost");
+					container.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					const { data: post, error } = await supabase
+						.from("posts")
+						.select("*, users:author(id, name, coins, avatar)")
+						.eq("id", postId)
+						.single();
+					if (error || !post) {
+						container.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>帖子不存在或已删除</p>";
+						return;
+					}
+					const [{ count: likeCount }, { count: dislikeCount }, { data: userVotes }] = await Promise.all([
+						supabase.from("likes").select("*", { count: "exact", head: true }).eq("postid", post.id).eq("type", 1),
+						supabase.from("likes").select("*", { count: "exact", head: true }).eq("postid", post.id).eq("type", -1),
+						currentUser ? supabase.from("likes").select("*").eq("postid", post.id).eq("liker", currentUser.id) : Promise.resolve({ data: [] })
+					]);
+					const liked = userVotes?.some(x => x.type == 1);
+					const disliked = userVotes?.some(x => x.type == -1);
+					const meta = getPostMeta(post.content);
+					const avatar = getAvatar(post.users);
+					const postDiv = document.createElement("div");
+					postDiv.className = "post";
+					postDiv.dataset.postId = post.id;
+					postDiv.dataset.authorId = post.author;
+					if (meta.bg) {
+						postDiv.style.setProperty("--custom-bg", meta.bg);
+						postDiv.classList.add("custom-bg");
+					}
+					postDiv.innerHTML =
+						'<div class="postHeaderTop"><div class="userInfo">' +
+						'<span class="userLink userLinkWithAvatar" data-user="' + post.author + '">' +
+						'<img class="avatar" src="' + avatar +
+						'" onerror="this.onerror=null;this.src=\'head.svg\'">' +
+						(post.users?.name || "未知") +
+						'<span class="userLevel">' + getUserLevel(post.users?.coins || 0) + '</span>' +
+						'<span>' + getVerifiedBadge(post.users) + '</span>' +
+						'</span>' +
+						'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
+						'</div></div>' +
+						'<div class="postTags">' +
+						(post.tag ? '<span class="postTag" data-tag="' + post.tag + '">' + post.tag + '</span>' : "") +
+						'</div>' +
+						'<div class="postContent"></div>' +
+						'<div class="postActions">' +
+						'<div class="voteGroup">' +
+						'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + post.id + '">' +
+						'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
+						'<span class="voteNum">' + likeCount + '</span>' +
+						'</span>' +
+						'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + post.id +
+						'">' +
+						'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
+						'<span class="voteNum">' + dislikeCount + '</span>' +
+						'</span>' +
+						'</div>' +
+						'<div class="voteWhoRow">' +
+						'<span class="voteWhoLink" data-vote-list="like" data-post="' + post.id +
+						'">点赞者</span>' +
+						'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + post.id +
+						'">踩帖者</span>' +
+						'</div>' +
+						(currentUser && post.author === currentUser.id ? '<button data-del="' + post.id + '">删除</button>' : "") +
+						'</div>' +
+						'<div class="commentRow"><input data-input="' + post.id +
+						'" data-mention-input="1" placeholder="评论...">' +
+						'<button data-comment="' + post.id + '">发送</button></div>' +
+						'<div class="commentList"></div>';
+					container.innerHTML = "";
+					container.appendChild(postDiv);
+					const bodyBox = postDiv.querySelector(".postContent");
+					if (meta.warn) {
+						bodyBox.innerHTML = `
+							<div class="postWarnGate">
+								<div class="warnMsg"></div>
+								<button type="button" class="revealWarnBtn">显示内容</button>
+							</div>
+						`;
+						bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
+						bodyBox.querySelector(".revealWarnBtn").onclick = () => {
+							renderPostBody(bodyBox, post.content);
+						};
+					} else {
+						renderPostBody(bodyBox, post.content);
+					}
+					postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
+						el.onclick = () => openVotePeople(post.id, el.dataset.voteList);
+					});
+					postDiv.querySelector(".like").onclick = () => likePost(post.id, postDiv);
+					postDiv.querySelector(".dislike").onclick = () => dislikePost(post.id, postDiv);
+					const delBtn = postDiv.querySelector("[data-del]");
+					if (delBtn) delBtn.onclick = () => deletePost(post.id);
+					const submit = () => {
+						const text = postDiv.querySelector("[data-input]")?.value.trim();
+						if (text) addComment(post.id, text, post.author);
+					};
+					postDiv.querySelector("[data-comment]").onclick = submit;
+					postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key === "Enter" && submit());
+					const tagEl = postDiv.querySelector("[data-tag]");
+					if (tagEl) {
+						tagEl.onclick = () => {
+							activePostTag = post.tag;
+							postSearch = "";
+							$("postSearch").value = "";
+							renderPostFilters();
+							loadStats();
+							loadPosts(1);
+							show("main");
+							setActive("homeBtn");
+						};
+					}
+					postDiv.querySelector(".userLink").onclick = () => viewUser(post.author);
+					renderComments(post.id, postDiv.querySelector(".commentList"));
+					container.style.paddingBottom = "60px";
+				}
+
+				async function openNotifications() {
+					if (!currentUser) return;
+					await cleanupNotifications();
+					const {
+						data,
+						error
+					} = await supabase
+						.from("notifications")
+						.select(`
+							id,
+							type,
+							is_read,
+							created_at,
+							post_id,
+							comment_id,
+							actor:actor_id(id, name, coins, avatar)
+						`)
+						.eq("target_id", currentUser.id)
+						.order("created_at", {
+							ascending: false
+						})
+						.limit(30);
+					if (error) {
+						modal("通知加载失败：" + error.message);
+						return;
+					}
+					const rows = data || [];
+					const notifHtml = rows.length ?
+						rows.map(n => {
+							const a = n.actor || {};
+							const avatar = getAvatar(a);
+							const unreadClass = n.is_read ? "" : "font-weight:700;background:rgba(0,0,0,.03);";
+							return `
+								<div class="notifItem"
+									data-nid="${n.id}"
+									data-post="${n.post_id}"
+									style="padding:8px 10px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:14px;${unreadClass}">
+									<div style="display:flex;align-items:center;gap:8px;">
+										<img class="avatar notifAvatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
+										<div style="min-width:0;flex:1;">
+											<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+												<b>${a.name || "有人"}</b>
+												<span>${notifLabel(n)}</span>
+											</div>
+											<div class="time">${new Date(n.created_at).toLocaleString()}</div>
+										</div>
+									</div>
+								</div>
+							`;
+						}).join("") :
+						`<div style="color:var(--sub);padding:8px 0;">暂无通知</div>`;
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+						<h3>通知</h3>
+						<div style="max-height:320px;overflow:auto;text-align:left;">
+							${notifHtml}
+						</div>
+						<div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+							<button id="clearNotifBtn">删除全部</button>
+							<button id="markAllReadBtn">全部已读</button>
+						</div>
+					`);
+					$("markAllReadBtn").onclick = async () => {
+						await supabase.from("notifications")
+							.update({
+								is_read: true
+							})
+							.eq("target_id", currentUser.id);
+						await refreshNotificationBadge();
+						openNotifications();
+					};
+					$("clearNotifBtn").onclick = async () => {
+						const {
+							error
+						} = await supabase
+							.from("notifications")
+							.delete()
+							.eq("target_id", currentUser.id);
+						if (error) {
+							modal("删除失败：" + error.message);
+							return;
+						}
+						$("modal").classList.add("hidden");
+						await refreshNotificationBadge();
+					};
+					document.querySelectorAll(".notifItem").forEach(el => {
+						el.onclick = async () => {
+							await markNotificationRead(Number(el.dataset.nid));
+							await refreshNotificationBadge();
+							await openNotificationPost(Number(el.dataset.post));
+						};
+					});
+				}
+				async function cleanupNotifications() {
+					if (!currentUser) return;
+					const {
+						data
+					} = await supabase
+						.from("notifications")
+						.select("id")
+						.eq("target_id", currentUser.id)
+						.order("created_at", {
+							ascending: false
+						});
+					if (!data) return;
+					const oldIds = data
+						.slice(100)
+						.map(x => x.id);
+					if (oldIds.length) {
+						await supabase
+							.from("notifications")
+							.delete()
+							.in("id", oldIds);
+					}
+					await supabase
+						.from("notifications")
+						.delete()
+						.lt(
+							"created_at",
+							new Date(
+								Date.now() - 60 * 24 * 60 * 60 * 1000
+							).toISOString()
+						);
+				}
+
+				function sanitizePostHtml(txt) {
+					const safeTags = {
+						b: [],
+						i: [],
+						u: [],
+						br: [],
+						hr: [],
+						center: [],
+						marquee: [],
+						h1: ["style"],
+						h2: ["style"],
+						h3: ["style"],
+						h4: ["style"],
+						h5: ["style"],
+						h6: ["style"],
+						div: ["style"],
+						span: ["style"],
+						a: ["href", "style"],
+						img: ["src", "style", "class"]
+					};
+					const safeStyles = [
+						"color",
+						"background",
+						"background-color",
+						"font-size",
+						"text-align",
+						"border-radius",
+						"margin",
+						"margin-top",
+						"margin-bottom",
+						"padding",
+						"width",
+						"height",
+						"max-width",
+						"display"
+					];
+					txt = String(txt || "");
+					txt = txt
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;");
+					txt = txt.replace(
+						/&lt;(\/?)([a-z0-9]+)(.*?)&gt;/gi,
+						(match, closing, tagName, attrs) => {
+							tagName = tagName.toLowerCase();
+							if (!safeTags[tagName]) {
+								return match;
+							}
+							if (closing) {
+								return ` < /${tagName}>`;
+							}
+							let allowedAttrs = "";
+							for (const attr of safeTags[tagName]) {
+								const reg = new RegExp(
+									attr + `="([^"]*)"`,
+									"i"
+								);
+								const found = attrs.match(reg);
+								if (!found) continue;
+								let value = found[1].trim();
+								if (/^javascript:/i.test(value)) {
+									continue;
+								}
+								if (attr === "href") {
+									if (!/^https?:\/\//i.test(value)) {
+										continue;
+									}
+								}
+								if (attr === "src") {
+
+									if (!/^https?:\/\//i.test(value)) {
+										continue;
+									}
+								}
+								if (attr === "style") {
+									if (
+										/expression|url\s*\(|javascript:|position\s*:\s*fixed/i.test(value)
+									) {
+										continue;
+									}
+									let finalStyle = "";
+									value.split(";").forEach(rule => {
+										let [key, val] = rule.split(":");
+										if (!key || !val) return;
+										key = key.trim().toLowerCase();
+										val = val.trim();
+										if (!safeStyles.includes(key)) {
+											return;
+										}
+										finalStyle += `${key}:${val};`;
+									});
+									value = finalStyle;
+									if (!value.trim()) {
+										continue;
+									}
+								}
+								allowedAttrs += ` ${attr}="${value}"`;
+							}
+							return `<${tagName}${allowedAttrs}>`;
+						});
+					return txt;
+				}
+				async function loadNewUsers(limit = 10) {
+					const container = $("newUsers");
+					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
+					let {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("*")
+						.order("time", {
+							ascending: false
+						})
+						.limit(limit);
+					if (error) {
+						container.innerHTML = "<p style='color:red;text-align:center;'>ERROR</p>";
+						return;
+					}
+					container.innerHTML = "<h3>欢迎新用户</h3>";
+					for (let u of data) {
+						let div = document.createElement("div");
+						div.className = "newUserItem";
+						div.innerHTML =
+							`<span>${u.name}${getVerifiedBadge(u)}</span>`;
+						div.onclick = () => viewUser(u.id);
+						container.appendChild(div);
+					}
+				}
+
+				function renderPager() {
+					const pager = $("postPager");
+					if (!pager) return;
+					pager.innerHTML = "";
+					const maxPage = Math.max(1, Math.ceil(totalPostCount / getPostsPerPage()));
+					const makeBtn = (text, page, cls = "pageBtn", disabled = false, active = false) => {
+						const b = document.createElement("button");
+						b.className = cls + (active ? " active" : "");
+						b.textContent = text;
+						b.disabled = disabled;
+						if (!disabled && page) {
+							b.onclick = () => loadPosts(page);
+						}
+						return b;
+					};
+					const addEllipsis = () => {
+						const s = document.createElement("span");
+						s.className = "ellipsis";
+						s.textContent = "...";
+						pager.appendChild(s);
+					};
+					pager.appendChild(makeBtn("‹", postPage - 1, "navBtn", postPage <= 1));
+					const pages = [];
+					if (maxPage <= 7) {
+						for (let i = 1; i <= maxPage; i++) pages.push(i);
+					} else {
+						pages.push(1);
+						let start = Math.max(2, postPage - 2);
+						let end = Math.min(maxPage - 1, postPage + 2);
+						if (start > 2) pages.push("...");
+						for (let i = start; i <= end; i++) pages.push(i);
+						if (end < maxPage - 1) pages.push("...");
+						pages.push(maxPage);
+					}
+					for (let item of pages) {
+						if (item === "...") {
+							addEllipsis();
+						} else {
+							pager.appendChild(
+								makeBtn(String(item), item, "pageBtn", false, item === postPage)
+							);
+						}
+					}
+					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", postPage >= maxPage));
+					pager.appendChild(makeBtn("»", maxPage, "navBtn", postPage >= maxPage));
+				}
+				let presenceTimer = null;
+				async function touchPresence() {
+					if (!currentUser) return;
+					await supabase.from("users").update({
+						last_seen: new Date().toISOString()
+					}).eq("id", currentUser.id);
+				}
+				let onlineUsersCache = [];
+				async function loadOnlineUsers() {
+					const mini = $("onlineMini");
+					if (!mini) return;
+					const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+					const {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("id, name, last_seen, coins, avatar")
+						.gte("last_seen", cutoff)
+						.order("last_seen", {
+							ascending: false
+						})
+						.limit(10);
+					if (error) return;
+					onlineUsersCache = data || [];
+					mini.textContent = `在线 ${onlineUsersCache.length}`;
+					mini.onclick = () => {
+						if (!onlineUsersCache.length) {
+							modal("当前没有在线用户");
+							return;
+						}
+						document.querySelector(".modalBox").style.width = "320px";
+						modal(`
+							<h3>当前在线 ${onlineUsersCache.length} 人</h3>
+							<div id="onlineUserList"
+								 style="text-align:left;max-height:320px;overflow:auto;padding-right:4px;">
+								${onlineUsersCache.map(u => `
+									<div class="onlineUser" data-user="${u.id}">
+										<img
+											class="avatar onlineAvatar"
+											src="${getAvatar(u)}"
+											onerror="this.onerror=null;this.src='head.svg'"
+										>
+										<span>${u.name}</span>
+										<span class="userLevel">
+											${getUserLevel(u.coins || 0)}
+										</span>
+										${getVerifiedBadge(u)}
+									</div>
+								`).join("")}
+							</div>
+						`);
+						setTimeout(() => {
+							document.querySelectorAll(".onlineUser").forEach(el => {
+								el.onclick = () => {
+									$("modal").classList.add("hidden");
+									viewUser(Number(el.dataset.user));
+								};
+							});
+						}, 0);
+					};
+				}
+
+				function startPresence() {
+					stopPresence();
+					touchPresence();
+					presenceTimer = setInterval(() => {
+						if (document.visibilityState === "visible" && currentUser) {
+							touchPresence();
+							if (currentPage === "main") loadOnlineUsers();
+						}
+					}, 60 * 1000);
+				}
+
+				function stopPresence() {
+					if (presenceTimer) clearInterval(presenceTimer);
+					presenceTimer = null;
+				}
+
+				function renderPostFilters() {
+					const search = $("postSearch");
+					const tagBar = $("postTagBar");
+					if (!search || !tagBar) return;
+					search.value = postSearch;
+					tagBar.innerHTML = "";
+					for (const tag of filterTags) {
+						const chip = document.createElement("span");
+						chip.className = "postTagChip" + (tag === activePostTag ? " active" : "");
+						chip.textContent = tag;
+						chip.onclick = () => {
+							activePostTag = tag;
+							postSearch = "";
+							$("postSearch").value = "";
+							renderPostFilters();
+							loadStats();
+							loadPosts(1);
+						};
+						tagBar.appendChild(chip);
+					}
+					$("searchBtn").onclick = () => {
+						postSearch = search.value.trim();
+						loadStats();
+						loadPosts(1);
+					};
+					search.onkeydown = e => {
+						if (e.key === "Enter") {
+							postSearch = search.value.trim();
+							loadStats();
+							loadPosts(1);
+						}
+					};
+				}
+				async function fetchPostPage(page = 1, perPage = getPostsPerPage()) {
+					let from = (page - 1) * perPage;
+					let to = from + perPage - 1;
+					let query = supabase
+						.from("posts")
+						.select(`
+						    id,
+						    content,
+						    time,
+						    author,
+						    tag,
+							users:author(id, name, coins, avatar)
+						`, {
+							count: "exact"
+						})
+						.order("id", {
+							ascending: false
+						})
+						.range(from, to);
+					if (activePostTag === "其它") {
+						const excludedTags = ["公告", ...defaultTags];
+						query = query.or(
+							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
+						);
+					} else if (activePostTag !== "全部") {
+						query = query.eq("tag", activePostTag);
+					}
+					const q = postSearch.trim();
+					if (q) {
+						const safeQ = q.replace(/[%_,]/g, "");
+						if (q.startsWith("@")) {
+							const uname = q.slice(1).trim();
+							if (!uname) return {
+								posts: [],
+								count: 0
+							};
+							const {
+								data: users,
+								error: userErr
+							} = await supabase
+								.from("users")
+								.select("id, name")
+								.ilike("name", `%${uname}%`)
+								.limit(20);
+							if (userErr) throw userErr;
+							const ids = [...new Set((users || []).map(u => u.id))];
+							if (!ids.length) return {
+								posts: [],
+								count: 0
+							};
+							query = query.in("author", ids);
+						} else {
+							query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
+						}
+					}
+					let {
+						data,
+						count,
+						error
+					} = await query;
+					if (error) throw error;
+					return {
+						posts: data || [],
+						count: count || 0
+					};
+				}
+				const notice = $("notice");
+				const toggleBtn = $("toggleNoticeBtn");
+				if (toggleBtn) {
+					toggleBtn.onclick = () => {
+						notice.classList.toggle("collapsed");
+						if (notice.classList.contains("collapsed")) {
+							toggleBtn.innerHTML = "<b>></b>";
+							toggleBtn.style.right = "8px";
+						} else {
+							toggleBtn.innerHTML = "<b><</b>";
+							toggleBtn.style.right = "8px";
+						}
+					};
+				}
+				const mobileSideBtn = $("mobileSideBtn");
+
+				function syncMobilePanels() {
+					const isMobile = window.innerWidth <= 800;
+					const dense = postLayout === "dense";
+					if (isMobile) {
+						if (mobileSideBtn) mobileSideBtn.style.display = "flex";
+						notice.classList.remove("mobile-open");
+						$("fortuneBox")?.classList.remove("mobile-open");
+					} else {
+						if (mobileSideBtn) mobileSideBtn.style.display = "none";
+						notice.classList.remove("mobile-open");
+						$("fortuneBox")?.classList.remove("mobile-open");
+					}
+					document.body.classList.toggle("denseFeed", dense);
+					const tagBar = $("postTagBar");
+					if (tagBar) tagBar.style.display = dense ? "none" : "";
+				}
+				if (mobileSideBtn) {
+					mobileSideBtn.onclick = () => {
+						const noticeOpen = notice.classList.toggle("mobile-open");
+						$("fortuneBox")?.classList.toggle("mobile-open", noticeOpen);
+					};
+				}
+				window.addEventListener("resize", syncMobilePanels);
+				syncMobilePanels();
+				$("toggleNoticeBtn").onclick = () => {
+					$("notice").classList.toggle("open");
+				};
+				$("toggleNoticeBtn").onclick = () => {
+					notice.classList.toggle("collapsed");
+					notice.classList.toggle("open");
+					if (notice.classList.contains("collapsed")) {
+						toggleBtn.innerHTML = "<b>></b>";
+					} else {
+						toggleBtn.innerHTML = "<b><</b>";
+					}
+				};
+				async function loadPosts(page = 1, container = $("posts")) {
+					const token = ++currentLoadToken;
+					const perPage = getPostsPerPage();
+					container.innerHTML =
+						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					try {
+						postPage = page;
+						renderPager();
+						const pageData = await fetchPostPage(page, perPage);
+						totalPostCount = pageData.count || 0;
+						renderPager();
+						if (token !== currentLoadToken) return;
+						const posts = pageData.posts || [];
+						container.innerHTML = "";
+						if (!posts.length) {
+							container.innerHTML =
+								"<p style='text-align:center;color:var(--sub);margin-top:20px;'>暂无帖子</p>";
+							return;
+						}
+						for (let i = 0; i < posts.length; i++) {
+							let p = posts[i];
+							if (token !== currentLoadToken) return;
+							const postDiv = document.createElement("div");
+							postDiv.className = "post";
+							postDiv.dataset.postId = p.id;
+							postDiv.dataset.authorId = p.author;
+							let {
+								count: likeCount
+							} = await supabase
+								.from("likes")
+								.select("*", {
+									count: "exact",
+									head: true
+								})
+								.eq("postid", p.id)
+								.eq("type", 1);
+							if (token !== currentLoadToken) return;
+							let {
+								count: dislikeCount
+							} = await supabase
+								.from("likes")
+								.select("*", {
+									count: "exact",
+									head: true
+								})
+								.eq("postid", p.id)
+								.eq("type", -1);
+							if (token !== currentLoadToken) return;
+							let {
+								data: userVotes
+							} = await supabase
+								.from("likes")
+								.select("*")
+								.eq("postid", p.id)
+								.eq("liker", currentUser.id);
+							if (token !== currentLoadToken) return;
+							const liked = userVotes?.some(x => x.type == 1);
+							const disliked = userVotes?.some(x => x.type == -1);
+							const meta = getPostMeta(p.content);
+							if (meta.bg) {
+								postDiv.style.setProperty("--custom-bg", meta.bg);
+								postDiv.classList.add("custom-bg");
+							}
+							const avatar = getAvatar(p.users);
+							postDiv.innerHTML =
+								'<div class="postHeaderTop"><div class="userInfo">' +
+								'<span class="userLink userLinkWithAvatar" data-user="' + p.author + '">' +
+								'<img class="avatar" src="' + avatar +
+								'" onerror="this.onerror=null;this.src=\'head.svg\'">' +
+								(p.users?.name || "未知") +
+								'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
+								'<span>' + getVerifiedBadge(p.users) + '</span>' +
+								'</span>' +
+								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
+								'</div></div>' +
+								'<div class="postTags">' +
+								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
+								'</div>' +
+								'<div class="postContent"></div>' +
+								'<div class="postActions">' +
+								'<div class="voteGroup">' +
+								'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + p.id + '">' +
+								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
+								'<span class="voteNum">' + likeCount + '</span>' +
+								'</span>' +
+								'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + p.id +
+								'">' +
+								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
+								'<span class="voteNum">' + dislikeCount + '</span>' +
+								'</span>' +
+								'</div>' +
+								'<div class="voteWhoRow">' +
+								'<span class="voteWhoLink" data-vote-list="like" data-post="' + p.id +
+								'">点赞者</span>' +
+								'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + p.id +
+								'">踩帖者</span>' +
+								'</div>' +
+								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
+								'</div>' +
+								'<div class="commentRow"><input data-input="' + p.id +
+								'" data-mention-input="1" placeholder="评论...">' +
+								'<button data-comment="' + p.id + '">发送</button></div>' +
+								'<div class="commentList"></div>';
+							container.appendChild(postDiv);
+							postDiv.style.opacity = "0";
+							postDiv.classList.add("postEnter");
+							postDiv.style.animationDelay = `${i*45}ms`;
+							container.appendChild(postDiv);
+							requestAnimationFrame(() => postDiv.style.opacity = "1");
+							const bodyBox = postDiv.querySelector(".postContent");
+							if (meta.warn) {
+								bodyBox.innerHTML =
+									'<div class="postWarnGate">' +
+									'<div class="warnMsg"></div>' +
+									'<button type="button" class="revealWarnBtn">显示内容</button>' +
+									'</div>';
+								bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
+								bodyBox.querySelector(".revealWarnBtn").onclick = () => {
+									renderPostBody(bodyBox, p.content);
+								};
+							} else {
+								renderPostBody(bodyBox, p.content);
+							}
+							postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
+								el.onclick = () => openVotePeople(p.id, el.dataset.voteList);
+							});
+							postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
+							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
+							const delBtn = postDiv.querySelector("[data-del]");
+							if (delBtn) delBtn.onclick = () => deletePost(p.id);
+							const submit = () => {
+								const text = postDiv.querySelector("[data-input]")?.value.trim();
+								if (text) addComment(p.id, text, p.author);
+							};
+							postDiv.querySelector("[data-comment]").onclick = submit;
+							postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key ===
+								"Enter" && submit());
+							const tagEl = postDiv.querySelector("[data-tag]");
+							if (tagEl) {
+								tagEl.onclick = () => {
+									activePostTag = p.tag;
+									postSearch = "";
+									$("postSearch").value = "";
+									renderPostFilters();
+									loadStats();
+									loadPosts(1);
+								};
+							}
+							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
+							renderComments(p.id, postDiv.querySelector(".commentList"));
+						}
+					} catch (e) {
+						console.error(e);
+						modal("加载失败：" + e.message);
+					}
+				}
+				async function renderComments(postId, container) {
+					container.innerHTML = "";
+					const {
+						data
+					} = await supabase
+						.from("comments")
+						.select("*, users(id, name, coins, avatar)")
+						.eq("postid", postId)
+						.order("id", {
+							ascending: true
+						});
+					const comments = data || [];
+					for (let c of comments) {
+						let div = document.createElement("div");
+						const avatar = getAvatar(c.users);
+						div.className = "comment";
+						div.innerHTML =
+							`<span class="userLink userLinkWithAvatar" data-user="${c.author}">
+								<img class="avatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
+								<b>${c.users?.name || "未知"}</b>
+								<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>
+								${getVerifiedBadge(c.users)}
+							</span>: <span class="commentContent"></span>
+							${currentUser && c.author === currentUser.id
+								? `<button class="commentDel" data-cdel="${c.id}">删除</button>`
+								: ""}`;
+						div.querySelector(".commentContent").textContent = c.content || "";
+						await ensureAllUsersCache();
+						linkifyMentions(div);
+						container.appendChild(div);
+						const userLink = div.querySelector(".userLink");
+						if (userLink) {
+							userLink.onclick = () => viewUser(c.author);
+						}
+						const del = div.querySelector("[data-cdel]");
+						if (del) {
+							del.onclick = async () => {
+								await supabase.from("comments").delete().eq("id", c.id);
+								renderComments(postId, container);
+								await changeCoins(currentUser.id, -3);
+							};
+						}
+					}
+				}
+				async function openVotePeople(postId, kind) {
+					const {
+						data,
+						error
+					} = await supabase
+						.from("likes")
+						.select("type, time, users:liker(id, name, coins, avatar)")
+						.eq("postid", postId)
+						.order("time", {
+							ascending: true
+						});
+					if (error) {
+						modal("读取失败：" + error.message);
+						return;
+					}
+					const rows = (data || []).filter(x => x.type === (kind === "like" ? 1 : -1));
+					document.querySelector(".modalBox").style.width = "360px";
+					modal(`
+											<h3>谁${kind === "like" ? "赞了" : "踩了"}</h3>
+											<div style="max-height:320px;overflow:auto;text-align:left;">
+												${
+													rows.length
+														? rows.map(x => `
+															<div class="onlineUser voteUser" data-user="${x.users?.id}" style="display:flex;align-items:center;gap:8px;">
+																<img class="avatar onlineAvatar" src="${getAvatar(x.users)}" onerror="this.onerror=null;this.src='head.svg'">
+																<span>${x.users?.name || "未知"}</span>
+																<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
+																${getVerifiedBadge(x.users)}
+															</div>
+														`).join("")
+														: `<div style="color:var(--sub);padding:8px 0;">暂无</div>`
+												}
+											</div>
+										`);
+					setTimeout(() => {
+						document.querySelectorAll(".voteUser").forEach(el => {
+							el.onclick = () => {
+								$("modal").classList.add("hidden");
+								viewUser(Number(el.dataset.user));
+							};
+						});
+					}, 0);
+				}
+				async function addComment(postId, content, postAuthorId) {
+					const text = String(content || "").trim();
+					if (!text) return;
+					try {
+						const {
+							data,
+							error
+						} = await supabase
+							.from("comments")
+							.insert([{
+								postid: postId,
+								content: sanitizePostHtml(text),
+								author: currentUser.id,
+								time: new Date().toISOString()
+							}])
+							.select("id")
+							.single();
+						if (error) throw error;
+						await notifyMentions(text, postId, data?.id || null);
+						await createNotification({
+							targetId: postAuthorId,
+							actorId: currentUser.id,
+							postId: postId,
+							commentId: data?.id || null,
+							type: "comment"
+						});
+						const postDiv = document.querySelector(`.post[data-post-id="${postId}"]`);
+						if (postDiv) {
+							const input = postDiv.querySelector("[data-input]");
+							if (input) {
+								input.value = "";
+								input.blur();
+							}
+							const list = postDiv.querySelector(".commentList");
+							if (list) await renderComments(postId, list);
+						}
+						await changeCoins(currentUser.id, 3);
+						await refreshNotificationBadge();
+						await loadStats();
+					} catch (e) {
+						console.error(e);
+						modal("评论失败：" + e.message);
+					}
+				}
+				async function likePost(id, postDiv) {
+					const likeBtn = postDiv.querySelector(".like");
+					const dislikeBtn = postDiv.querySelector(".dislike");
+					const likeNumEl = likeBtn.querySelector(".voteNum");
+					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
+					let likeCount = parseInt(likeNumEl.textContent) || 0;
+					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
+					let {
+						data
+					} = await supabase
+						.from("likes")
+						.select("*")
+						.eq("postid", id)
+						.eq("liker", currentUser.id);
+					const hasLike = data.some(x => x.type === 1);
+					const hasDislike = data.some(x => x.type === -1);
+					const prevLikeCount = likeCount;
+					const prevDislikeCount = dislikeCount;
+					const prevLiked = likeBtn.classList.contains("liked");
+					const prevDisliked = dislikeBtn.classList.contains("disliked");
+					if (hasLike) {
+						likeCount = Math.max(0, likeCount - 1);
+						likeBtn.classList.remove("liked");
+					} else {
+						likeCount += 1;
+						likeBtn.classList.add("liked");
+						if (hasDislike) {
+							dislikeCount = Math.max(0, dislikeCount - 1);
+							dislikeBtn.classList.remove("disliked");
+						}
+					}
+					likeNumEl.textContent = likeCount;
+					dislikeNumEl.textContent = dislikeCount;
+					try {
+						if (hasLike) {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", 1);
+							await changeCoins(currentUser.id, -1);
+						} else {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", -1);
+							await supabase
+								.from("likes")
+								.insert([{
+									postid: id,
+									liker: currentUser.id,
+									type: 1,
+									time: new Date().toISOString()
+								}]);
+							await changeCoins(currentUser.id, hasDislike ? 2 : 1);
+						}
+					} catch (e) {
+						console.error(e);
+						likeNumEl.textContent = prevLikeCount;
+						dislikeNumEl.textContent = prevDislikeCount;
+						likeBtn.classList.toggle("liked", prevLiked);
+						dislikeBtn.classList.toggle("disliked", prevDisliked);
+						modal("点赞失败：" + e.message);
+					}
+				}
+				async function dislikePost(id, postDiv) {
+					const likeBtn = postDiv.querySelector(".like");
+					const dislikeBtn = postDiv.querySelector(".dislike");
+					const likeNumEl = likeBtn.querySelector(".voteNum");
+					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
+					let likeCount = parseInt(likeNumEl.textContent) || 0;
+					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
+					let {
+						data
+					} = await supabase
+						.from("likes")
+						.select("*")
+						.eq("postid", id)
+						.eq("liker", currentUser.id);
+					const hasLike = data.some(x => x.type === 1);
+					const hasDislike = data.some(x => x.type === -1);
+					const prevLikeCount = likeCount;
+					const prevDislikeCount = dislikeCount;
+					const prevLiked = likeBtn.classList.contains("liked");
+					const prevDisliked = dislikeBtn.classList.contains("disliked");
+					if (hasDislike) {
+						dislikeCount = Math.max(0, dislikeCount - 1);
+						dislikeBtn.classList.remove("disliked");
+					} else {
+						dislikeCount += 1;
+						dislikeBtn.classList.add("disliked");
+						if (hasLike) {
+							likeCount = Math.max(0, likeCount - 1);
+							likeBtn.classList.remove("liked");
+						}
+					}
+					likeNumEl.textContent = likeCount;
+					dislikeNumEl.textContent = dislikeCount;
+					try {
+						if (hasDislike) {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", -1);
+							await changeCoins(currentUser.id, 1);
+						} else {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", 1);
+							await supabase
+								.from("likes")
+								.insert([{
+									postid: id,
+									liker: currentUser.id,
+									type: -1,
+									time: new Date().toISOString()
+								}]);
+							await changeCoins(currentUser.id, hasLike ? -2 : -1);
+						}
+					} catch (e) {
+						console.error(e);
+						likeNumEl.textContent = prevLikeCount;
+						dislikeNumEl.textContent = prevDislikeCount;
+						likeBtn.classList.toggle("liked", prevLiked);
+						dislikeBtn.classList.toggle("disliked", prevDisliked);
+						modal("踩帖失败：" + e.message);
+					}
+				}
+				async function deletePost(id) {
+					let {
+						data: myComments
+					} = await supabase
+						.from("comments")
+						.select("*")
+						.eq("postid", id)
+						.eq("author", currentUser.id);
+					let {
+						data: myLikes
+					} = await supabase
+						.from("likes")
+						.select("*")
+						.eq("postid", id)
+						.eq("liker", currentUser.id);
+					let penalty = -5;
+					if (myComments) penalty -= myComments.length * 3;
+					if (myLikes) penalty -= myLikes.length * 1;
+					await changeCoins(currentUser.id, penalty);
+					await supabase.from("posts").delete().eq("id", id);
+					await supabase.from("comments").delete().eq("postid", id);
+					await supabase.from("likes").delete().eq("postid", id);
+					loadStats();
+					loadPosts(1);
+				}
+
+				function openPostBgPicker() {
+					if (!currentUser) return;
+					document.querySelector(".modalBox").style.width = "420px";
+					let picked = "";
+					modal(`
+						<h3>背景</h3>
+						<div style="font-size:14px;color:var(--sub);margin-bottom:12px;">
+							花 15 金币，给这条帖子加一个彩色背景
+						</div>
+						<div id="bgPickerGrid" class="bgPickerGrid"></div>
+						<div style="margin-top:14px;text-align:center;">
+							<button id="bgApplyBtn" disabled>确定</button>
+						</div>
+					`);
+					const grid = $("bgPickerGrid");
+					for (const color of POST_BG_OPTIONS) {
+						const item = document.createElement("div");
+						item.className = "bgOption";
+						item.style.background = color;
+						item.onclick = () => {
+							picked = color;
+							grid.querySelectorAll(".bgOption").forEach(el => el.classList.remove("active"));
+							item.classList.add("active");
+							$("bgApplyBtn").disabled = false;
+						};
+						grid.appendChild(item);
+					}
+					$("bgApplyBtn").onclick = async () => {
+						if (!picked) return;
+						if ((currentUser.coins || 0) < POST_BG_COST) {
+							return modal("金币不足");
+						}
+						await changeCoins(currentUser.id, -POST_BG_COST);
+						selectedPostBg = picked;
+						$("bgBuyBtn").textContent = "已使用";
+						$("modal").classList.add("hidden");
+						showCoinMsg("已应用背景，金币 -15");
+					};
+				}
+				const DEFAULT_AVATAR = "head.svg";
+
+				function getAvatar(user) {
+					return user?.avatar?.trim() || DEFAULT_AVATAR;
+				}
+
+				function escapeAttr(s) {
+					return String(s ?? "")
+						.replace(/&/g, "&amp;")
+						.replace(/"/g, "&quot;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;");
+				}
+				async function loadUserList() {
+					let box = $("userItems");
+					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					let {
+						data
+					} = await supabase.from("users").select("*");
+					data.sort((a, b) => {
+						let coinsA = a.coins || 0;
+						let coinsB = b.coins || 0;
+						if (coinsB !== coinsA) return coinsB - coinsA;
+						return a.name.localeCompare(b.name);
+					});
+					box.innerHTML = "";
+					data.forEach((u, i) => {
+						let rank = i + 1;
+						let div = document.createElement("div");
+						div.className = "userItem";
+						let rankDisplay;
+						if (rank === 1) rankDisplay = ` <span style="color: #ffaa00;">1</span>`;
+						else if (rank === 2) rankDisplay = `<span style="color: #a3a3a3">2</span>`;
+						else if (rank === 3) rankDisplay = `<span style="color: #c68326">3</span>`;
+						else rankDisplay = `<span class="rank-num">${rank}</span>`;
+						const avatar = getAvatar(u);
+						div.innerHTML = `
+							<div style="width: 40px; font-weight: bold; text-align: center;">${rankDisplay}</div>
+							<div style="flex:1; display:flex; align-items:center; gap:8px; min-width:0;">
+								<img class="avatar rankAvatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
+								<div style="min-width:0;">
+									<div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+										<span>${u.name}</span>
+										<span class="userLevel">${getUserLevel(u.coins || 0)}</span>
+									</div>
+								</div>
+							</div>
+							<div style="width:100px; text-align:right;">${u.coins || 0}</div>
+						`;
+						div.onclick = () => viewUser(u.id);
+						box.appendChild(div);
+					});
+				}
+				async function viewUser(uid) {
+					let container = $("userPosts");
+					container.innerHTML =
+						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					let {
+						data: user
+					} = await supabase.from("users").select("*").eq("id", uid).single();
+					const avatarUrl = getAvatar(user);
+					$("profileAvatar").src = avatarUrl;
+					$("profileAvatar").onclick = () => openViewer(avatarUrl);
+					container.innerHTML = "";
+					history.pushState(null, "", "?uid=" + uid);
+					const isSelf = currentUser && uid === currentUser.id;
+					$("pname").innerHTML =
+						user.name +
+						`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+						getVerifiedBadge(user) +
+						(isSelf ? "&ensp;<button id='editAvatarBtn'>修改头像</button>" : "") +
+						"&ensp;<button class='helpBtn' id='levelBtn'>?</button>";
+					if (isSelf) {
+						$("editAvatarBtn").onclick = () => {
+							openAvatarEditor();
+						};
+					}
+					$("moreInfo").innerHTML =
+						"金币：" + (user.coins || 0) +
+						"&ensp;<button class='helpBtn' id='coinBtn'>?</button>" +
+						"&emsp;&emsp;注册时间：" + new Date(user.time).toISOString();
+					$("levelBtn").onclick = () => {
+						document.querySelector(".modalBox").style.width = "600px";
+						modal(`
+					<h3>等级规则</h3>
+					<p>1. 等级分为 LV0 - LV9 共 10 个等级</p>
+					<p>2. 不同等级会有不同颜色区分</p>
+					<p>3. 金币到达某数量后，自动升级</p>
+					<p>4. 获取金币并提升等级吧！</p>
+						`);
+					}
+					$("coinBtn").onclick = () => {
+						document.querySelector(".modalBox").style.width = "600px";
+						modal(`
+					<h3>金币规则</h3>
+					<p>1. 发布 +5 金币</p>
+					<p>2. 评论 +3 金币</p>
+					<p>3. 点赞 +1 金币</p>
+					<p>4. 踩 + (-1) 金币</p>
+					<p>5. 删除帖子、内容或取消点赞，减少对应数量金币</p>
+					<p>金币用途：提升等级、购买彩色帖子背景</p>
+						`);
+					}
+					container.className = "profileBtnGrid";
+					container.innerHTML =
+						'<div class="pbtn" data-action="search">查看' + (isSelf ? "我的" : "TA的") + '帖子</div>' +
+						(isSelf ? '<div class="pbtn" data-action="about">关于</div>' : '') +
+						(isSelf ? '<div class="pbtn" data-action="sponsor">赞助</div>' : '') +
+						(isSelf ? '<div class="pbtn" data-action="download">获取应用版</div>' : '') +
+						(isSelf ? '<div class="themeRow"><button id="sysTheme2">跟随系统</button><button id="lightTheme2">浅色</button><button id="darkTheme2">深色</button></div>' : '');
+					container.querySelector("[data-action='search']").onclick = () => {
+						show("main");
+						$("postSearch").value = "@" + user.name;
+						postSearch = "@" + user.name;
+						activePostTag = "全部";
+						renderPostFilters();
+						loadPosts(1);
+						setActive("homeBtn");
+					};
+					if (isSelf) {
+						container.querySelector("[data-action='about']").onclick = () => {
+							document.querySelector(".modalBox").style.width = "800px";
+							modal(`<h2>关于</h2><div style="text-align:left;"><b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br><br><b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br><b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br><b>【提醒】</b>请勿发布违法内容，请勿滥用。<br><br>如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br></div><h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6><h6>© Jacky Forum. All rights reserved.</h6>`);
+						};
+						container.querySelector("[data-action='sponsor']").onclick = () => {
+							modal(`<h2>赞助</h2><a href="https://zhujingqi.com/money.html">点击此处赞助 Jacky</a>`);
+						};
+						container.querySelector("[data-action='download']").onclick = () => {
+							document.querySelector(".modalBox").style.width = "800px";
+							modal(`<h3>获取应用版 Jacky 论坛</h3><h4>Windows系统</h4><details><summary>如何安装？</summary><p>1. <a href="https://github.com/zhujingqi/download/releases/download/1.0.0/Jacky.Forum.Setup.1.0.0.exe">点击<b>下载EXE安装程序</b></a><br>2. 双击安装程序，安装<b>桌面版 Jacky 论坛</b><br>3. 更加便捷地使用 <b>Jacky 论坛</b> 吧！<h6>注：国内下载可能<del>较慢</del>非常慢！</h6></p></details><h4>iOS系统</h4><details><summary>如何安装？</summary>使用Safari浏览器访问 <b>Jacky 论坛</b><br><img src="1.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="2.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="3.jpg" style="width:100px;margin-top:10px;" class="zoomable" /></details>`);
+						};
+						$("sysTheme2").onclick = () => document.body.classList.remove("dark");
+						$("lightTheme2").onclick = () => document.body.classList.remove("dark");
+						$("darkTheme2").onclick = () => document.body.classList.add("dark");
+					}
+					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
+					$("userDescription").innerText = user.description || "暂无简介";
+					if (uid === currentUser.id) {
+						let editBtn = document.createElement("button");
+						editBtn.innerText = "编辑";
+						let btnContainer = document.createElement("div");
+						btnContainer.style.display = "flex";
+						btnContainer.style.justifyContent = "flex-end";
+						btnContainer.appendChild(editBtn);
+						$("userDescription").appendChild(btnContainer);
+						editBtn.onclick = () => {
+							document.querySelector(".modalBox").style.width = "400px";
+							$("modalText").innerHTML = `
+					            <h3>编辑个人简介</h3>
+					            <textarea id="descTextarea" maxlength="500" style="height:120px;">${user.description || ""}</textarea>
+					            <div style="margin-top:10px;"><button id="saveDescBtn">保存</button></div>
+					        `;
+							$("modal").classList.remove("hidden");
+							$("saveDescBtn").onclick = async () => {
+								const newDesc = $("descTextarea").value.trim();
+								const {
+									error
+								} = await supabase.from("users").update({
+									description: newDesc
+								}).eq("id", currentUser.id);
+								if (error) return modal("保存失败：" + error.message);
+								currentUser.description = newDesc;
+								$("userDescription").innerText = newDesc || "暂无简介";
+								$("modal").classList.add("hidden");
+							};
+						};
+					}
+					show("profilePage");
+				}
+
+				function openAvatarEditor() {
+					const oldUrl = currentUser?.avatar || "";
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+						<h3>修改头像</h3>
+						<img id="avatarPreview" class="avatar big" src="${escapeAttr(oldUrl || DEFAULT_AVATAR)}"
+							style="display:block;margin:0 auto 12px auto;">
+						<input id="avatarUrlInput" placeholder="头像链接（http/https）" value="${escapeAttr(oldUrl)}">
+						<div style="display:flex;gap:8px;margin-top:14px;">
+							<button id="avatarSaveBtn">保存</button>
+							<button id="avatarCancelBtn">取消</button>
+						</div>
+					`);
+					const input = $("avatarUrlInput");
+					const preview = $("avatarPreview");
+					input.oninput = () => {
+						preview.src = input.value.trim() || DEFAULT_AVATAR;
+					};
+					$("avatarCancelBtn").onclick = () => {
+						$("modal").classList.add("hidden");
+					};
+					$("avatarSaveBtn").onclick = async () => {
+						const url = input.value.trim();
+						if (url && !/^https?:\/\//i.test(url)) {
+							return modal("头像链接必须以 http:// 或 https:// 开头");
+						}
+						const {
+							error
+						} = await supabase
+							.from("users")
+							.update({
+								avatar: url || null
+							})
+							.eq("id", currentUser.id);
+						if (error) return modal("保存失败：" + error.message);
+						currentUser.avatar = url || null;
+						$("modal").classList.add("hidden");
+						loadPosts(postPage);
+						viewUser(currentUser.id);
+					};
+				}
+				async function changeCoins(uid, amount) {
+					const {
+						data: user
+					} = await supabase
+						.from("users")
+						.select("coin_ban")
+						.eq("id", uid)
+						.single();
+					if (user?.coin_ban) {
+						showCoinMsg(`你已被禁止获得金币！`);
+						return false;
+					}
+					let {
+						data
+					} = await supabase
+						.from("users")
+						.select("coins")
+						.eq("id", uid)
+						.single();
+					let newCoins = (data.coins || 0) + amount;
+					if (newCoins < 0) newCoins = 0;
+					await supabase
+						.from("users")
+						.update({
+							coins: newCoins
+						})
+						.eq("id", uid);
+					if (currentUser && currentUser.id === uid) {
+						currentUser.coins = newCoins;
+						showCoinMsg(amount > 0 ? `金币 +${amount}！` : `金币 -${Math.abs(amount)}！`);
+					}
+				}
+
+				function showCoinMsg(text) {
+					const msg = document.getElementById("coinMsg");
+					msg.textContent = text;
+					msg.style.opacity = 1;
+					clearTimeout(msg.hideTimeout);
+					msg.hideTimeout = setTimeout(() => {
+						msg.style.opacity = 0;
+					}, 3000);
+				}
+				const autoId = localStorage.getItem("loginUser");
+
+				function getUserLevel(coins) {
+					let level = "LV0",
+						color = "#888";
+					if (coins > 5120) {
+						level = "MAX";
+						color = "#000000";
+					} else if (coins > 2560) {
+						level = "LV9";
+						color = "#55007f";
+					} else if (coins > 1280) {
+						level = "LV8";
+						color = "#9900ff";
+					} else if (coins > 640) {
+						level = "LV7";
+						color = "#ff55ff";
+					} else if (coins > 320) {
+						level = "LV6";
+						color = "#d93131";
+					} else if (coins > 160) {
+						level = "LV5";
+						color = "#ff5500";
+					} else if (coins > 80) {
+						level = "LV4";
+						color = "#ff9900";
+					} else if (coins > 40) {
+						level = "LV3";
+						color = "#ffcc00";
+					} else if (coins > 20) {
+						level = "LV2";
+						color = "#00aaff";
+					} else if (coins > 0) {
+						level = "LV1";
+						color = "#77bb00";
+					}
+					return `<span class="userLevel" style="color:${color}">${level}</span>`;
+				}
+				const levels = ["大吉", "吉", "中平", "凶", "大凶"];
+				const things = [
+					"发帖",
+					"评论",
+					"点赞",
+					"刷题",
+					"学习",
+					"找 BUG",
+					"早睡",
+					"熬夜",
+					"打游戏",
+					"玩手机",
+					"上学",
+					"写作业",
+					"重启电脑",
+					"探索论坛",
+					"找到论坛的第一条帖子",
+					"赞助杰基",
+					"看排行榜",
+					"装呆",
+					"装酷",
+					"装唐",
+					"阴 TA 一手",
+					"做多邻国",
+					"玩 Minecraft",
+					"与管理员聊天",
+					"发呆",
+					"思考人生",
+					"怀疑人生",
+					"数键盘上的按键（有几个呢？）",
+					"等待管理员上线",
+					"万事皆宜",
+					"万事不宜"
+				];
+
+				function stringToSeed(str) {
+					let hash = 0;
+					for (let i = 0; i < str.length; i++) {
+						hash = str.charCodeAt(i) + ((hash << 5) - hash);
+					}
+					return Math.abs(hash);
+				}
+
+				function seededRandom(seed) {
+					seed = (seed * 9301 + 49297) % 233280;
+					return seed / 233280;
+				}
+
+				function getDailyFortune(username) {
+					const now = new Date();
+					const dayIndex = Math.floor(
+						now.getTime() / 86400000
+					);
+					const baseSeed = (stringToSeed(username) + dayIndex * 9973) % 2147483647;
+					const r1 = seededRandom(baseSeed);
+					let levelIndex =
+						Math.floor(r1 * levels.length);
+					const yesterdaySeed =
+						stringToSeed(username) ^
+						((dayIndex - 1) * 1145141);
+					const yesterdayRandom =
+						seededRandom(yesterdaySeed);
+					const yesterdayIndex =
+						Math.floor(yesterdayRandom * levels.length);
+					if (levelIndex === yesterdayIndex) {
+						levelIndex =
+							(levelIndex + 1) % levels.length;
+					}
+					const level = levels[levelIndex] || "中平";
+					const r2 = seededRandom(baseSeed + 1);
+					let goodIndex =
+						Math.floor(r2 * things.length);
+					const r3 = seededRandom(baseSeed + 2);
+					let badIndex =
+						Math.floor(r3 * things.length);
+					if (goodIndex === badIndex) {
+						badIndex =
+							(badIndex + 1) % things.length;
+					}
+					return {
+						level,
+						good: things[goodIndex],
+						bad: things[badIndex]
+					};
+				}
+				document.getElementById("fortuneBtn").onclick = function() {
+					const username = currentUser.name;
+					const f = getDailyFortune(username);
+					document.getElementById("fortuneLevel").innerText = f.level;
+					document.getElementById("fortuneGood").innerText = f.good;
+					document.getElementById("fortuneBad").innerText = f.bad;
+					document.getElementById("fortuneResult").style.display = "block";
+					const colors = {
+						"大吉": "gold",
+						"吉": "green",
+						"中平": "gray",
+						"凶": "red",
+						"大凶": "darkred"
+					};
+					const levelEl = document.getElementById("fortuneLevel");
+					levelEl.innerText = f.level;
+					levelEl.style.color = colors[f.level];
+					this.style.display = "none";
+				};
+
+				let viewerScale = 1;
+
+				function openViewer(src) {
+					const viewer = $("viewer");
+					const viewerImg = $("viewerImg");
+					viewerImg.src = src;
+					viewer.style.display = "flex";
+					viewerScale = 1;
+					viewerImg.style.transform = "scale(1)";
+					viewerImg.onwheel = e => {
+						e.preventDefault();
+						if (e.deltaY < 0) {
+							viewerScale *= 1.1;
+						} else {
+							viewerScale /= 1.1;
+						}
+						viewerScale = Math.max(
+							0.2,
+							Math.min(8, viewerScale)
+						);
+						viewerImg.style.transform =
+							`scale(${viewerScale})`;
+					};
+					viewerImg.ondblclick = () => {
+						viewerScale =
+							viewerScale === 1 ? 2 : 1;
+						viewerImg.style.transform =
+							`scale(${viewerScale})`;
+					};
+				}
+				window.closeViewer = function() {
+					document.getElementById("viewer").style.display = "none";
+				};
+				document.addEventListener("input", e => {
+					const el = e.target;
+					if (!el.matches || !el.matches("[data-mention-input]")) return;
+					updateMentionBox(el);
+				});
+				document.addEventListener("keydown", e => {
+					const box = $("mentionBox");
+					if (box.classList.contains("hidden")) return;
+					if (e.key === "Escape") {
+						hideMentionBox();
+						return;
+					}
+					if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") {
+						e.preventDefault();
+						const items = [...box.querySelectorAll(".mentionItem")];
+						if (!items.length) return;
+						if (e.key === "ArrowDown") mentionState.activeIndex = (mentionState.activeIndex + 1) %
+							items.length;
+						if (e.key === "ArrowUp") mentionState.activeIndex = (mentionState.activeIndex - 1 + items
+							.length) % items.length;
+						if (e.key === "Enter") {
+							const item = items[mentionState.activeIndex];
+							if (item) insertMentionFromBox(Number(item.dataset.uid), item.dataset.uname);
+							return;
+						}
+						items.forEach((el, idx) => el.classList.toggle("active", idx === mentionState
+							.activeIndex));
+					}
+				});
+				document.addEventListener("click", e => {
+					if (e.target.closest("#mentionBox")) return;
+					if (e.target.matches && e.target.matches("[data-mention-input]")) return;
+					hideMentionBox();
+				});
+				document.addEventListener("click", e => {
+					const img = e.target.closest(".zoomable");
+					if (img) {
+						openViewer(img.src);
+					}
+				});
+				document.addEventListener("visibilitychange", () => {
+					if (document.visibilityState === "visible" && currentUser) {
+						touchPresence();
+						if (currentPage === "main") loadOnlineUsers();
+					}
+				});
+				function getUrlParam(name) {
+					const params = new URLSearchParams(window.location.search);
+					return params.get(name);
+				}
+
+				function handleUrlRoute() {
+					const pid = getUrlParam("pid");
+					const uid = getUrlParam("uid");
+					if (pid) {
+						const postId = Number(pid);
+						if (!isNaN(postId)) openSinglePost(postId);
+					} else if (uid) {
+						const userId = Number(uid);
+						if (!isNaN(userId)) viewUser(userId);
+					}
+				}
+
+				(async () => {
+					const mask = document.createElement("div");
+					mask.className = "loadingMask";
+					mask.innerHTML = `
+						<div class="loadingBox">
+							<div class="loadingLogo">
+								<img src="icon.svg" alt="">
+								<span>Jacky 论坛</span>
+							</div>
+							<div class="loadingText">Loading<span class="dot dot1">.</span><span class="dot dot2">.</span><span class="dot dot3">.</span></div>
+						</div>
+					`;
+					document.body.appendChild(mask);
+					try {
+						if (autoId) {
+							const {
+								data
+							} = await supabase.from("users").select("*").eq("id", autoId).single();
+							if (data) {
+								currentUser = data;
+								$("nav").classList.remove("hidden");
+								show("main");
+								renderPostFilters();
+								syncLayoutBtn();
+								syncLayoutMode();
+								loadStats();
+								loadOnlineUsers();
+								startPresence();
+								refreshNotificationBadge();
+								loadPosts(1);
+								handleUrlRoute();
+								return;
+							}
+						}
+						show("welcomePage");
+						const uid = getUrlParam("uid");
+						if (uid) {
+							const userId = Number(uid);
+							if (!isNaN(userId)) viewUser(userId);
+						}
+					} finally {
+						mask.classList.add("fadeOut");
+						setTimeout(() => mask.remove(), 300);
+					}
+				})();
+			});
+			document.addEventListener("contextmenu", e => e.preventDefault());
+		</script>
+	</body>
+</html>

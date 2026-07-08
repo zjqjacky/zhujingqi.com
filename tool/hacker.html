@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>HackyOS - Zhujingqi</title>
+		<style>
+			body {
+				background-color: black;
+				color: #00ff00;
+				font-family: 'Courier New', Courier, monospace;
+				font-size: 16px;
+				margin: 0;
+				padding: 10px;
+				cursor: none;
+			}
+
+			#terminal {
+				white-space: pre-wrap;
+			}
+			
+			::-webkit-scrollbar {
+			      display: none;
+			}
+
+			.input-line {
+				display: flex;
+			}
+
+			.prompt {
+				margin-right: 5px;
+			}
+
+			.cmd-input {
+				background-color: black;
+				color: #00ff00;
+				border: none;
+				outline: none;
+				font-family: 'Courier New', Courier, monospace;
+				font-size: 16px;
+				flex-grow: 1;
+			}
+			
+			
+		</style>
+	</head>
+	<body>
+		<div id="terminal">
+Welcome to HackyOS v1.0
+Press F11 to fullscreen mode.
+Type 'help' for a list of commands.
+		</div>
+
+		<script>
+			const terminal = document.getElementById('terminal');
+
+			const responses = {
+				help: `
+Available commands:
+- help: Show available commands
+- hack: Start hacking sequence
+- stat: Show system status
+- cls: Clear the terminal
+- exit: Exit HackyOS
+- sd: Self-destruction
+    `,
+				stat: `
+System Status:
+- CPU Temp: 8192°C
+- Memory Usage: 128%
+- Battery Usage: 4096%
+- Firewall: Non-existent
+- Access Level: ADMIN_ROOT
+    `,
+				hack: `
+Initializing hack protocol...
+Bypassing security...
+Accessing classified data...
+Decrypting files...
+Hack Successful!
+    `,
+				sd: `
+Preparing to self destruction...
+..........
+3...
+2...
+1...
+
+ERROR!
+
+The self destruct function has been destroyed!
+    `,
+				
+			};
+
+			createInputLine();
+
+			function createInputLine() {
+				const inputLine = document.createElement('div');
+				inputLine.className = 'input-line';
+
+				const prompt = document.createElement('div');
+				prompt.className = 'prompt';
+				prompt.textContent = '>';
+
+				const input = document.createElement('input');
+				input.type = 'text';
+				input.className = 'cmd-input';
+
+				inputLine.appendChild(prompt);
+				inputLine.appendChild(input);
+				terminal.appendChild(inputLine);
+
+				input.focus();
+
+				input.addEventListener('keydown', function(event) {
+					if (event.key === 'Enter') {
+						const cmd = input.value.trim();
+						processCommand(cmd, inputLine);
+					}
+				});
+
+				terminal.scrollTop = terminal.scrollHeight;
+			}
+
+			function processCommand(cmd, inputLine) {
+				const input = inputLine.querySelector('input');
+				input.disabled = true;
+
+				if (cmd.toLowerCase() === 'cls') {
+					terminal.innerHTML = '';
+					createInputLine();
+				} else if (cmd.toLowerCase() === 'exit') {
+					typeText(`Exiting...                                               \nERROR\nYou cannot exit!`, () => {
+						createInputLine();
+					});
+				} else if (responses[cmd.toLowerCase()]) {
+					typeText(responses[cmd.toLowerCase()], () => {
+						createInputLine();
+					});
+				} else {
+					typeText(`Unknown command: ${cmd}`, () => {
+						createInputLine();
+					});
+				}
+
+				terminal.scrollTop = terminal.scrollHeight;
+			}
+
+			function typeText(text, callback) {
+				const output = document.createElement('div');
+				terminal.appendChild(output);
+
+				let index = 0;
+				const speed = 10;
+
+				function type() {
+					if (index < text.length) {
+						output.textContent += text.charAt(index);
+						index++;
+						terminal.scrollTop = terminal.scrollHeight;
+						setTimeout(type, speed);
+					} else {
+						if (callback) callback();
+					}
+				}
+
+				type();
+			}
+		</script>
+	</body>
+
+</html>

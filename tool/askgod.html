@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>AskGod</title>
+		<style>
+			body {
+				text-align: center;
+				margin-top: 100px;
+				background: radial-gradient(circle at center, #333 0%, #000 100%);
+				color: #eee;
+				overflow-x: hidden;
+			}
+
+			h1 {
+				font-size: 40px;
+				padding: 20px;
+			}
+
+			input {
+				width: 300px;
+				padding: 12px;
+				font-size: 16px;
+				border-radius: 30px;
+				border: 2px solid #444;
+				background: #222;
+				color: #fff;
+				transition: 0.3s all;
+			}
+
+			input:focus {
+				border-color: #ffd700;
+				outline: none;
+			}
+
+			button {
+				padding: 10px 16px;
+				font-size: 16px;
+				margin-left: 8px;
+				cursor: pointer;
+				border-radius: 30px;
+				border: 2px solid #444;
+				background: #333;
+				color: #ffd700;
+				font-weight: bold;
+				transition: 0.3s all;
+			}
+
+			button:hover {
+				background: #444;
+				transform: scale(1.05);
+			}
+
+			#answer {
+				margin-top: 40px;
+				font-size: 20px;
+				color: #ffd700;
+				min-height: 80px;
+				line-height: 1.6;
+				display: inline-block;
+				background: #00557f;
+				padding: 16px 24px;
+				border-radius: 30px;
+				position: relative;
+				max-width: 400px;
+				text-align: left;
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+				z-index: 99999;
+			}
+
+			#answer::after {
+				content: "";
+				position: absolute;
+				bottom: -15px;
+				left: 50%;
+				transform: translateX(-50%);
+				border-width: 15px 15px 0 15px;
+				border-style: solid;
+				border-color: #00557f transparent transparent transparent;
+				z-index: 99999;
+			}
+
+			.char {
+				opacity: 0;
+				display: inline-block;
+				transform: translateY(20px);
+				animation-name: floatInChar;
+				animation-duration: 0.6s;
+				animation-fill-mode: forwards;
+			}
+
+			@keyframes floatInChar {
+				0% {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+
+				100% {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			#godCanvas {
+				position: fixed;
+				left: 50%;
+				bottom: 0;
+				transform: translateX(-50%);
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>AskGod</h1>
+		<input id="q" placeholder="询问上帝问题（注：回答由随机算法生成，仅供娱乐！）" autofocus>
+		<button onclick="ask()">获得上帝的回答</button>
+		<br>
+		<div id="answer">你有什么疑惑吗？</div>
+		<canvas id="godCanvas" width="400" height="400"></canvas>
+		<script>
+			const dbKey = "zhujingqi_askgod";
+			const dbReadURL = "https://textdb.online/" + dbKey;
+			const dbWriteURL = "https://api.textdb.online/update/";
+
+			function getAnswer() {
+				const answers = [
+					"仔细观察身边的细节，你可能会发现问题的线索。",
+					"先整理已有的信息，再做下一步行动。",
+					"与信任的人交流你的想法，或许会得到启发。",
+					"尝试记录每天的感受，你会慢慢明白方向。",
+					"短暂休息后再思考，心境平和时思路更清晰。",
+					"分解问题，先解决最容易的一部分。",
+					"给自己设定小目标，一步步推进。",
+					"多尝试不同方法，每一次实验都会带来收获。",
+					"不要害怕错误，它们是通向理解的桥梁。",
+					"关注长期趋势而非短期波动，结果往往更明确。",
+					"静下心来写下你的疑问，整理后再分析。",
+					"尝试换个角度看问题，会有意想不到的发现。",
+					"将复杂问题拆成几个部分，逐个突破。",
+					"借助工具或资料，可以更快找到方向。",
+					"记录每一次尝试的结果，回顾会有启示。",
+					"观察他人的做法，但保持自己的判断。",
+					"在行动前做好计划，避免盲目尝试。",
+					"找到一个安静的环境，让思路更容易流动。",
+					"学习相关的知识和经验，能减少误判。",
+					"尝试做出小的决策，而不是一次性全盘考虑。",
+					"适度的等待，也是一种策略，信息会慢慢明朗。",
+					"与不同背景的人交流，会拓展思路。",
+					"使用笔记或工具记录想法，避免遗漏。",
+					"尝试具体列出可行方案，评估利弊再行动。",
+					"多角度分析问题，有助于发现隐藏因素。",
+					"先尝试最容易实现的方案，积累信心和经验。",
+					"通过实践验证想法，比仅停留在思考更有价值。",
+					"对可能失败的环节提前做好准备，减少风险。",
+					"回顾过去类似经验，寻找可借鉴的方法。",
+					"尝试将问题可视化，比如画图或列表。",
+					"设定优先级，先处理影响最大的部分。",
+					"保持开放心态，灵感常来自意外的观察。",
+					"在行动中调整策略，不必固守初衷。",
+					"向经验丰富的人请教，可能会少走弯路。",
+					"记录每次决策的理由，方便总结经验。",
+					"分阶段尝试，每一步都能获得反馈。",
+					"尝试不同的资源组合，可能会有新突破。",
+					"先做小实验，再推广到大范围应用。",
+					"将抽象问题具体化，会更容易找到落脚点。",
+					"保持耐心，复杂问题往往需要时间发酵。",
+					"建立简单的流程，逐步执行比一次完成更稳妥。",
+					"观察现象背后的原因，而不仅仅是表面结果。",
+					"尝试从失败中提炼可操作的改进措施。",
+					"让身体参与思考，比如走动或动手操作，会激发思路。",
+					"尝试用比喻或类比理解问题，会更易掌握核心。",
+					"定期复盘，查看哪些方法有效哪些需要改进。",
+					"先收集信息，再决策，不要冲动行动。",
+					"在做决定前，列出潜在风险和应对方法。",
+					"用文字表达自己的困惑，有助于发现可行方向。",
+					"尝试每天一个小动作，会慢慢推动整体进展。",
+					"尝试记录每天的感受，你会慢慢明白方向。",
+					"短暂休息后再思考，心境平和时思路更清晰。",
+					"分解问题，先解决最容易的一部分。",
+					"给自己设定小目标，一步步推进。",
+					"多尝试不同方法，每一次实验都会带来收获。",
+					"不要害怕错误，它们是通向理解的桥梁。",
+					"关注长期趋势而非短期波动，结果往往更明确。",
+					"静下心来写下你的疑问，整理后再分析。",
+					"尝试换个角度看问题，会有意想不到的发现。",
+					"将复杂问题拆成几个部分，逐个突破。",
+					"借助工具或资料，可以更快找到方向。",
+					"记录每一次尝试的结果，回顾会有启示。",
+					"观察他人的做法，但保持自己的判断。",
+					"在行动前做好计划，避免盲目尝试。",
+					"找到一个安静的环境，让思路更容易流动。",
+					"学习相关的知识和经验，能减少误判。",
+					"尝试做出小的决策，而不是一次性全盘考虑。",
+					"适度的等待，也是一种策略，信息会慢慢明朗。",
+					"与不同背景的人交流，会拓展思路。",
+					"使用笔记或工具记录想法，避免遗漏。",
+					"尝试具体列出可行方案，评估利弊再行动。",
+					"多角度分析问题，有助于发现隐藏因素。",
+					"先尝试最容易实现的方案，积累信心和经验。",
+					"通过实践验证想法，比仅停留在思考更有价值。",
+					"对可能失败的环节提前做好准备，减少风险。",
+					"回顾过去类似经验，寻找可借鉴的方法。",
+					"尝试将问题可视化，比如画图或列表。",
+					"设定优先级，先处理影响最大的部分。",
+					"保持开放心态，灵感常来自意外的观察。",
+					"在行动中调整策略，不必固守初衷。",
+					"向经验丰富的人请教，可能会少走弯路。",
+					"记录每次决策的理由，方便总结经验。",
+					"分阶段尝试，每一步都能获得反馈。",
+					"尝试不同的资源组合，可能会有新突破。",
+					"先做小实验，再推广到大范围应用。",
+					"将抽象问题具体化，会更容易找到落脚点。",
+					"保持耐心，复杂问题往往需要时间发酵。",
+					"建立简单的流程，逐步执行比一次完成更稳妥。",
+					"观察现象背后的原因，而不仅仅是表面结果。",
+					"尝试从失败中提炼可操作的改进措施。",
+					"让身体参与思考，比如走动或动手操作，会激发思路。",
+					"尝试用比喻或类比理解问题，会更易掌握核心。",
+					"定期复盘，查看哪些方法有效哪些需要改进。",
+					"先收集信息，再决策，不要冲动行动。",
+					"在做决定前，列出潜在风险和应对方法。",
+					"用文字表达自己的困惑，有助于发现可行方向。",
+					"尝试每天一个小动作，会慢慢推动整体进展。",
+					"观察问题的反面，有时更容易找到突破口。",
+					"在尝试前先模拟可能的结果，减少意外。",
+					"将大目标拆分为小步骤，更易执行。",
+					"保持好奇心，细微变化中藏着关键线索。",
+					"将你的思路与他人分享，会产生意想不到的启发。",
+					"反思之前的决策，从中提炼可行策略。",
+					"不要追求完美，先执行比完美更重要。",
+					"尝试用不同的工具或方法，会带来新发现。",
+					"静心倾听自己的直觉，有时比理性更准确。",
+					"记录每天的困惑和解决过程，便于总结经验。",
+					"尝试从不同情境中寻找规律，会更易理解整体。",
+					"多做实验，少做假设，实践是最好的老师。",
+					"通过小规模测试验证想法，减少浪费。",
+					"观察自然规律，借鉴其逻辑来解决问题。",
+					"分清轻重缓急，先解决关键环节。",
+					"给自己设定限定时间，激发决策效率。",
+					"尝试不同的组合和排列，会有意外收获。",
+					"与他人交换观点，扩展自己的思路空间。",
+					"关注趋势而非瞬时表现，获得更长期启示。",
+					"保持笔记和记录，方便随时复盘总结。",
+					"尝试将问题讲给别人听，有助于理清思路。",
+					"每一次尝试都是积累，哪怕未见成效。",
+					"多角度思考，不局限于单一方法。",
+					"实践后再调整理论，理论需服务于行动。",
+					"反复小规模尝试，比一次大动作更稳妥。",
+					"借助模型或图表理解问题，可提高可行性。",
+					"先收集最可靠的信息，再行动。",
+					"关注最容易实施的方案，逐步推进。",
+					"尝试组合不同方法，寻找最优策略。",
+					"保持灵活性，适时调整计划方向。",
+					"在行动中观察反馈，实时优化策略。",
+					"尝试从问题中提炼可操作的核心。",
+					"将复杂任务拆解为可执行的小步骤。",
+					"保持记录习惯，便于日后复盘和改进。",
+					"在困惑时先暂停，给自己留出思考空间。",
+					"分析失败原因，从中找到改进路径。",
+					"尝试使用不同工具或资源，提高效率。",
+					"每次决策前列出可能结果，做最合理选择。",
+					"是的。",
+					"不是。",
+					"很可能。",
+					"不太可能。",
+					"现在还不是时候。",
+					"再等等。",
+					"立刻行动。",
+					"最好不要。",
+					"大胆去做。",
+					"先观察。",
+					"重新考虑。",
+					"继续坚持。",
+					"换一个方法。",
+					"答案就在眼前。",
+					"暂时放下。",
+					"值得一试。",
+					"风险很大。",
+					"成功的机会很高。",
+					"成功的机会不高。",
+					"需要更多信息。",
+					"你已经知道答案。",
+					"向别人请教。",
+					"自己决定。",
+					"听从直觉。",
+					"不要冲动。",
+					"保持耐心。",
+					"现在就开始。",
+					"明天再决定。",
+					"再确认一次。",
+					"不要改变计划。",
+					"改变计划。",
+					"事情会顺利。",
+					"事情不会顺利。",
+					"结果会比预期更好。",
+					"结果可能不如预期。",
+					"坚持原来的方向。",
+					"寻找新的方向。",
+					"先解决小问题。",
+					"把注意力放在关键点。",
+					"不要担心。",
+					"值得信任。",
+					"不要轻信。",
+					"时机正在接近。",
+					"时机还没到。",
+					"答案是肯定的。",
+					"答案是否定的。",
+					"可能会发生。",
+					"不会发生。",
+					"继续前进。",
+					"停下来想一想。",
+					"是的。",
+					"不是。",
+					"现在不是合适的时机。",
+					"可以，但需要耐心。",
+					"不建议这样做。",
+					"答案是肯定的。",
+					"答案是否定的。",
+					"稍后再问。",
+					"现在行动是正确的。",
+					"最好再等等。",
+					"顺其自然。",
+					"你已经知道答案。",
+					"不要这样做。",
+					"大胆去做。",
+					"保持现在的计划。",
+					"改变方向。",
+					"继续前进。",
+					"停下来重新考虑。",
+					"先观察一段时间。",
+					"信任你的直觉。",
+					"不要急。",
+					"时机还没到。",
+					"现在正是时候。",
+					"结果会比你想的好。",
+					"结果可能不如预期。",
+					"很有可能成功。",
+					"成功的概率不高。",
+					"可以尝试。",
+					"最好不要尝试。",
+					"答案会很快出现。",
+					"事情正在向好的方向发展。",
+					"事情可能需要更长时间。",
+					"有隐藏的信息。",
+					"有人会帮助你。",
+					"需要自己解决。",
+					"保持耐心等待。",
+					"现在做决定。",
+					"不要现在决定。",
+					"答案是肯定的，但要慢慢来。",
+					"答案是否定的，但别灰心。",
+					"你会找到办法。",
+					"再想一想。",
+					"现在行动。",
+					"先休息一下。",
+					"事情会自行解决。",
+					"需要更多信息。",
+					"答案就在眼前。",
+					"很快会有结果。",
+					"未来会更清晰。",
+					"相信这个选择。",
+					"是的，毫无疑问。",
+					"不是，现在不行。",
+					"答案很明确：是。",
+					"答案很明确：不是。",
+					"暂时不要行动。",
+					"现在就去做。",
+					"最好改变计划。",
+					"继续按照原计划。",
+					"再等一等。",
+					"立刻停止。",
+					"继续尝试。",
+					"不要再尝试了。",
+					"成功的机会很大。",
+					"成功的机会不大。",
+					"结果会很好。",
+					"结果不会理想。",
+					"事情会顺利。",
+					"事情会遇到阻碍。",
+					"你会得到帮助。",
+					"不要依赖别人。",
+					"再确认一次。",
+					"不需要再确认。",
+					"答案就在你眼前。",
+					"你忽略了关键线索。",
+					"现在不是时机。",
+					"现在正是时机。",
+					"保持耐心。",
+					"立刻行动。",
+					"重新考虑这个决定。",
+					"坚持你的选择。",
+					"改变你的方向。",
+					"继续走这条路。",
+					"结果很快出现。",
+					"结果需要时间。",
+					"先冷静下来。",
+					"大胆一点。",
+					"谨慎一点。",
+					"不要太乐观。",
+					"可以更乐观一点。",
+					"先观察情况。",
+					"不要再拖延。",
+					"拖延一下会更好。",
+					"答案是肯定的。",
+					"答案是否定的。",
+					"这不是好主意。",
+					"这是个好主意。",
+					"机会正在靠近。",
+					"机会已经错过。",
+					"还有机会。",
+					"机会不多。",
+					"先处理其他事情。",
+					"专注这件事。",
+					"继续努力。",
+					"放弃这个想法。",
+					"调整你的方法。",
+					"方法是正确的。",
+					"方法需要改变。",
+					"答案会变得清晰。",
+					"现在还不清晰。",
+					"别急着决定。",
+					"马上决定。",
+					"事情会比想象更好。",
+					"事情会比想象更难。",
+					"相信这个方向。",
+					"不要相信这个方向。",
+					"有人会支持你。",
+					"你需要独立完成。",
+					"继续等待。",
+					"不要再等待。",
+					"准备好再行动。",
+					"行动会带来答案。",
+					"观察更多细节。",
+					"忽略无关因素。",
+					"答案就在过程中。",
+					"结果值得期待。",
+					"结果可能平淡。",
+					"这是正确的一步。",
+					"这一步不太对。",
+					"尝试新的方式。",
+					"保持现在的方式。",
+					"先停下来思考。",
+					"不要再犹豫。",
+					"事情正在改变。",
+					"变化会带来机会。",
+					"变化可能带来风险。",
+					"保持稳定。",
+					"稳定会带来结果。",
+					"答案是积极的。",
+					"答案偏向否定。",
+					"现在继续。",
+					"现在暂停。",
+					"继续观察。",
+					"你会得到结果。",
+					"结果不会马上出现。",
+					"事情正在向好发展。",
+					"事情正在变复杂。",
+					"再试一次。",
+					"不要再试。",
+					"答案是：可以。",
+					"答案是：不可以。",
+					"你居然看到了这句话，杰基表示很惊讶。"
+				];
+				return answers[Math.floor(Math.random() * answers.length)];
+			}
+			async function postQuestion(q) {
+				const res = await fetch(dbReadURL);
+				const oldText = await res.text();
+				const entry = q + "\n";
+				const params = new URLSearchParams();
+				params.append("key", dbKey);
+				params.append("value", oldText + entry);
+				await fetch(dbWriteURL, {
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					body: params.toString()
+				});
+			}
+			async function ask() {
+				const q = document.getElementById("q").value.trim();
+				if (!q) return;
+				const ansDiv = document.getElementById("answer");
+				ansDiv.innerHTML = "";
+				const thinking = "上帝在思考...";
+				for (let i = 0; i < thinking.length; i++) {
+					const span = document.createElement("span");
+					span.className = "char";
+					span.style.animationDelay = `${i * 0.05}s`;
+					span.textContent = thinking[i];
+					ansDiv.appendChild(span);
+				}
+				postQuestion(q);
+				setTimeout(() => {
+					ansDiv.innerHTML = "";
+					let ans = "";
+					for (let a = 0; a < 2; a++) {
+						ans = ans + getAnswer();
+					}
+					for (let i = 0; i < ans.length; i++) {
+						const span = document.createElement("span");
+						span.className = "char";
+						span.style.animationDelay = `${i * 0.05}s`;
+						span.textContent = ans[i];
+						ansDiv.appendChild(span);
+					}
+				}, 3000);
+			}
+			const canvas = document.getElementById("godCanvas");
+			const ctx = canvas.getContext("2d");
+			let t = 0;
+			let haloPhase = 0;
+			let blinkInterval = 300;
+			let blinkTimer = 0;
+			let blinking = false;
+			let blinkDuration = 10;
+
+			function roundRect(ctx, x, y, w, h, r) {
+				ctx.beginPath();
+				ctx.moveTo(x + r, y);
+				ctx.lineTo(x + w - r, y);
+				ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+				ctx.lineTo(x + w, y + h - r);
+				ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+				ctx.lineTo(x + r, y + h);
+				ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+				ctx.lineTo(x, y + r);
+				ctx.quadraticCurveTo(x, y, x + r, y);
+				ctx.closePath();
+			}
+
+			function drawGod() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				const floatY = Math.sin(t * 0.03) * 6;
+				ctx.save();
+				ctx.translate(canvas.width / 2, 220 + floatY);
+				/* 头位置 */
+				const headY = -85;
+				const haloY = headY - 60;
+				const haloWidth = 40;
+				const haloHeight = 10;
+				/* 呼吸亮度 */
+				let glow = 0.7 + Math.sin(haloPhase) * 0.25;
+				ctx.save();
+				ctx.rotate(Math.sin(haloPhase * 0.7) * 0.06);
+				/* 外层柔光 */
+				ctx.beginPath();
+				ctx.ellipse(0, haloY, haloWidth + 6, haloHeight + 4, 0, 0, Math.PI * 2);
+				ctx.fillStyle = "rgba(255,220,120," + (0.15 + glow * 0.2) + ")";
+				ctx.fill();
+
+				/* 主光环（细环） */
+				ctx.beginPath();
+				ctx.ellipse(0, haloY, haloWidth, haloHeight, 0, 0, Math.PI * 2);
+				ctx.lineWidth = 3;
+				ctx.strokeStyle = "rgba(255,215,120," + glow + ")";
+				ctx.shadowColor = "gold";
+				ctx.shadowBlur = 15 + glow * 10;
+				ctx.stroke();
+
+				/* 内侧高光 */
+				ctx.beginPath();
+				ctx.ellipse(0, haloY - 1, haloWidth - 6, haloHeight - 3, 0, 0, Math.PI);
+				ctx.lineWidth = 1.5;
+				ctx.strokeStyle = "rgba(255,255,230,0.8)";
+				ctx.stroke();
+
+				ctx.shadowBlur = 0;
+				ctx.restore();
+				/* 头位置 */
+
+				/* 头发 */
+				ctx.fillStyle = "#ffffff";
+				ctx.beginPath();
+				ctx.arc(0, headY - 10, 32, Math.PI, 0); // 上半圆头发
+				ctx.fill();
+
+				/* 侧边头发 */
+				ctx.beginPath();
+				ctx.arc(-22, headY - 2, 12, Math.PI / 2, Math.PI * 1.5);
+				ctx.arc(22, headY - 2, 12, -Math.PI / 2, Math.PI / 2);
+				ctx.fill();
+
+				/* 头 */
+				ctx.beginPath();
+				ctx.arc(0, headY, 28, 0, Math.PI * 2);
+				ctx.fillStyle = "#ffe0a0";
+				ctx.fill();
+				ctx.strokeStyle = "#fff";
+				ctx.lineWidth = 3;
+				ctx.stroke();
+
+				/* 眼睛 */
+				ctx.fillStyle = "#000";
+				let eyeHeight = blinking ? 1 : 3;
+
+				ctx.beginPath();
+				ctx.ellipse(-10, headY - 5, 3, eyeHeight, 0, 0, Math.PI * 2);
+				ctx.ellipse(10, headY - 5, 3, eyeHeight, 0, 0, Math.PI * 2);
+				ctx.fill();
+
+				/* 身体衣服（白色圆角矩形） */
+				ctx.fillStyle = "#eee";
+				ctx.strokeStyle = "#eee";
+				ctx.lineWidth = 2;
+
+				roundRect(ctx, -40, -50, 80, 130, 20);
+				ctx.fill();
+				ctx.stroke();
+
+				/* 手臂 */
+				const armSwing = Math.sin(t * 0.08) * 12;
+
+				ctx.strokeStyle = "#ffe0a0";
+				ctx.lineWidth = 12;
+				ctx.lineCap = "round";
+
+				ctx.beginPath();
+				ctx.moveTo(-40, -30);
+				ctx.lineTo(-70 - armSwing, -10);
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.moveTo(40, -30);
+				ctx.lineTo(70 + armSwing, -10);
+				ctx.stroke();
+
+				/* 腿 */
+				ctx.lineWidth = 14;
+
+				ctx.beginPath();
+				ctx.moveTo(-15, 80);
+				ctx.lineTo(-15, 120);
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.moveTo(15, 80);
+				ctx.lineTo(15, 120);
+				ctx.stroke();
+
+				ctx.restore();
+				blinkTimer++;
+				if (!blinking && blinkTimer >= blinkInterval) {
+					blinking = true;
+					blinkTimer = 0;
+				}
+				if (blinking && blinkTimer >= blinkDuration) {
+					blinking = false;
+					blinkTimer = 0;
+				}
+				t++;
+				haloPhase += 0.05;
+				requestAnimationFrame(drawGod);
+			}
+			drawGod();
+			const defaultAnswers = [
+				"你有什么疑惑吗？",
+				"上帝在关注你的问题。",
+				"思考后再提问，我在聆听。",
+				"每一个疑问都是通往智慧的道路。",
+				"向我提出你的问题吧。",
+				"你在想什么？",
+				"我能看见你的思考，慢慢说吧。",
+				"每个问题都有它独特的意义。",
+				"选择困难症？找我吧。",
+				"May God bless you. ✝"
+			];
+			window.onload = function() {
+				const ansDiv = document.getElementById("answer");
+				const randIndex = Math.floor(Math.random() * defaultAnswers.length);
+				ansDiv.textContent = defaultAnswers[randIndex];
+			};
+		</script>
+	</body>
+</html>

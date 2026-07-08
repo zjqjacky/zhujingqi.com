@@ -1,0 +1,204 @@
+body {
+	margin: 0px;
+	background-color: #161616;
+	color: #ebebeb;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:link {
+	color: #fffab2;
+}
+
+a:visited {
+	color: #fffab2;
+}
+
+a:hover {
+	color: #ffd362;
+	text-decoration: underline;
+}
+
+a:active {
+	color: orangered;
+	text-decoration: underline wavy;
+}
+
+.text {
+	background-color: #262626;
+	color: #efefef;
+	border-radius: 20px;
+	padding: 20px;
+	margin: 10px;
+	transition: 0.2s;
+}
+
+.text:hover {
+	background-color: #2f2f2f;
+	transition: 0.2s;
+}
+
+*::selection {
+	background-color: #cbcbcb;
+	color: #000000;
+}
+
+.card {
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+	transition: 0.3s;
+	overflow: hidden;
+	border-radius: 20px;
+	background-color: #262626;
+	color: #efefef;
+	margin: 10px;
+	padding: 20px;
+	animation: appear 1s ease-in-out;
+}
+
+.card:hover {
+	box-shadow: 2px 8px 16px 2px rgba(255, 255, 255, 0.2);
+}
+
+.scroll-container {
+	position: absolute;
+	left: 50%;
+	background-color: #262626;
+	color: #efefef;
+	border-radius: 20px;
+	padding: 20px;
+	transition: 0.2s;
+	width: 45%;
+	height: 80px;
+	overflow: hidden;
+	border-radius: 20px;
+}
+
+.scroll-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	animation: scroll-up 8s linear infinite;
+}
+
+.scroll-list li {
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.scroll-list a {
+	color: #feffac;
+}
+
+.social-icons {
+    display: flex;
+    gap: 5px;
+}
+
+.social-icons a {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.social-icons img {
+    width: 24px;
+    height: 24px;
+    filter: invert(70%);
+}
+
+.social-icons a:hover {
+    transform: scale(1.2);
+}
+
+.msg {
+	position: fixed;
+	right: 20px;
+	top: 60px;
+	border-radius: 30px;
+	background-color: #f3f3f3;
+	color: #000000;
+	border: 5px solid #00aaff;
+	padding: 5px 20px 5px 20px;
+	z-index: 999;
+	animation: slide 1s ease-in-out;
+}
+
+@keyframes slide {
+	0% {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+
+	80% {
+		transform: translateX(-20px);
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+.msgclosebtn {
+	font-size: 20px;
+	color: #000000;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.msgclosebtn:hover {
+	color: #ff0000;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.bottom {
+    background-color: #262626;
+    color: #999999;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.bottom a {
+    color: #999999;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.bottom a:hover {
+    color: #aaaaaa;
+}
+
+/*以下为未改动内容*/
+.bar {
+	overflow: hidden;
+	background-color: #b7f1d9;
+	font-size: 20px;
+	transition: 0.2s;
+}
+
+.bar a {
+	float: left;
+	display: block;
+	color: #000;
+	text-align: center;
+	padding: 15px 20px;
+	text-decoration: none;
+	transition: 0.2s;
+}
+
+.bar a:hover {
+	background-color: #c2ffe6;
+	color: black;
+	transition: 0.2s;
+}
+
+.zjq {
+	background-color: #ffe93e;
+}
