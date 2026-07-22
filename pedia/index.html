@@ -1,0 +1,6793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<title>Jackypedia - Zhujingqi</title>
+		<link rel="icon" type="image/svg+xml" href="icon.svg">
+		<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="icon.png">
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js">
+		</script>
+		<style>
+			:root {
+				--bg: #fff;
+				--bg2: #f5f5f7;
+				--bg3: #e8e8ed;
+				--text: #1d1d1f;
+				--text2: #86868b;
+				--text3: #aeaeb2;
+				--border: #d2d2d7;
+				--accent: #FF9500;
+				--accent2: #E68700;
+				--accent3: #FFF3E0;
+				--red: #ff3b30;
+				--orange: #ff9500;
+				--green: #34c759;
+				--shadow-sm: 0 1px 3px rgba(0, 0, 0, .04);
+				--shadow: 0 2px 20px rgba(0, 0, 0, .08);
+				--shadow-lg: 0 8px 40px rgba(0, 0, 0, .12);
+				--radius-sm: 20px;
+				--radius: 20px;
+				--radius-lg: 20px;
+				--nav-h: 60px;
+				--font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+				--mono: "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+				--max-w: 1100px;
+			}
+
+			@media(prefers-color-scheme:dark) {
+				:root {
+					--bg: #000;
+					--bg2: #1c1c1e;
+					--bg3: #2c2c2e;
+					--text: #d1d1d6;
+					--text2: #6e6e73;
+					--text3: #48484a;
+					--border: #38383a;
+					--accent: #CC7700;
+					--accent2: #B36600;
+					--accent3: #1a2a3e;
+					--shadow-sm: 0 1px 3px rgba(0, 0, 0, .2);
+					--shadow: 0 2px 20px rgba(0, 0, 0, .4);
+					--shadow-lg: 0 8px 40px rgba(0, 0, 0, .6)
+				}
+			}
+
+			body.dark {
+				--bg: #000;
+				--bg2: #1c1c1e;
+				--bg3: #2c2c2e;
+				--text: #d1d1d6;
+				--text2: #6e6e73;
+				--text3: #48484a;
+				--border: #38383a;
+				--accent: #CC7700;
+				--accent2: #B36600;
+				--accent3: #1a2a3e;
+				--shadow-sm: 0 1px 3px rgba(0, 0, 0, .2);
+				--shadow: 0 2px 20px rgba(0, 0, 0, .4);
+				--shadow-lg: 0 8px 40px rgba(0, 0, 0, .6)
+			}
+
+			body.dark nav {
+				background: rgba(0, 0, 0, .8)
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box
+			}
+
+			html,
+			body {
+				height: 100%
+			}
+
+			body {
+				font-family: var(--font);
+				background: var(--bg);
+				color: var(--text);
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				line-height: 1.6;
+				overflow: hidden;
+				user-select: none;
+				-webkit-user-select: none
+			}
+
+			input,
+			textarea,
+			button,
+			select {
+				font-family: var(--font);
+				outline: none
+			}
+
+			input,
+			textarea,
+			[contenteditable] {
+				user-select: text;
+				-webkit-user-select: text
+			}
+
+			a {
+				color: var(--accent);
+				text-decoration: none
+			}
+
+			a:hover {
+				text-decoration: underline
+			}
+
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px
+			}
+
+			::-webkit-scrollbar-track {
+				background: transparent
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--text3);
+				border-radius: 20px
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--text2)
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(12px)
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0)
+				}
+			}
+
+			@keyframes fadeInUp {
+				from {
+					opacity: 0;
+					transform: translateY(24px)
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0)
+				}
+			}
+
+			@keyframes scaleIn {
+				from {
+					opacity: 0;
+					transform: scale(.95)
+				}
+
+				to {
+					opacity: 1;
+					transform: scale(1)
+				}
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg)
+				}
+			}
+
+			.anim-fade {
+				animation: fadeIn .4s ease
+			}
+
+			.anim-fade-up {
+				animation: fadeInUp .6s ease
+			}
+
+			.loading-overlay {
+				display: none;
+				position: fixed;
+				inset: 0;
+				z-index: 400;
+				background: rgba(0, 0, 0, .3);
+				backdrop-filter: blur(8px);
+				align-items: center;
+				justify-content: center
+			}
+
+			.loading-overlay.active {
+				display: flex
+			}
+
+			.loading-spinner {
+				width: 36px;
+				height: 36px;
+				border: 2.5px solid var(--bg3);
+				border-top-color: var(--accent);
+				border-radius: 50%;
+				animation: spin .8s linear infinite
+			}
+
+			.loading-text {
+				margin-top: 10px;
+				font-size: 13px;
+				color: var(--text2);
+				font-weight: 500
+			}
+
+			nav {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: var(--nav-h);
+				z-index: 100;
+				background: rgba(255, 255, 255, .8);
+				backdrop-filter: blur(30px) saturate(1.4);
+				-webkit-backdrop-filter: blur(30px) saturate(1.4);
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				padding: 0 24px;
+				gap: 8px
+			}
+
+			@media(prefers-color-scheme:dark) {
+				nav {
+					background: rgba(0, 0, 0, .8)
+				}
+			}
+
+			.nav-scroll {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				width: 100%;
+				max-width: var(--max-w);
+				margin: 0 auto
+			}
+
+			.nav-logo {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+				flex-shrink: 0;
+				font-size: 16px;
+				font-weight: 700;
+				letter-spacing: -.2px;
+				height: 30px;
+				border: 0;
+				background: transparent;
+				color: var(--text);
+				font-family: var(--font);
+				padding: 0
+			}
+
+			.nav-link {
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--text2);
+				cursor: pointer;
+				padding: 6px 10px;
+				border-radius: 20px;
+				transition: all .2s;
+				white-space: nowrap;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				background: transparent;
+				border: 0;
+				font-family: var(--font)
+			}
+
+			.nav-link:hover {
+				color: var(--text);
+				background: var(--bg2)
+			}
+
+			.nav-link.active {
+				color: var(--accent);
+				background: var(--accent3)
+			}
+
+			.nav-search {
+				flex: 1;
+				max-width: 320px;
+				margin: 0 12px;
+				display: flex;
+				align-items: center
+			}
+
+			.nav-search input {
+				flex: 1;
+				height: 34px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 13px;
+				transition: all .25s
+			}
+
+			.nav-search input:focus {
+				border-color: var(--accent);
+				box-shadow: 0 0 0 3px rgba(255, 149, 0, .1);
+				background: var(--bg)
+			}
+
+			.nav-search input::placeholder {
+				color: var(--text3)
+			}
+
+			.nav-search-btn {
+				height: 30px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg);
+				color: var(--text2);
+				font-size: 12px;
+				cursor: pointer;
+				margin-left: 6px;
+				transition: all .2s;
+				font-family: var(--font);
+				flex-shrink: 0;
+				white-space: nowrap;
+				font-weight: 500
+			}
+
+			.nav-search-btn:hover {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent)
+			}
+
+			.nav-right {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0
+			}
+
+			.nav-btn {
+				height: 30px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: transparent;
+				color: var(--text);
+				font-size: 12px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				white-space: nowrap;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				font-family: var(--font)
+			}
+
+			.nav-btn:hover {
+				background: var(--bg2);
+				border-color: var(--text3)
+			}
+
+			.nav-btn.primary {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent)
+			}
+
+			.nav-btn.primary:hover {
+				background: var(--accent2)
+			}
+
+			.user-btn {
+				height: 30px;
+				padding: 0 8px 0 4px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: transparent;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				transition: all .2s
+			}
+
+			.user-btn:hover {
+				background: var(--bg2)
+			}
+
+			.user-avatar-wrap {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				overflow: hidden;
+				flex-shrink: 0;
+				background: var(--bg2);
+				display: flex;
+				align-items: center;
+				justify-content: center
+			}
+
+			.user-avatar-wrap img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block
+			}
+
+			.user-avatar-wrap .av-initial {
+				font-size: 12px;
+				font-weight: 600;
+				color: var(--text2);
+				line-height: 22px
+			}
+
+			.user-name {
+				font-size: 12px;
+				font-weight: 500;
+				color: var(--text);
+				max-width: 80px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap
+			}
+
+			.user-link {
+				color: var(--orange);
+				cursor: pointer;
+				font-weight: 500;
+				transition: opacity .2s
+			}
+
+			.user-link:hover {
+				opacity: .7;
+				text-decoration: underline
+			}
+
+			.screen {
+				display: none;
+				height: 100vh;
+				padding-top: var(--nav-h)
+			}
+
+			.screen.active {
+				display: flex;
+				flex-direction: column
+			}
+
+			#welcomeScreen {
+				overflow-y: auto
+			}
+
+			.welcome-wrap {
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%;
+				padding: 0 24px
+			}
+
+			.hero-section {
+				padding: 48px 0 32px;
+				text-align: center
+			}
+
+			.hero-row {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 24px;
+				margin-bottom: 6px
+			}
+
+			.hero-side {
+				flex: 0 0 180px;
+				font-size: 11px;
+				color: var(--text3);
+				line-height: 1.5;
+				text-align: left
+			}
+
+			.hero-right {
+				text-align: right
+			}
+
+			.hero-announce {
+				margin-bottom: 2px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical
+			}
+
+			.hero-stats span {
+				display: inline;
+				margin-right: 8px
+			}
+
+			.hero-btn {
+				height: 28px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: transparent;
+				color: var(--text3);
+				font-size: 11px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				font-family: var(--font)
+			}
+
+			.hero-btn:hover {
+				color: var(--accent);
+				border-color: var(--accent)
+			}
+
+			.hero-title {
+				font-size: 80px;
+				font-weight: 800;
+				letter-spacing: -3px;
+				line-height: 1.0;
+				color: var(--text)
+			}
+
+			.hero-sub {
+				font-size: 28px;
+				font-weight: 500;
+				color: var(--text2);
+				margin-bottom: 4px
+			}
+
+			.hero-icon {
+				width: 80px;
+				height: 80px;
+				display: block;
+				margin: 0 auto 8px;
+				filter: drop-shadow(0 4px 20px rgba(255, 149, 0, .25))
+			}
+
+			.hero-slogan {
+				font-size: 16px;
+				font-weight: 500;
+				color: var(--accent);
+				letter-spacing: 1px;
+				margin-top: 12px
+			}
+
+			.hero-slogan::before,
+			.hero-slogan::after {
+				content: '';
+				display: inline-block;
+				width: 40px;
+				height: 1px;
+				background: var(--border);
+				vertical-align: middle;
+				margin: 0 16px
+			}
+
+			.section {
+				margin-bottom: 40px
+			}
+
+			.section-header {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 16px;
+				font-size: 18px;
+				font-weight: 600
+			}
+
+			.section-header .sec-count {
+				font-size: 12px;
+				font-weight: 400;
+				color: var(--text2);
+				margin-left: auto
+			}
+
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 10px
+			}
+
+			.card {
+				padding: 16px;
+				border-radius: var(--radius);
+				border: 1px solid var(--border);
+				cursor: pointer;
+				transition: all .25s ease;
+				background: var(--bg)
+			}
+
+			.card:hover {
+				border-color: var(--accent);
+				box-shadow: var(--shadow);
+				transform: translateY(-2px)
+			}
+
+			.card h3 {
+				font-size: 14px;
+				font-weight: 600;
+				margin-bottom: 3px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap
+			}
+
+			.card p {
+				font-size: 12px;
+				color: var(--text2)
+			}
+
+			.card .card-meta {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-top: 6px;
+				font-size: 11px;
+				color: var(--text3)
+			}
+
+
+			#allScreen {
+				overflow-y: auto
+			}
+
+			.all-header {
+				padding: 24px 24px 8px;
+				font-size: 18px;
+				font-weight: 600;
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%
+			}
+
+			.sort-bar {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 0 24px 12px;
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%;
+				flex-wrap: wrap
+			}
+
+			.sort-lbl {
+				font-size: 12px;
+				color: var(--text3);
+				font-weight: 500;
+				margin-right: 4px
+			}
+
+			.sort-btn {
+				height: 28px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg);
+				color: var(--text2);
+				font-size: 11px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				font-family: var(--font)
+			}
+
+			.sort-btn:hover {
+				background: var(--bg2);
+				color: var(--text)
+			}
+
+			.sort-btn.active {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent)
+			}
+
+			.all-grid {
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%;
+				padding: 0 24px 80px;
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+				gap: 10px
+			}
+
+			/* ─── Tags ─── */
+			.tag {
+				padding: 2px 10px;
+				border-radius: 20px;
+				border: 1px solid var(--accent);
+				color: var(--accent);
+				font-size: 11px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				background: transparent;
+				display: inline-block;
+				white-space: nowrap
+			}
+
+			.tag:hover {
+				background: var(--accent);
+				color: #fff
+			}
+
+			.tag.active {
+				background: var(--accent);
+				color: #fff
+			}
+
+			.page-tags {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+				margin-bottom: 14px
+			}
+
+			.tag-bar {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+				align-items: center
+			}
+
+			.tag-bar .tag-lbl {
+				font-size: 11px;
+				color: var(--text3);
+				font-weight: 500;
+				margin-right: 2px
+			}
+
+			.all-tags {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+				padding: 0 24px 10px;
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%
+			}
+
+			.tag-input-wrap {
+				display: flex;
+				gap: 4px;
+				margin-top: 6px
+			}
+
+			.tag-input-wrap input {
+				flex: 1;
+				height: 28px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 11px;
+				min-width: 80px
+			}
+
+			.tag-input-wrap input:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.tag-input-wrap button {
+				height: 28px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 11px;
+				cursor: pointer;
+				font-family: var(--font);
+				white-space: nowrap
+			}
+
+			.tag-sel {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+				margin-top: 6px
+			}
+
+			.tag-sel .tag {
+				cursor: pointer;
+				font-size: 11px;
+				padding: 2px 8px
+			}
+
+			.tag-sel .tag.selected {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent)
+			}
+
+			.edit-tags {
+				padding: 6px 16px;
+				border-bottom: 1px solid var(--border);
+				background: var(--bg);
+				flex-shrink: 0;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 6px
+			}
+
+			.tag-hdr {
+				font-size: 11px;
+				color: var(--text3);
+				font-weight: 500;
+				margin-right: 2px;
+				white-space: nowrap
+			}
+
+			/* ─── Page View + Comments ─── */
+			#pageScreen {
+				overflow-y: auto
+			}
+
+			.page-wrap {
+				max-width: 720px;
+				margin: 0 auto;
+				padding: 32px 24px 80px;
+				width: 100%
+			}
+
+			.page-title {
+				font-size: 40px;
+				font-weight: 700;
+				letter-spacing: -.5px;
+				line-height: 1.15;
+				margin-bottom: 4px
+			}
+
+			.page-meta {
+				color: var(--text2);
+				font-size: 13px;
+				margin-bottom: 20px;
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				align-items: center
+			}
+
+			.page-meta .dot {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: var(--text3);
+				display: inline-block;
+				margin: 0 2px
+			}
+
+			.page-actions {
+				display: flex;
+				gap: 6px;
+				margin-bottom: 24px
+			}
+
+			.page-actions button {
+				height: 30px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg);
+				color: var(--text);
+				font-size: 12px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				display: flex;
+				align-items: center;
+				gap: 4px
+			}
+
+			.page-actions button:hover {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent)
+			}
+
+			.page-actions button.danger:hover {
+				background: var(--red);
+				border-color: var(--red)
+			}
+
+
+			#pageContent,
+			.comments-section,
+			.refs-section,
+			.refs-list {
+				user-select: text;
+				-webkit-user-select: text
+			}
+
+			#pageContent h1 {
+				font-size: 30px;
+				font-weight: 600;
+				margin: 32px 0 10px;
+				padding-bottom: 8px;
+				border-bottom: 1px solid var(--border);
+				letter-spacing: -.3px
+			}
+
+			#pageContent h2 {
+				font-size: 22px;
+				font-weight: 600;
+				margin: 24px 0 8px
+			}
+
+			#pageContent h3 {
+				font-size: 18px;
+				font-weight: 600;
+				margin: 20px 0 6px
+			}
+
+			#pageContent p {
+				margin-bottom: 16px
+			}
+
+			#pageContent ul,
+			#pageContent ol {
+				margin-bottom: 16px;
+				padding-left: 22px
+			}
+
+			#pageContent li {
+				margin-bottom: 4px
+			}
+
+			#pageContent code {
+				font-family: var(--mono);
+				font-size: 13px;
+				background: var(--bg2);
+				padding: 2px 8px;
+				border-radius: 20px
+			}
+
+			#pageContent pre {
+				background: var(--bg2);
+				padding: 16px 20px;
+				border-radius: 20px;
+				overflow-x: auto;
+				margin-bottom: 16px;
+				border: 1px solid var(--border)
+			}
+
+			#pageContent pre code {
+				background: none;
+				padding: 0;
+				border-radius: 0;
+				font-size: 13px
+			}
+
+			#pageContent blockquote {
+				border-left: 3px solid var(--accent);
+				padding: 8px 18px;
+				margin: 16px 0;
+				color: var(--text2);
+				background: var(--bg2);
+				border-radius: 0 20px 20px 0
+			}
+
+			#pageContent img {
+				max-width: 100%;
+				border-radius: 20px;
+				margin: 20px 0;
+				box-shadow: var(--shadow)
+			}
+
+			#pageContent table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 16px;
+				font-size: 14px
+			}
+
+			#pageContent th,
+			#pageContent td {
+				padding: 8px 12px;
+				border: 1px solid var(--border);
+				text-align: left
+			}
+
+			#pageContent th {
+				background: var(--bg2);
+				font-weight: 600
+			}
+
+			#pageContent tr:nth-child(even) {
+				background: var(--bg2)
+			}
+
+			#pageContent hr {
+				margin: 28px 0;
+				border: 0;
+				height: 1px;
+				background: var(--border)
+			}
+
+			/* ─── Comments ─── */
+			.comments-section {
+				margin-top: 48px;
+				padding-top: 32px;
+				border-top: 1px solid var(--border)
+			}
+
+			.comments-title {
+				font-size: 16px;
+				font-weight: 600;
+				margin-bottom: 16px;
+				display: flex;
+				align-items: center;
+				gap: 6px
+			}
+
+			.comment-form {
+				display: flex;
+				gap: 8px;
+				margin-bottom: 20px
+			}
+
+			.comment-form textarea {
+				flex: 1;
+				height: 42px;
+				padding: 10px 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 13px;
+				resize: none;
+				transition: border-color .2s;
+				line-height: 1.5
+			}
+
+			.comment-form textarea:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.comment-form textarea::placeholder {
+				color: var(--text3)
+			}
+
+			.comment-form button {
+				height: 42px;
+				padding: 0 18px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 13px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				white-space: nowrap;
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				gap: 4px
+			}
+
+			.comment-form button:hover {
+				background: var(--accent2)
+			}
+
+			.comment-item {
+				padding: 10px 0;
+				border-bottom: 1px solid var(--border);
+				animation: fadeIn .3s ease
+			}
+
+			.comment-item:last-child {
+				border-bottom: 0
+			}
+
+			.comment-hdr {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-bottom: 2px
+			}
+
+			.comment-av {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 10px;
+				font-weight: 600;
+				color: #fff;
+				overflow: hidden;
+				flex-shrink: 0
+			}
+
+			.comment-av img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover
+			}
+
+			.comment-author {
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--text)
+			}
+
+			.comment-time {
+				font-size: 11px;
+				color: var(--text3)
+			}
+
+			.comment-body {
+				font-size: 14px;
+				line-height: 1.6;
+				color: var(--text);
+				margin-left: 28px
+			}
+
+			.comment-actions {
+				display: flex;
+				gap: 8px;
+				margin-left: 28px;
+				margin-top: 3px
+			}
+
+			.comment-actions button {
+				cursor: pointer;
+				background: none;
+				border: 0;
+				padding: 2px 6px;
+				border-radius: 20px;
+				font-size: 11px;
+				color: var(--text3);
+				transition: all .2s;
+				font-family: var(--font)
+			}
+
+			.comment-actions button:hover {
+				background: var(--bg2);
+				color: var(--accent)
+			}
+
+			.comment-actions .del:hover {
+				color: var(--red);
+				background: var(--accent3)
+			}
+
+			.comment-reply-form {
+				margin: 6px 0 6px 28px;
+				display: none
+			}
+
+			.comment-reply-form.active {
+				display: flex;
+				gap: 6px
+			}
+
+			.comment-reply-form textarea {
+				flex: 1;
+				height: 34px;
+				padding: 6px 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 12px;
+				resize: none;
+				transition: border-color .2s;
+				line-height: 1.5;
+				font-family: var(--font)
+			}
+
+			.comment-reply-form textarea:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.comment-reply-form button {
+				height: 34px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 12px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				flex-shrink: 0;
+				font-family: var(--font)
+			}
+
+			.comment-reply-form button:hover {
+				background: var(--accent2)
+			}
+
+			.comment-nested {
+				margin-left: 28px;
+				border-left: 2px solid var(--border);
+				padding-left: 10px
+			}
+
+			.empty-comments {
+				padding: 24px 0;
+				text-align: center;
+				color: var(--text3);
+				font-size: 13px
+			}
+
+			/* ─── Editor ─── */
+			#editScreen {
+				flex-direction: column
+			}
+
+			.edit-top {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 16px;
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+				background: var(--bg);
+				flex-wrap: wrap
+			}
+
+			.edit-top .back-btn {
+				height: 30px;
+				width: 30px;
+				border-radius: 20px;
+				border: 0;
+				background: transparent;
+				color: var(--text);
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all .2s
+			}
+
+			.edit-top .back-btn:hover {
+				background: var(--bg2)
+			}
+
+			.edit-top .slug-in {
+				height: 30px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 12px;
+				font-family: var(--mono);
+				flex: 1;
+				min-width: 100px;
+				max-width: 240px;
+				transition: border-color .2s
+			}
+
+			.edit-top .slug-in:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.edit-top .slug-in.err {
+				border-color: var(--red)
+			}
+
+			.edit-top .title-in {
+				height: 30px;
+				padding: 0 10px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 13px;
+				font-weight: 500;
+				flex: 2;
+				min-width: 120px;
+				max-width: 280px;
+				transition: border-color .2s
+			}
+
+			.edit-top .title-in:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.edit-top label {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 12px;
+				color: var(--text2);
+				cursor: pointer;
+				white-space: nowrap
+			}
+
+			.edit-top label input[type="checkbox"] {
+				width: 14px;
+				height: 14px;
+				accent-color: var(--accent);
+				cursor: pointer
+			}
+
+			.edit-top .save-btn {
+				height: 30px;
+				padding: 0 16px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 12px;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all .2s;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				position: relative
+			}
+
+			.edit-top .save-btn:hover {
+				background: var(--accent2)
+			}
+
+			.edit-top .save-btn.loading .btn-txt {
+				visibility: hidden
+			}
+
+			.edit-top .save-btn.loading::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				margin: auto;
+				width: 16px;
+				height: 16px;
+				border: 2px solid rgba(255, 255, 255, .3);
+				border-top-color: #fff;
+				border-radius: 50%;
+				animation: spin .7s linear infinite
+			}
+
+			.toolbar {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				padding: 4px 10px;
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+				background: var(--bg2);
+				overflow-x: auto;
+				flex-wrap: wrap
+			}
+
+			.toolbar::-webkit-scrollbar {
+				height: 0
+			}
+
+			.tb-group {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				padding: 0 5px;
+				border-right: 1px solid var(--border)
+			}
+
+			.tb-group:last-child {
+				border-right: 0
+			}
+
+			.tb-btn {
+				height: 28px;
+				min-width: 28px;
+				padding: 0 5px;
+				border-radius: 20px;
+				border: 0;
+				background: transparent;
+				color: var(--text2);
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all .15s;
+				gap: 2px
+			}
+
+			.tb-btn:hover {
+				background: var(--bg3);
+				color: var(--text)
+			}
+
+			.tb-btn:active {
+				transform: scale(.93)
+			}
+
+			.tb-btn .lbl {
+				font-size: 10px;
+				font-weight: 700;
+				letter-spacing: -.3px
+			}
+
+			.editor-body {
+				display: flex;
+				flex: 1;
+				overflow: hidden
+			}
+
+			.editor-pane {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				position: relative;
+				min-width: 0
+			}
+
+			.editor-pane textarea {
+				flex: 1;
+				padding: 20px 22px;
+				border: 0;
+				resize: none;
+				outline: none;
+				font-family: var(--mono);
+				font-size: 13px;
+				line-height: 1.7;
+				background: var(--bg);
+				color: var(--text)
+			}
+
+			.editor-pane textarea::placeholder {
+				color: var(--text3)
+			}
+
+			.editor-pane .word-c {
+				position: absolute;
+				bottom: 8px;
+				right: 14px;
+				font-size: 11px;
+				color: var(--text3);
+				pointer-events: none
+			}
+
+			.preview-pane {
+				flex: 1;
+				overflow-y: auto;
+				padding: 20px 22px;
+				border-left: 1px solid var(--border);
+				background: var(--bg)
+			}
+
+			.preview-pane #mdPrev {
+				max-width: 600px;
+				font-size: 15px;
+				line-height: 1.75
+			}
+
+			.preview-pane #mdPrev h1 {
+				font-size: 26px;
+				font-weight: 600;
+				margin: 24px 0 8px
+			}
+
+			.preview-pane #mdPrev h2 {
+				font-size: 20px;
+				font-weight: 600;
+				margin: 18px 0 6px
+			}
+
+			.preview-pane #mdPrev h3 {
+				font-size: 17px;
+				font-weight: 600;
+				margin: 14px 0 4px
+			}
+
+			.preview-pane #mdPrev p {
+				margin-bottom: 12px
+			}
+
+			.preview-pane #mdPrev ul,
+			.preview-pane #mdPrev ol {
+				padding-left: 18px;
+				margin-bottom: 12px
+			}
+
+			.preview-pane #mdPrev code {
+				font-family: var(--mono);
+				font-size: 12px;
+				background: var(--bg2);
+				padding: 2px 6px;
+				border-radius: 20px
+			}
+
+			.preview-pane #mdPrev pre {
+				background: var(--bg2);
+				padding: 12px 16px;
+				border-radius: 20px;
+				overflow-x: auto;
+				margin-bottom: 12px;
+				border: 1px solid var(--border)
+			}
+
+			.preview-pane #mdPrev pre code {
+				background: none;
+				padding: 0
+			}
+
+			.preview-pane #mdPrev blockquote {
+				border-left: 3px solid var(--accent);
+				padding: 6px 14px;
+				margin: 12px 0;
+				color: var(--text2);
+				background: var(--bg2);
+				border-radius: 0 20px 20px 0
+			}
+
+			.preview-pane #mdPrev img {
+				max-width: 100%;
+				border-radius: 20px;
+				margin: 12px 0;
+				box-shadow: var(--shadow-sm)
+			}
+
+			.preview-pane #mdPrev table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 12px;
+				font-size: 13px
+			}
+
+			.preview-pane #mdPrev th,
+			.preview-pane #mdPrev td {
+				padding: 6px 10px;
+				border: 1px solid var(--border);
+				text-align: left
+			}
+
+			.preview-pane #mdPrev hr {
+				margin: 16px 0;
+				border: 0;
+				height: 1px;
+				background: var(--border)
+			}
+
+			#profileScreen {
+				overflow-y: auto
+			}
+
+			.profile-hdr {
+				display: flex;
+				align-items: center;
+				gap: 20px;
+				padding: 36px 24px 24px;
+				border-bottom: 1px solid var(--border);
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%
+			}
+
+			.profile-av {
+				width: 64px;
+				height: 64px;
+				border-radius: 50%;
+				overflow: hidden;
+				flex-shrink: 0;
+				background: var(--bg2);
+				display: flex;
+				align-items: center;
+				justify-content: center
+			}
+
+			.profile-av img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover
+			}
+
+			.profile-inf {
+				flex: 1
+			}
+
+			.profile-nm {
+				font-size: 22px;
+				font-weight: 600;
+				margin-bottom: 1px
+			}
+
+			.profile-jn {
+				font-size: 12px;
+				color: var(--text2)
+			}
+
+			.profile-stats {
+				display: flex;
+				gap: 16px;
+				margin-top: 8px
+			}
+
+			.profile-st {
+				text-align: center
+			}
+
+			.profile-st-n {
+				font-size: 18px;
+				font-weight: 600;
+				line-height: 1.2
+			}
+
+			.profile-st-l {
+				font-size: 10px;
+				color: var(--text2);
+				text-transform: uppercase;
+				letter-spacing: .4px
+			}
+
+			.profile-lst {
+				max-width: var(--max-w);
+				margin: 0 auto;
+				width: 100%;
+				padding: 12px 24px 80px
+			}
+
+			.profile-lst-t {
+				font-size: 12px;
+				font-weight: 600;
+				color: var(--text2);
+				text-transform: uppercase;
+				letter-spacing: .4px;
+				margin-bottom: 10px;
+				padding: 0 4px
+			}
+
+			.profile-it {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 12px;
+				border-radius: var(--radius);
+				transition: all .2s;
+				border: 1px solid transparent
+			}
+
+			.profile-it:hover {
+				background: var(--bg2);
+				border-color: var(--border)
+			}
+
+			.profile-it .it-inf {
+				flex: 1;
+				min-width: 0
+			}
+
+			.profile-it .it-t {
+				font-size: 13px;
+				font-weight: 500;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap
+			}
+
+			.profile-it .it-m {
+				font-size: 11px;
+				color: var(--text2);
+				margin-top: 1px
+			}
+
+			.profile-it .it-act {
+				display: flex;
+				gap: 4px;
+				flex-shrink: 0
+			}
+
+			.profile-it .it-act button {
+				height: 24px;
+				padding: 0 9px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg);
+				color: var(--text2);
+				font-size: 11px;
+				cursor: pointer;
+				transition: all .2s;
+				font-family: var(--font)
+			}
+
+			.profile-it .it-act button:hover {
+				background: var(--accent);
+				color: #fff;
+				border-color: var(--accent)
+			}
+
+			.profile-it .it-act button.del:hover {
+				background: var(--red);
+				border-color: var(--red)
+			}
+
+			.profile-desc {
+				font-size: 13px;
+				color: var(--text2);
+				margin: 4px 0 0;
+				line-height: 1.5;
+				padding: 4px 8px;
+				border-radius: 20px;
+				max-width: 500px
+			}
+
+			.profile-desc.empty {
+				color: var(--text3);
+				font-style: italic
+			}
+
+			#termsScreen {
+				overflow-y: auto
+			}
+
+			.terms-body h2 {
+				font-size: 16px;
+				font-weight: 600;
+				margin: 24px 0 8px
+			}
+
+			.terms-body p {
+				margin: 8px 0
+			}
+
+			.terms-body ul {
+				padding-left: 20px;
+				margin: 8px 0
+			}
+
+			.terms-body li {
+				margin: 4px 0
+			}
+
+			/* ─── Modal (Login + Confirm)  ─── */
+			.modal-overlay {
+				display: none;
+				position: fixed;
+				inset: 0;
+				z-index: 200;
+				background: rgba(0, 0, 0, .35);
+				backdrop-filter: blur(10px);
+				align-items: center;
+				justify-content: center
+			}
+
+			.modal-overlay.active {
+				display: flex
+			}
+
+			.modal-box {
+				background: var(--bg);
+				border-radius: var(--radius-lg);
+				padding: 28px;
+				width: 360px;
+				max-width: 90vw;
+				box-shadow: var(--shadow-lg)
+			}
+
+			.modal-box h2 {
+				font-size: 20px;
+				font-weight: 600;
+				margin-bottom: 18px;
+				text-align: center
+			}
+
+			.modal-box input {
+				width: 100%;
+				height: 40px;
+				padding: 0 14px;
+				margin-bottom: 8px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 14px;
+				transition: border-color .2s
+			}
+
+			.modal-box input:focus {
+				border-color: var(--accent)
+			}
+
+			.modal-box button {
+				width: 100%;
+				height: 40px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 13px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				margin-top: 2px;
+				font-family: var(--font)
+			}
+
+			.modal-box button:hover {
+				background: var(--accent2)
+			}
+
+			.modal-box button:disabled {
+				opacity: .5;
+				cursor: not-allowed
+			}
+
+			.modal-box .m-cancel {
+				background: transparent;
+				color: var(--text);
+				border: 1px solid var(--border);
+				margin-top: 6px
+			}
+
+			.modal-box .m-cancel:hover {
+				background: var(--bg2)
+			}
+
+			.modal-switch {
+				text-align: center;
+				margin-top: 10px;
+				font-size: 13px;
+				color: var(--text2);
+				cursor: pointer
+			}
+
+			.modal-switch:hover {
+				color: var(--accent)
+			}
+
+			.modal-err {
+				font-size: 12px;
+				text-align: center;
+				margin-bottom: 8px;
+				display: none;
+				padding: 8px;
+				background: var(--accent3);
+				border-radius: 20px;
+				color: var(--red)
+			}
+
+			.modal-msg {
+				font-size: 14px;
+				text-align: center;
+				margin-bottom: 16px;
+				line-height: 1.6;
+				color: var(--text);
+				padding: 4px 0
+			}
+
+			.modal-confirm-btns {
+				display: flex;
+				gap: 8px
+			}
+
+			.modal-confirm-btns button {
+				flex: 1;
+				margin-top: 0
+			}
+
+			.modal-confirm-btns .m-no {
+				background: transparent;
+				color: var(--text);
+				border: 1px solid var(--border)
+			}
+
+			.modal-confirm-btns .m-no:hover {
+				background: var(--bg2)
+			}
+
+			.empty {
+				text-align: center;
+				padding: 40px 20px;
+				color: var(--text2)
+			}
+
+			.empty h2 {
+				font-size: 20px;
+				font-weight: 600;
+				margin-bottom: 4px;
+				color: var(--text)
+			}
+
+			.empty p {
+				font-size: 13px
+			}
+
+			/* ─── Editor Tabs ─── */
+			.edit-tabs {
+				display: flex;
+				gap: 0;
+				border-bottom: 1px solid var(--border);
+				background: var(--bg2);
+				flex-shrink: 0;
+				padding: 0 10px
+			}
+
+			.edit-tab {
+				height: 34px;
+				padding: 0 14px;
+				border: 0;
+				background: transparent;
+				color: var(--text2);
+				font-size: 12px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all .2s;
+				font-family: var(--font);
+				border-bottom: 2px solid transparent;
+				margin-bottom: -1px
+			}
+
+			.edit-tab:hover {
+				color: var(--text);
+				background: var(--bg3);
+				border-radius: 20px 20px 0 0;
+				border-bottom-color: transparent
+			}
+
+			.edit-tab.active {
+				color: var(--accent);
+				border-bottom-color: var(--accent);
+				background: transparent
+			}
+
+			/* ─── Gallery Editor ─── */
+			.gal-edit {
+				display: none;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				padding: 12px 16px
+			}
+
+			.gal-edit.active {
+				display: flex
+			}
+
+			.gal-edit .gal-input-row {
+				display: flex;
+				gap: 6px;
+				margin-bottom: 8px;
+				flex-shrink: 0
+			}
+
+			.gal-edit .gal-input-row input {
+				flex: 1;
+				height: 34px;
+				padding: 0 12px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 12px
+			}
+
+			.gal-edit .gal-input-row input:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.gal-edit .gal-input-row button {
+				height: 34px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 12px;
+				cursor: pointer;
+				font-family: var(--font);
+				white-space: nowrap
+			}
+
+			.gal-edit .gal-list {
+				overflow-y: auto;
+				flex: 1;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				align-content: start;
+				padding: 4px
+			}
+
+			.gal-edit .gal-item {
+				width: calc(33.33% - 6px);
+				min-width: 160px;
+				border-radius: 20px;
+				overflow: hidden;
+				border: 1px solid var(--border);
+				position: relative;
+				aspect-ratio: 16/9;
+				background: var(--bg2)
+			}
+
+			.gal-edit .gal-item .gal-img-wrap {
+				position: absolute;
+				inset: 0
+			}
+
+			.gal-edit .gal-item .gal-img-wrap img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block
+			}
+
+			.gal-edit .gal-item .gal-del {
+				position: absolute;
+				top: 4px;
+				right: 4px;
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				border: 0;
+				background: rgba(0, 0, 0, .6);
+				color: #fff;
+				font-size: 14px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font);
+				transition: background .2s;
+				z-index: 1
+			}
+
+			.gal-edit .gal-item .gal-del:hover {
+				background: rgba(255, 0, 0, .8)
+			}
+
+			/* ─── References Editor ─── */
+			.ref-edit {
+				display: none;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				padding: 12px 16px
+			}
+
+			.ref-edit.active {
+				display: flex
+			}
+
+			.ref-edit .ref-input-row {
+				display: flex;
+				gap: 6px;
+				margin-bottom: 8px;
+				flex-shrink: 0
+			}
+
+			.ref-edit .ref-input-row input {
+				flex: 1;
+				height: 34px;
+				padding: 0 12px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 12px;
+				min-width: 0
+			}
+
+			.ref-edit .ref-input-row input:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.ref-edit .ref-input-row input:first-child {
+				flex: 0 0 200px
+			}
+
+			.ref-edit .ref-input-row button {
+				height: 34px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 0;
+				background: var(--accent);
+				color: #fff;
+				font-size: 12px;
+				cursor: pointer;
+				font-family: var(--font);
+				white-space: nowrap
+			}
+
+			.ref-edit .ref-list {
+				overflow-y: auto;
+				flex: 1
+			}
+
+			.ref-edit .ref-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 10px;
+				border-radius: 20px;
+				transition: background .2s
+			}
+
+			.ref-edit .ref-item:hover {
+				background: var(--bg2)
+			}
+
+			.ref-edit .ref-item .ref-num {
+				font-size: 11px;
+				color: var(--text3);
+				font-weight: 600;
+				min-width: 20px
+			}
+
+			.ref-edit .ref-item .ref-t {
+				font-size: 13px;
+				font-weight: 500;
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap
+			}
+
+			.ref-edit .ref-item .ref-u {
+				font-size: 11px;
+				color: var(--accent);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				max-width: 200px
+			}
+
+			.ref-edit .ref-item .ref-del {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				border: 0;
+				background: transparent;
+				color: var(--text3);
+				cursor: pointer;
+				font-size: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font);
+				transition: all .2s;
+				flex-shrink: 0
+			}
+
+			.ref-edit .ref-item .ref-del:hover {
+				background: var(--accent3);
+				color: var(--red)
+			}
+
+			/* ─── Mobile Hamburger & Menu ─── */
+			.nav-hamburger {
+				display: none;
+				width: 32px;
+				height: 32px;
+				border: 0;
+				background: transparent;
+				color: var(--text);
+				font-size: 20px;
+				cursor: pointer;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				border-radius: 20px;
+				transition: background .2s
+			}
+
+			.nav-hamburger:hover {
+				background: var(--bg2)
+			}
+
+			.mob-search-btn {
+				display: none
+			}
+
+			.mob-menu {
+				display: none;
+				position: fixed;
+				top: var(--nav-h);
+				left: 0;
+				right: 0;
+				z-index: 99;
+				background: var(--bg);
+				border-bottom: 1px solid var(--border);
+				padding: 8px 16px 12px;
+				box-shadow: var(--shadow);
+				animation: fadeIn .2s ease
+			}
+
+			.mob-menu.active {
+				display: block
+			}
+
+			.mob-link {
+				display: block;
+				width: 100%;
+				padding: 10px 12px;
+				border: 0;
+				background: transparent;
+				color: var(--text);
+				font-size: 15px;
+				font-weight: 500;
+				text-align: left;
+				cursor: pointer;
+				border-radius: 20px;
+				transition: background .2s;
+				font-family: var(--font)
+			}
+
+			.mob-link:hover {
+				background: var(--bg2)
+			}
+
+			.mob-divider {
+				height: 1px;
+				background: var(--border);
+				margin: 6px 0
+			}
+
+			#mobUserArea .mob-user-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 12px;
+				border-radius: 20px;
+				cursor: pointer;
+				transition: background .2s
+			}
+
+			#mobUserArea .mob-user-row:hover {
+				background: var(--bg2)
+			}
+
+			#mobUserArea .mob-user-av {
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				overflow: hidden;
+				flex-shrink: 0;
+				background: var(--bg2);
+				display: flex;
+				align-items: center;
+				justify-content: center
+			}
+
+			#mobUserArea .mob-user-av img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover
+			}
+
+			#mobUserArea .mob-user-av .av-init {
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--text2)
+			}
+
+			#mobUserArea .mob-user-nm {
+				font-size: 14px;
+				font-weight: 500;
+				color: var(--text)
+			}
+
+			#mobUserArea .mob-login-btn {
+				display: block;
+				width: 100%;
+				padding: 10px 12px;
+				border: 0;
+				background: transparent;
+				color: var(--accent);
+				font-size: 15px;
+				font-weight: 500;
+				text-align: left;
+				cursor: pointer;
+				border-radius: 20px;
+				transition: background .2s;
+				font-family: var(--font)
+			}
+
+			#mobUserArea .mob-login-btn:hover {
+				background: var(--bg2)
+			}
+
+			#mobUserArea .mob-logout-btn {
+				display: block;
+				width: 100%;
+				padding: 8px 12px;
+				border: 0;
+				background: transparent;
+				color: var(--red);
+				font-size: 14px;
+				font-weight: 500;
+				text-align: left;
+				cursor: pointer;
+				border-radius: 20px;
+				transition: background .2s;
+				font-family: var(--font)
+			}
+
+			#mobUserArea .mob-logout-btn:hover {
+				background: var(--accent3)
+			}
+
+			/* ─── Mobile Search Header ─── */
+			.search-hdr {
+				display: none;
+				padding: 12px 16px;
+				border-bottom: 1px solid var(--border);
+				gap: 8px;
+				align-items: center;
+				flex-shrink: 0
+			}
+
+			.search-hdr input {
+				flex: 1;
+				height: 40px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 14px;
+				transition: border-color .2s
+			}
+
+			.search-hdr input:focus {
+				border-color: var(--accent);
+				background: var(--bg)
+			}
+
+			.search-hdr input::placeholder {
+				color: var(--text3)
+			}
+
+			.search-scr-back {
+				height: 34px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg);
+				color: var(--text2);
+				font-size: 13px;
+				cursor: pointer;
+				transition: all .2s;
+				font-family: var(--font);
+				font-weight: 500;
+				white-space: nowrap
+			}
+
+			.search-scr-back:hover {
+				background: var(--bg2)
+			}
+
+			/* ─── Gallery Display (Fandom-style) ─── */
+			.gallery-section {
+				margin-top: 32px;
+				padding-top: 24px;
+				border-top: 1px solid var(--border)
+			}
+
+			.gallery-title {
+				font-size: 16px;
+				font-weight: 600;
+				margin-bottom: 12px;
+				display: flex;
+				align-items: center;
+				gap: 6px
+			}
+
+			.gallery-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 8px
+			}
+
+			.gallery-grid .gal-thumb {
+				border-radius: 20px;
+				overflow: hidden;
+				cursor: pointer;
+				aspect-ratio: 16/9;
+				background: var(--bg2);
+				border: 1px solid var(--border);
+				transition: all .25s ease;
+				position: relative
+			}
+
+			.gallery-grid .gal-thumb:hover {
+				border-color: var(--accent);
+				transform: scale(1.02);
+				box-shadow: var(--shadow)
+			}
+
+			.gallery-grid .gal-thumb img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block
+			}
+
+			/* ─── Lightbox ─── */
+			.lightbox {
+				display: none;
+				position: fixed;
+				inset: 0;
+				z-index: 500;
+				background: rgba(0, 0, 0, .9);
+				backdrop-filter: blur(12px);
+				align-items: center;
+				justify-content: center;
+				user-select: none
+			}
+
+			.lightbox.active {
+				display: flex
+			}
+
+			.lightbox .lb-close {
+				position: absolute;
+				top: 16px;
+				right: 16px;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: 0;
+				background: rgba(255, 255, 255, .1);
+				color: #fff;
+				font-size: 22px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background .2s;
+				z-index: 10;
+				font-family: var(--font)
+			}
+
+			.lightbox .lb-close:hover {
+				background: rgba(255, 255, 255, .2)
+			}
+
+			.lightbox .lb-nav {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 48px;
+				height: 48px;
+				border-radius: 50%;
+				border: 0;
+				background: rgba(255, 255, 255, .1);
+				color: #fff;
+				font-size: 24px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all .2s;
+				z-index: 10;
+				font-family: var(--font)
+			}
+
+			.lightbox .lb-nav:hover {
+				background: rgba(255, 255, 255, .25)
+			}
+
+			.lightbox .lb-prev {
+				left: 16px
+			}
+
+			.lightbox .lb-next {
+				right: 16px
+			}
+
+			.lightbox .lb-img-wrap {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 100%;
+				padding: 60px 70px;
+				overflow: hidden
+			}
+
+			.lightbox .lb-img-wrap img {
+				max-width: 100%;
+				max-height: 100%;
+				object-fit: contain;
+				transition: transform .2s ease;
+				cursor: grab
+			}
+
+			.lightbox .lb-img-wrap img:active {
+				cursor: grabbing
+			}
+
+			.lightbox .lb-counter {
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				color: rgba(255, 255, 255, .6);
+				font-size: 13px;
+				font-weight: 500
+			}
+
+			/* ─── References Display ─── */
+			.refs-section {
+				margin-top: 24px;
+				padding-top: 20px;
+				border-top: 1px solid var(--border)
+			}
+
+			.refs-title {
+				font-size: 14px;
+				font-weight: 600;
+				margin-bottom: 10px;
+				color: var(--text2)
+			}
+
+			.refs-list {
+				list-style: none;
+				padding: 0
+			}
+
+			.refs-list .ref-li {
+				margin-bottom: 6px;
+				font-size: 13px;
+				line-height: 1.5;
+				padding-left: 16px;
+				position: relative
+			}
+
+			.refs-list .ref-li::before {
+				content: '·';
+				position: absolute;
+				left: 0;
+				color: var(--accent);
+				font-weight: 700;
+				font-size: 16px
+			}
+
+			.refs-list a {
+				color: var(--accent);
+				word-break: break-all
+			}
+
+			.footer-copy {
+				text-align: center;
+				font-size: 11px;
+				color: var(--text3);
+				padding: 16px 24px 40px
+			}
+
+			.toast.show {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0)
+			}
+
+			/* ─── Search Dropdown ─── */
+			.nav-search {
+				position: relative
+			}
+
+			.search-dd {
+				display: none;
+				position: absolute;
+				top: calc(100% + 6px);
+				left: 0;
+				right: 0;
+				z-index: 200;
+				background: var(--bg);
+				border: 1px solid var(--border);
+				border-radius: 20px;
+				box-shadow: var(--shadow-lg);
+				padding: 8px 0;
+				overflow: hidden
+			}
+
+			.search-dd.show {
+				display: block
+			}
+
+			.sd-hint {
+				padding: 20px 16px;
+				text-align: center;
+				font-size: 13px;
+				color: var(--text3)
+			}
+
+			.sd-results {
+				max-height: 320px;
+				overflow-y: auto
+			}
+
+			.sd-results .sd-item {
+				padding: 10px 16px;
+				cursor: pointer;
+				transition: background .15s;
+				display: flex;
+				align-items: center;
+				gap: 10px
+			}
+
+			.sd-results .sd-item:hover {
+				background: var(--bg2)
+			}
+
+			.sd-results .sd-item .sd-t {
+				font-size: 13px;
+				font-weight: 500;
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap
+			}
+
+			.sd-results .sd-item .sd-s {
+				font-size: 11px;
+				color: var(--accent);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				max-width: 120px
+			}
+
+			.sd-results .sd-item .sd-o {
+				font-size: 11px;
+				color: var(--text3);
+				white-space: nowrap
+			}
+
+			.sd-divider {
+				height: 1px;
+				background: var(--border);
+				margin: 4px 0
+			}
+
+			.sd-footer {
+				padding: 8px 12px
+			}
+
+			.sd-row {
+				display: flex;
+				gap: 6px;
+				align-items: center
+			}
+
+			.sd-row select {
+				flex: 1;
+				height: 28px;
+				padding: 0 8px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: var(--bg2);
+				color: var(--text);
+				font-size: 11px;
+				font-weight: 500;
+				cursor: pointer;
+				font-family: var(--font);
+				appearance: none;
+				-webkit-appearance: none
+			}
+
+			/* ─── Leaderboard ─── */
+			#rankScreen {
+				overflow-y: auto
+			}
+
+			.rank-hdr {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 12px 16px;
+				border-bottom: 1px solid var(--border);
+				position: sticky;
+				top: 0;
+				background: var(--bg);
+				z-index: 10
+			}
+
+			.rank-hdr h2 {
+				font-size: 16px;
+				font-weight: 600;
+				flex: 1
+			}
+
+			.rank-table {
+				width: 100%;
+				border-collapse: collapse
+			}
+
+			.rank-table th {
+				position: sticky;
+				top: 48px;
+				background: var(--bg);
+				z-index: 9;
+				padding: 10px 12px;
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--text3);
+				text-align: left;
+				border-bottom: 1px solid var(--border);
+				white-space: nowrap
+			}
+
+			.rank-table th:last-child {
+				text-align: center
+			}
+
+			.rank-table td {
+				padding: 10px 12px;
+				border-bottom: 1px solid var(--border);
+				font-size: 13px;
+				vertical-align: middle
+			}
+
+			.rank-table tr:hover td {
+				background: var(--bg2)
+			}
+
+			.rank-table tr {
+				cursor: pointer;
+				transition: background .15s
+			}
+
+			.rank-num {
+				width: 24px;
+				height: 24px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				font-size: 11px;
+				font-weight: 600;
+				flex-shrink: 0
+			}
+
+			.rank-num.gold {
+				background: #ffd700;
+				color: #000
+			}
+
+			.rank-num.silver {
+				background: #c0c0c0;
+				color: #000
+			}
+
+			.rank-num.bronze {
+				background: #cd7f32;
+				color: #fff
+			}
+
+			.rank-num.norm {
+				background: var(--bg2);
+				color: var(--text2)
+			}
+
+			.rank-av {
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				overflow: hidden;
+				flex-shrink: 0;
+				background: var(--bg2);
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 11px;
+				color: var(--text2);
+				vertical-align: middle;
+				margin-right: 8px
+			}
+
+			.rank-av img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover
+			}
+
+			.rank-un {
+				font-weight: 500;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				max-width: 140px;
+				display: inline-block;
+				vertical-align: middle
+			}
+
+			.rank-stats {
+				text-align: center;
+				font-weight: 600;
+				font-variant-numeric: tabular-nums
+			}
+
+			.rank-join {
+				font-size: 11px;
+				color: var(--text3);
+				display: block;
+				margin-top: 1px
+			}
+
+			@media(max-width:900px) {
+				.hero-title {
+					font-size: 56px
+				}
+
+				.hero-sub {
+					font-size: 24px
+				}
+
+				.hero-slogan {
+					font-size: 14px
+				}
+
+				.hero-slogan::before,
+				.hero-slogan::after {
+					width: 20px;
+					margin: 0 10px
+				}
+
+				.nav-logo {
+					font-size: 14px;
+					flex-shrink: 0
+				}
+
+				.nav-search {
+					max-width: 180px
+				}
+
+				.nav-link .nav-lb {
+					font-size: 10px
+				}
+
+				.nav-link {
+					padding: 6px 6px
+				}
+			}
+
+			@media(max-width:640px) {
+				nav {
+					padding: 0 8px;
+					gap: 3px
+				}
+
+				.nav-hamburger {
+					display: flex
+				}
+
+				.mob-search-btn {
+					display: flex
+				}
+
+				.nav-link#allNavBtn,
+				.nav-link#createNavBtn {
+					display: none
+				}
+
+				.nav-search {
+					display: none
+				}
+
+				#darkBtn,
+				.nav-lang-select,
+				.nav-right {
+					display: none
+				}
+
+				.mob-menu {
+					display: none
+				}
+
+				.mob-menu.active {
+					display: block
+				}
+
+				.search-hdr {
+					display: flex
+				}
+
+				#searchScreen.screen.active .search-hdr {
+					display: flex
+				}
+
+				.nav-btn {
+					height: 26px;
+					padding: 0 8px;
+					font-size: 11px
+				}
+
+				.nav-link {
+					padding: 4px 5px
+				}
+
+				.nav-link .nav-lb {
+					font-size: 10px
+				}
+
+				.user-btn {
+					height: 26px;
+					padding: 0 4px 0 2px
+				}
+
+				.user-avatar-wrap {
+					width: 18px;
+					height: 18px
+				}
+
+				.user-name {
+					font-size: 11px;
+					max-width: 50px
+				}
+
+				.hero-title {
+					font-size: 38px;
+					letter-spacing: -1.5px;
+					font-weight: 800
+				}
+
+				.hero-sub {
+					font-size: 18px;
+					font-weight: 500
+				}
+
+				.hero-section {
+					padding: 28px 0 20px
+				}
+
+				.hero-row {
+					flex-direction: column;
+					gap: 8px
+				}
+
+				.hero-side {
+					flex: none;
+					text-align: center;
+					font-size: 10px
+				}
+
+				.hero-right {
+					text-align: center
+				}
+
+				.hero-announce {
+					-webkit-line-clamp: 1
+				}
+
+				.card-grid {
+					grid-template-columns: repeat(auto-fill, minmax(130px, 1fr))
+				}
+
+				.page-title {
+					font-size: 24px
+				}
+
+				.editor-body {
+					flex-direction: column
+				}
+
+				.preview-pane {
+					border-left: 0;
+					border-top: 1px solid var(--border);
+					flex: 0 0 40%
+				}
+
+				.all-grid {
+					grid-template-columns: 1fr
+				}
+
+				.profile-hdr {
+					flex-direction: column;
+					text-align: center;
+					padding: 20px 12px 12px
+				}
+
+				.profile-stats {
+					justify-content: center
+				}
+
+				.profile-lst {
+					padding: 8px 12px 80px
+				}
+
+				.comment-form {
+					flex-direction: column
+				}
+
+				.comment-form textarea {
+					height: 60px
+				}
+
+				.gal-edit .gal-item {
+					min-width: 120px
+				}
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="loading-overlay" id="loadingOverlay">
+			<div style="text-align:center">
+				<div class="loading-spinner"></div>
+				<div class="loading-text" id="loadingTxt">加载中...</div>
+			</div>
+		</div>
+
+		<nav>
+			<div class="nav-scroll">
+				<button class="nav-hamburger" id="hamburgerBtn" aria-label="菜单">☰</button>
+				<button class="nav-logo" id="logoBtn">Jackypedia</button>
+				<button class="nav-link" id="allNavBtn"><span class="nav-lb">所有百科</span></button>
+				<button class="nav-link" id="createNavBtn"><span class="nav-lb">创建百科</span></button>
+				<div class="nav-search" id="navSearchWrap">
+					<input id="qryInp" placeholder="搜索百科" autocomplete="off">
+					<button class="nav-search-btn" id="searchBtn">搜索</button>
+					<div class="search-dd" id="searchDD">
+						<div class="sd-body" id="sdBody">
+							<div class="sd-hint" id="sdHint">输入关键词搜索百科</div>
+							<div class="sd-results" id="sdResults"></div>
+							<div class="sd-footer" id="sdFooter">
+								<div class="sd-divider"></div>
+								<div class="sd-row">
+									<select id="sdSort"></select>
+									<select id="sdTag"></select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<button class="nav-link mob-search-btn" id="mobSearchBtn"><span class="nav-lb">搜索</span></button>
+				<select class="nav-btn nav-lang-select" id="langSelect"
+					style="height:30px;padding:0 8px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--font);appearance:none;-webkit-appearance:none;width:60px"></select>
+				<button class="nav-btn dark-toggle-btn" id="darkBtn" onclick="toggleDark()"
+					style="width:30px;padding:0;font-size:14px;display:flex;align-items:center;justify-content:center">☾</button>
+				<div class="nav-right" id="navRight"></div>
+			</div>
+		</nav>
+
+		<div class="mob-menu" id="mobMenu">
+			<button class="mob-link" id="mobAllBtn">所有百科</button>
+			<button class="mob-link" id="mobCreateBtn">创建百科</button>
+			<select id="mobLangSelect"
+				style="width:100%;padding:10px 12px;border:0;background:transparent;color:var(--text);font-size:15px;font-weight:500;cursor:pointer;border-radius:20px;font-family:var(--font);appearance:none;-webkit-appearance:none"></select>
+			<button class="mob-link dark-toggle-btn" onclick="toggleDark()" style="font-size:15px">☾ 深色模式</button>
+			<div class="mob-divider"></div>
+			<div id="mobUserArea"></div>
+		</div>
+
+		<div id="app">
+
+			<div id="welcomeScreen" class="screen active">
+				<div class="welcome-wrap">
+					<div class="hero-section">
+						<img class="hero-icon" src="icon.svg" alt="Jackypedia">
+						<div class="hero-row">
+							<div class="hero-side hero-left">
+								<div class="hero-announce" id="announceBody"></div>
+								<div class="hero-stats" id="statsBody"></div>
+							</div>
+							<div class="hero-title" id="heroTitle">Jackypedia</div>
+							<div class="hero-side hero-right">
+								<button class="hero-btn" id="randomBtn" onclick="randomPage()">随机百科</button>
+								<button class="hero-btn" id="rankBtn" onclick="showRank()">排行榜</button>
+								<button class="hero-btn" id="termsBtn" onclick="showTerms()">用户协议</button>
+							</div>
+						</div>
+						<div class="hero-sub" id="heroSub">杰基百科</div>
+						<div class="hero-slogan" id="heroSlogan"></div>
+					</div>
+					<div class="section">
+						<div class="section-header"><span id="hotSectionTitle">热门词条</span><span class="sec-count"
+								id="hotCount"></span></div>
+						<div class="card-grid" id="hotGrid"></div>
+					</div>
+					<div class="section">
+						<div class="section-header"><span id="newSectionTitle">最新词条</span><span class="sec-count"
+								id="newCount"></span></div>
+						<div class="card-grid" id="newGrid"></div>
+					</div>
+					<div class="footer-copy">© 2026 Jackypedia. All rights reserved.</div>
+				</div>
+			</div>
+
+			<div id="allScreen" class="screen">
+				<div class="all-header" id="allHeader">所有百科</div>
+				<div class="sort-bar" id="sortBar">
+					<span class="sort-lbl" id="sortLbl">排序</span>
+					<button class="sort-btn active" data-sort="timeD">时间↓</button>
+					<button class="sort-btn" data-sort="timeA">时间↑</button>
+					<button class="sort-btn" data-sort="alphaA">A-Z</button>
+					<button class="sort-btn" data-sort="alphaD">Z-A</button>
+				</div>
+				<div class="all-tags" id="allTags"></div>
+				<div class="all-grid" id="allGrid"></div>
+			</div>
+
+			<div id="pageScreen" class="screen">
+				<div class="page-wrap">
+					<div class="page-title" id="pageTitle"></div>
+					<div class="page-meta" id="pageMeta"></div>
+					<div class="page-tags" id="pageTags"></div>
+					<div class="page-actions" id="pageActions"></div>
+					<div id="pageContent"></div>
+					<div class="gallery-section" id="gallerySection" style="display:none">
+						<div class="gallery-title" id="galTitle">图片集</div>
+						<div class="gallery-grid" id="galleryGrid"></div>
+					</div>
+					<div class="refs-section" id="refsSection" style="display:none">
+						<div class="refs-title" id="refsTitle">参考资料</div>
+						<div class="refs-list" id="refsList"></div>
+					</div>
+					<div class="comments-section" id="commentsSection">
+						<div class="comments-title" id="commentsTitle">评论</div>
+						<div class="comment-form" id="commentForm">
+							<textarea id="commentInput" placeholder="写下你的评论..." rows="1"></textarea>
+							<button id="commentBtn">发送</button>
+						</div>
+						<div id="commentList"></div>
+					</div>
+				</div>
+			</div>
+
+			<div id="editScreen" class="screen">
+				<div class="edit-top">
+					<button class="back-btn" id="editBack">←</button>
+					<input class="title-in" id="editTitle" placeholder="百科名称" spellcheck="false">
+					<input class="slug-in" id="editSlug" placeholder="百科ID (如 my-article)" spellcheck="false">
+					<label><input type="checkbox" id="editOpen" checked> <span id="editOpenLabel">公开编辑</span></label>
+					<button class="save-btn" id="editSave"><span class="btn-txt" id="editSaveBtnTxt">保存</span></button>
+				</div>
+				<div class="edit-tags" id="editTags">
+					<span class="tag-hdr" id="tagHdr">标签</span>
+					<div class="tag-bar" id="tagPresets"></div>
+					<div class="tag-input-wrap"><input id="tagCustomInp" placeholder="自定义标签..." maxlength="10"><button
+							id="tagAddBtn">添加</button></div>
+					<div class="tag-sel" id="tagSel"></div>
+				</div>
+				<div class="edit-tabs" id="editTabs">
+					<button class="edit-tab active" data-etab="content">正文</button>
+					<button class="edit-tab" data-etab="refs">参考资料</button>
+					<button class="edit-tab" data-etab="gallery">图片集</button>
+				</div>
+				<!-- Content editor (default visible) -->
+				<div class="toolbar" id="toolbar">
+					<div class="tb-group">
+						<button class="tb-btn" data-cmd="bold" title="粗体"><span class="lbl">B</span></button>
+						<button class="tb-btn" data-cmd="italic" title="斜体"><span class="lbl">I</span></button>
+						<button class="tb-btn" data-cmd="strike" title="删除线"><span class="lbl">S</span></button>
+						<button class="tb-btn" data-cmd="u" title="下划线"><span class="lbl">U</span></button>
+					</div>
+					<div class="tb-group">
+						<button class="tb-btn" data-cmd="h1" title="标题1"><span class="lbl">H1</span></button>
+						<button class="tb-btn" data-cmd="h2" title="标题2"><span class="lbl">H2</span></button>
+						<button class="tb-btn" data-cmd="h3" title="标题3"><span class="lbl">H3</span></button>
+					</div>
+					<div class="tb-group">
+						<button class="tb-btn" data-cmd="link" title="链接"><span class="lbl">链接</span></button>
+						<button class="tb-btn" data-cmd="image" title="图片"><span class="lbl">图</span></button>
+					</div>
+					<div class="tb-group">
+						<button class="tb-btn" data-cmd="ul" title="无序列表"><span class="lbl">UL</span></button>
+						<button class="tb-btn" data-cmd="ol" title="有序列表"><span class="lbl">OL</span></button>
+					</div>
+					<div class="tb-group">
+						<button class="tb-btn" data-cmd="quote" title="引用"><span class="lbl">引用</span></button>
+						<button class="tb-btn" data-cmd="code" title="代码"><span class="lbl">&lt;/&gt;</span></button>
+						<button class="tb-btn" data-cmd="hr" title="分割线"><span class="lbl">—</span></button>
+					</div>
+				</div>
+				<div class="editor-body" id="editorBody">
+					<div class="editor-pane" id="contentPane"><textarea id="editTa"
+							placeholder="用 Markdown 写点什么..."></textarea>
+						<div class="word-c" id="wordC">0 字</div>
+					</div>
+					<div class="preview-pane" id="previewPane">
+						<div id="mdPrev">
+							<p style="color:var(--text3);margin:0">预览区域</p>
+						</div>
+					</div>
+				</div>
+				<!-- Gallery editor panel -->
+				<div class="gal-edit" id="galEdit">
+					<div class="gal-input-row">
+						<input id="galUrl" placeholder="输入图片 URL..." autocomplete="off">
+						<button id="galAddBtn">添加</button>
+					</div>
+					<div class="gal-list" id="galList"></div>
+				</div>
+				<!-- References editor panel -->
+				<div class="ref-edit" id="refEdit">
+					<div class="ref-input-row">
+						<input id="refTitle" placeholder="标题" autocomplete="off">
+						<input id="refUrl" placeholder="URL" autocomplete="off">
+						<button id="refAddBtn">添加</button>
+					</div>
+					<div class="ref-list" id="refList"></div>
+				</div>
+			</div>
+
+			<div id="profileScreen" class="screen">
+				<div class="profile-hdr">
+					<div class="profile-av" id="profileAv"></div>
+					<div class="profile-inf">
+						<div class="profile-nm" id="profileNm"></div>
+						<div class="profile-jn" id="profileJn"></div>
+						<div class="profile-stats">
+							<div class="profile-st">
+								<div class="profile-st-n" id="stPages">0</div>
+								<div class="profile-st-l" id="stPagesLbl">词条</div>
+							</div>
+							<div class="profile-st">
+								<div class="profile-st-n" id="stPub">0</div>
+								<div class="profile-st-l" id="stPubLbl">公开</div>
+							</div>
+							<div class="profile-st">
+								<div class="profile-st-n" id="stPri">0</div>
+								<div class="profile-st-l" id="stPriLbl">私有</div>
+							</div>
+						</div>
+						<div class="profile-desc" id="profileDesc"></div>
+					</div>
+				</div>
+				<div class="profile-lst" id="profileLst"></div>
+			</div>
+
+			<div id="searchScreen" class="screen">
+				<div class="search-hdr" id="searchHdr">
+					<input id="searchScrInp" placeholder="搜索百科" autocomplete="off">
+					<button class="search-scr-back" id="searchScrBack">返回</button>
+				</div>
+				<div class="welcome-wrap" id="searchRes" style="padding-bottom:80px"></div>
+			</div>
+
+			<div id="rankScreen" class="screen">
+				<div class="rank-hdr">
+					<h2 id="rankTitle">贡献排行榜</h2>
+					<button class="search-scr-back" id="rankBack">返回</button>
+				</div>
+				<div class="welcome-wrap" id="rankBody" style="padding-bottom:80px"></div>
+			</div>
+
+			<div id="termsScreen" class="screen">
+				<div class="rank-hdr">
+					<h2 id="termsTitle">用户协议</h2>
+					<button class="search-scr-back" id="termsBack">返回</button>
+				</div>
+				<div class="welcome-wrap" id="termsBody" style="padding-bottom:80px"></div>
+			</div>
+
+		</div>
+
+		<!-- Login Modal -->
+		<div class="modal-overlay" id="loginModal">
+			<div class="modal-box anim-scale">
+				<h2 id="modalTitle">登录 Jacky 账号</h2>
+				<div class="modal-err" id="modalErr"></div>
+				<input id="loginUser" placeholder="用户名" autocomplete="username">
+				<input id="loginPass" type="password" placeholder="密码" autocomplete="current-password">
+				<input id="regUser" placeholder="用户名" autocomplete="username" style="display:none">
+				<input id="regPass" type="password" placeholder="密码" autocomplete="new-password" style="display:none">
+				<input id="regPass2" type="password" placeholder="再次输入密码" style="display:none">
+				<button id="modalBtn">登录</button>
+				<div class="modal-switch" id="modalSwitch">没有账号？点击注册</div>
+				<button class="m-cancel" id="modalCancel">取消</button>
+			</div>
+		</div>
+
+		<!-- Confirm Modal -->
+		<div class="modal-overlay" id="confirmModal">
+			<div class="modal-box anim-scale">
+				<h2 id="confirmTitle">确认</h2>
+				<div class="modal-msg" id="confirmMsg"></div>
+				<div class="modal-confirm-btns">
+					<button class="m-no" id="confirmNo">取消</button>
+					<button id="confirmYes">确定</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="lightbox" id="lightbox">
+			<button class="lb-close" id="lbClose">✕</button>
+			<button class="lb-nav lb-prev" id="lbPrev">‹</button>
+			<button class="lb-nav lb-next" id="lbNext">›</button>
+			<div class="lb-img-wrap" id="lbImgWrap"><img id="lbImg" src="" alt=""></div>
+			<div class="lb-counter" id="lbCounter"></div>
+		</div>
+
+		<div class="toast" id="toast"></div>
+
+		<script>
+			/* ══════════════════════════════════════════════════════════════╗   Jackypedia
+   ══════════════════════════════════════════════════════════════╝*/
+			const DB_R = 'https://textdb.online/';
+			const DB_W = 'https://api.textdb.online/update/';
+			const K = {
+				rankCache: 'zhujingqi_pedia_rank_cache'
+			};
+			const API_BASE = 'https://hxlhrrllhvvazyhiuhvb.supabase.co/functions/v1';
+			const SUPA_KEY = 'sb_publishable_uM0aEPvk4q_hRI5VzXN3Yg_IQsCdOCY';
+			const SUPA_URL = 'https://hxlhrrllhvvazyhiuhvb.supabase.co/rest/v1';
+			const $ = id => document.getElementById(id);
+
+			/* ══════════════════════════════════════════════════════════════╗   i18n
+			   ══════════════════════════════════════════════════════════════╝*/
+			const LANGS = [{
+					v: "zh",
+					k: "lang_zh"
+				},
+				{
+					v: "en",
+					k: "lang_en"
+				},
+				{
+					v: "es",
+					k: "lang_es"
+				},
+				{
+					v: "de",
+					k: "lang_de"
+				},
+				{
+					v: "zh-TW",
+					k: "lang_zh_tw"
+				}
+			];
+			const TRANSLATIONS = {};
+
+			function tr(key, o) {
+				if (!TRANSLATIONS[key]) TRANSLATIONS[key] = o;
+			}
+			tr("lang_zh", {
+				zh: "简体中文",
+				en: "简体中文",
+				es: "简体中文",
+				de: "简体中文",
+				"zh-TW": "简体中文"
+			});
+			tr("lang_en", {
+				zh: "English",
+				en: "English",
+				es: "English",
+				de: "English",
+				"zh-TW": "English"
+			});
+			tr("lang_es", {
+				zh: "Español",
+				en: "Español",
+				es: "Español",
+				de: "Español",
+				"zh-TW": "Español"
+			});
+			tr("lang_de", {
+				zh: "Deutsch",
+				en: "Deutsch",
+				es: "Deutsch",
+				de: "Deutsch",
+				"zh-TW": "Deutsch"
+			});
+			tr("lang_zh_tw", {
+				zh: "繁體中文",
+				en: "繁體中文",
+				es: "繁體中文",
+				de: "繁體中文",
+				"zh-TW": "繁體中文"
+			});
+			// Nav
+			tr("nav_all", {
+				zh: "所有百科",
+				en: "All Wiki",
+				es: "Todos los Wikis",
+				de: "Alle Wikis",
+				"zh-TW": "所有百科"
+			});
+			tr("nav_create", {
+				zh: "创建百科",
+				en: "Create Wiki",
+				es: "Crear Wiki",
+				de: "Wiki erstellen",
+				"zh-TW": "創建百科"
+			});
+			tr("nav_search", {
+				zh: "搜索",
+				en: "Search",
+				es: "Buscar",
+				de: "Suchen",
+				"zh-TW": "搜索"
+			});
+			tr("search_ph", {
+				zh: "搜索百科",
+				en: "Search Wiki",
+				es: "Buscar Wiki",
+				de: "Wiki suchen",
+				"zh-TW": "搜索百科"
+			});
+			tr("login_btn_txt", {
+				zh: "登录",
+				en: "Login",
+				es: "Iniciar sesión",
+				de: "Anmelden",
+				"zh-TW": "登錄"
+			});
+			tr("logout", {
+				zh: "退出",
+				en: "Logout",
+				es: "Cerrar sesión",
+				de: "Abmelden",
+				"zh-TW": "退出"
+			});
+			tr("logout_mob", {
+				zh: "退出登录",
+				en: "Logout",
+				es: "Cerrar sesión",
+				de: "Abmelden",
+				"zh-TW": "退出登錄"
+			});
+			tr("login_reg", {
+				zh: "登录 / 注册",
+				en: "Login / Register",
+				es: "Iniciar sesión / Registrarse",
+				de: "Anmelden / Registrieren",
+				"zh-TW": "登錄 / 註冊"
+			});
+			// Loading
+			tr("loading", {
+				zh: "加载中...",
+				en: "Loading...",
+				es: "Cargando...",
+				de: "Laden...",
+				"zh-TW": "加載中..."
+			});
+			tr("load_list", {
+				zh: "加载词条列表...",
+				en: "Loading page list...",
+				es: "Cargando lista de páginas...",
+				de: "Lade Seitenliste...",
+				"zh-TW": "加載詞條列表..."
+			});
+			tr("load_content", {
+				zh: "加载内容中...",
+				en: "Loading content...",
+				es: "Cargando contenido...",
+				de: "Lade Inhalt...",
+				"zh-TW": "加載內容中..."
+			});
+			tr("load_submit", {
+				zh: "提交中...",
+				en: "Submitting...",
+				es: "Enviando...",
+				de: "Sende...",
+				"zh-TW": "提交中..."
+			});
+			tr("load_searching", {
+				zh: "搜索中...",
+				en: "Searching...",
+				es: "Buscando...",
+				de: "Suche...",
+				"zh-TW": "搜索中..."
+			});
+			tr("load_deleting", {
+				zh: "删除中...",
+				en: "Deleting...",
+				es: "Eliminando...",
+				de: "Lösche...",
+				"zh-TW": "刪除中..."
+			});
+			tr("load_verify", {
+				zh: "验证中...",
+				en: "Verifying...",
+				es: "Verificando...",
+				de: "Überprüfe...",
+				"zh-TW": "驗證中..."
+			});
+			tr("load_registering", {
+				zh: "注册中...",
+				en: "Registering...",
+				es: "Registrando...",
+				de: "Registriere...",
+				"zh-TW": "註冊中..."
+			});
+			// Hero / Home
+			tr("hero_sub", {
+				zh: "杰基百科",
+				en: "Jackypedia",
+				es: "Jackypedia",
+				de: "Jackypedia",
+				"zh-TW": "傑基百科"
+			});
+			tr("hero_random", {
+				zh: "随机百科",
+				en: "Random",
+				es: "Aleatorio",
+				de: "Zufällig",
+				"zh-TW": "隨機百科"
+			});
+			tr("hero_rank", {
+				zh: "百科贡献榜",
+				en: "Wiki Contributors",
+				es: "Ranking de contribuciones",
+				de: "Wiki-Beitragende",
+				"zh-TW": "百科貢獻榜"
+			});
+			tr("rank_title", {
+				zh: "百科贡献榜",
+				en: "Wiki Contributors",
+				es: "Ranking de contribuciones",
+				de: "Wiki-Beitragende",
+				"zh-TW": "百科貢獻榜"
+			});
+			tr("rank_rank", {
+				zh: "排名",
+				en: "Rank",
+				es: "Rango",
+				de: "Rang",
+				"zh-TW": "排名"
+			});
+			tr("rank_user", {
+				zh: "用户",
+				en: "User",
+				es: "Usuario",
+				de: "Benutzer",
+				"zh-TW": "用戶"
+			});
+			tr("rank_wikis", {
+				zh: "创建百科",
+				en: "Wiki created",
+				es: "Wikis creados",
+				de: "Erstellte Wikis",
+				"zh-TW": "創建百科"
+			});
+
+			tr("rank_comments", {
+				zh: "总评论",
+				en: "Comments",
+				es: "Comentarios",
+				de: "Kommentare",
+				"zh-TW": "總評論"
+			});
+			tr("rank_joined", {
+				zh: "加入时间",
+				en: "Joined",
+				es: "Registrado",
+				de: "Beigetreten",
+				"zh-TW": "加入時間"
+			});
+			tr("rank_loading", {
+				zh: "统计中...",
+				en: "Calculating...",
+				es: "Calculando...",
+				de: "Berechne...",
+				"zh-TW": "統計中..."
+			});
+			tr("rank_empty", {
+				zh: "暂无数据",
+				en: "No data",
+				es: "Sin datos",
+				de: "Keine Daten",
+				"zh-TW": "暫無數據"
+			});
+			tr("rank_me", {
+				zh: "我",
+				en: "Me",
+				es: "Yo",
+				de: "Ich",
+				"zh-TW": "我"
+			});
+			tr("hot_title", {
+				zh: "热门词条",
+				en: "Hot",
+				es: "Populares",
+				de: "Beliebt",
+				"zh-TW": "熱門詞條"
+			});
+			tr("new_title", {
+				zh: "最新词条",
+				en: "Latest",
+				es: "Recientes",
+				de: "Neueste",
+				"zh-TW": "最新詞條"
+			});
+			tr("no_hot", {
+				zh: "还没有热门词条",
+				en: "No hot pages yet",
+				es: "Sin páginas populares aún",
+				de: "Noch keine beliebten Seiten",
+				"zh-TW": "還沒有熱門詞條"
+			});
+			tr("no_new", {
+				zh: "还没有词条",
+				en: "No pages yet",
+				es: "Sin páginas aún",
+				de: "Noch keine Seiten",
+				"zh-TW": "還沒有詞條"
+			});
+			tr("stats_pages", {
+				zh: "百科数 {0}",
+				en: "Pages: {0}",
+				es: "Páginas: {0}",
+				de: "Seiten: {0}",
+				"zh-TW": "百科數 {0}"
+			});
+			tr("stats_visits", {
+				zh: "总访问数 {0}",
+				en: "Total visits: {0}",
+				es: "Visitas totales: {0}",
+				de: "Gesamtbesuche: {0}",
+				"zh-TW": "總訪問數 {0}"
+			});
+			// All Wiki
+			tr("all_title", {
+				zh: "所有百科",
+				en: "All Wiki",
+				es: "Todos los Wikis",
+				de: "Alle Wikis",
+				"zh-TW": "所有百科"
+			});
+			tr("sort_lbl", {
+				zh: "排序",
+				en: "Sort",
+				es: "Ordenar",
+				de: "Sortieren",
+				"zh-TW": "排序"
+			});
+			tr("sort_timeD", {
+				zh: "时间↓",
+				en: "Time\u2193",
+				es: "Tiempo\u2193",
+				de: "Zeit\u2193",
+				"zh-TW": "時間↓"
+			});
+			tr("sort_timeA", {
+				zh: "时间↑",
+				en: "Time\u2191",
+				es: "Tiempo\u2191",
+				de: "Zeit\u2191",
+				"zh-TW": "時間↑"
+			});
+			tr("sort_alphaA", {
+				zh: "A-Z",
+				en: "A-Z",
+				es: "A-Z",
+				de: "A-Z",
+				"zh-TW": "A-Z"
+			});
+			tr("sort_alphaD", {
+				zh: "Z-A",
+				en: "Z-A",
+				es: "Z-A",
+				de: "Z-A",
+				"zh-TW": "Z-A"
+			});
+			tr("filter_all", {
+				zh: "全部",
+				en: "All",
+				es: "Todos",
+				de: "Alle",
+				"zh-TW": "全部"
+			});
+			tr("filter_other", {
+				zh: "其它",
+				en: "Other",
+				es: "Otros",
+				de: "Sonstige",
+				"zh-TW": "其他"
+			});
+			tr("login_to_create", {
+				zh: "登录后即可创建",
+				en: "Login to create",
+				es: "Inicia sesión para crear",
+				de: "Anmelden zum Erstellen",
+				"zh-TW": "登錄後即可創建"
+			});
+			// Page
+			tr("page_not_found", {
+				zh: "词条不存在",
+				en: "Page not found",
+				es: "Página no encontrada",
+				de: "Seite nicht gefunden",
+				"zh-TW": "詞條不存在"
+			});
+			tr("page_not_created", {
+				zh: "还没有被创建",
+				en: "has not been created yet",
+				es: "aún no ha sido creada",
+				de: "wurde noch nicht erstellt",
+				"zh-TW": "還沒有被創建"
+			});
+			tr("page_empty", {
+				zh: "词条内容为空",
+				en: "No content",
+				es: "Sin contenido",
+				de: "Kein Inhalt",
+				"zh-TW": "詞條內容為空"
+			});
+			tr("unknown_author", {
+				zh: "未知",
+				en: "Unknown",
+				es: "Desconocido",
+				de: "Unbekannt",
+				"zh-TW": "未知"
+			});
+			tr("created_label", {
+				zh: "创建",
+				en: "Created",
+				es: "Creado",
+				de: "Erstellt",
+				"zh-TW": "創建"
+			});
+			tr("page_views", {
+				zh: "{0} 次浏览",
+				en: "{0} views",
+				es: "{0} vistas",
+				de: "{0} Aufrufe",
+				"zh-TW": "{0} 次瀏覽"
+			});
+			// Gallery / Refs / Comments
+			tr("gallery_title", {
+				zh: "图片集",
+				en: "Gallery",
+				es: "Galería",
+				de: "Galerie",
+				"zh-TW": "圖片集"
+			});
+			tr("refs_title", {
+				zh: "参考资料",
+				en: "References",
+				es: "Referencias",
+				de: "Quellen",
+				"zh-TW": "參考資料"
+			});
+			tr("comments_title", {
+				zh: "评论",
+				en: "Comments",
+				es: "Comentarios",
+				de: "Kommentare",
+				"zh-TW": "評論"
+			});
+			tr("comment_ph", {
+				zh: "写下你的评论...",
+				en: "Write a comment...",
+				es: "Escribe un comentario...",
+				de: "Schreib einen Kommentar...",
+				"zh-TW": "寫下你的評論..."
+			});
+			tr("comment_btn", {
+				zh: "发送",
+				en: "Send",
+				es: "Enviar",
+				de: "Senden",
+				"zh-TW": "發送"
+			});
+			tr("reply", {
+				zh: "回复",
+				en: "Reply",
+				es: "Responder",
+				de: "Antworten",
+				"zh-TW": "回覆"
+			});
+			tr("reply_ph", {
+				zh: "回复 {0}...",
+				en: "Reply to {0}...",
+				es: "Responder a {0}...",
+				de: "Antworte {0}...",
+				"zh-TW": "回覆 {0}..."
+			});
+			tr("login_comment", {
+				zh: "登录后即可评论",
+				en: "Login to comment",
+				es: "Inicia sesión para comentar",
+				de: "Anmelden zum Kommentieren",
+				"zh-TW": "登錄後即可評論"
+			});
+			tr("no_comments", {
+				zh: "还没有评论，欢迎发表观点",
+				en: "No comments yet, be the first!",
+				es: "No hay comentarios, ¡sé el primero!",
+				de: "Noch keine Kommentare, sei der Erste!",
+				"zh-TW": "還沒有評論，歡迎發表觀點"
+			});
+			// Editor
+			tr("edit_title_ph", {
+				zh: "百科名称",
+				en: "Page title",
+				es: "Título de la página",
+				de: "Seitentitel",
+				"zh-TW": "百科名稱"
+			});
+			tr("edit_slug_ph", {
+				zh: "百科ID (如 my-article)",
+				en: "Page ID (e.g. my-article)",
+				es: "ID de página (ej. my-article)",
+				de: "Seiten-ID (z.B. my-article)",
+				"zh-TW": "百科ID (如 my-article)"
+			});
+			tr("edit_open", {
+				zh: "公开编辑",
+				en: "Public edit",
+				es: "Edición pública",
+				de: "Öffentliche Bearbeitung",
+				"zh-TW": "公開編輯"
+			});
+			tr("edit_save", {
+				zh: "保存",
+				en: "Save",
+				es: "Guardar",
+				de: "Speichern",
+				"zh-TW": "保存"
+			});
+			tr("edit_saving", {
+				zh: "保存中...",
+				en: "Saving...",
+				es: "Guardando...",
+				de: "Speichern...",
+				"zh-TW": "保存中..."
+			});
+			tr("edit_creating", {
+				zh: "创建中...",
+				en: "Creating...",
+				es: "Creando...",
+				de: "Erstelle...",
+				"zh-TW": "創建中..."
+			});
+			tr("md_ph", {
+				zh: "用 Markdown 写点什么...",
+				en: "Write something in Markdown...",
+				es: "Escribe algo en Markdown...",
+				de: "Schreib etwas in Markdown...",
+				"zh-TW": "用 Markdown 寫點什麼..."
+			});
+			tr("word_count", {
+				zh: "{0} 字",
+				en: "{0} chars",
+				es: "{0} caracteres",
+				de: "{0} Zeichen",
+				"zh-TW": "{0} 字"
+			});
+			tr("preview_ph", {
+				zh: "预览区域",
+				en: "Preview",
+				es: "Vista previa",
+				de: "Vorschau",
+				"zh-TW": "預覽區域"
+			});
+			// Tags
+			tr("tag_hdr", {
+				zh: "标签",
+				en: "Tags",
+				es: "Etiquetas",
+				de: "Tags",
+				"zh-TW": "標籤"
+			});
+			tr("tag_ph", {
+				zh: "自定义标签...",
+				en: "Custom tag...",
+				es: "Etiqueta personalizada...",
+				de: "Benutzerdefinierter Tag...",
+				"zh-TW": "自定義標籤..."
+			});
+			tr("tag_add", {
+				zh: "添加",
+				en: "Add",
+				es: "Añadir",
+				de: "Hinzufügen",
+				"zh-TW": "添加"
+			});
+			tr("tag_exists", {
+				zh: "标签已存在",
+				en: "Tag already exists",
+				es: "La etiqueta ya existe",
+				de: "Tag existiert bereits",
+				"zh-TW": "標籤已存在"
+			});
+			tr("tag_max", {
+				zh: "最多 5 个标签",
+				en: "Max 5 tags",
+				es: "Máximo 5 etiquetas",
+				de: "Maximal 5 Tags",
+				"zh-TW": "最多 5 個標籤"
+			});
+			// Tabs
+			tr("sd_relevance", {
+				zh: "相关度",
+				en: "Relevance",
+				es: "Relevancia",
+				de: "Relevanz",
+				"zh-TW": "相關度"
+			});
+			tr("sd_sort_timeD", {
+				zh: "最新",
+				en: "Latest",
+				es: "Más reciente",
+				de: "Neueste",
+				"zh-TW": "最新"
+			});
+			tr("sd_sort_alphaA", {
+				zh: "A-Z",
+				en: "A-Z",
+				es: "A-Z",
+				de: "A-Z",
+				"zh-TW": "A-Z"
+			});
+			tr("sd_hint", {
+				zh: "输入关键词搜索百科",
+				en: "Type keywords to search wiki",
+				es: "Escribe palabras clave para buscar",
+				de: "Gib Schlüsselwörter ein",
+				"zh-TW": "輸入關鍵詞搜索百科"
+			});
+			tr("page_title", {
+				zh: "Jackypedia - Zhujingqi",
+				en: "Jackypedia - Zhujingqi",
+				es: "Jackypedia - Zhujingqi",
+				de: "Jackypedia - Zhujingqi",
+				"zh-TW": "Jackypedia - Zhujingqi"
+			});
+			tr("search_btn", {
+				zh: "搜索",
+				en: "Search",
+				es: "Buscar",
+				de: "Suchen",
+				"zh-TW": "搜索"
+			});
+			tr("mob_back", {
+				zh: "返回",
+				en: "Back",
+				es: "Volver",
+				de: "Zurück",
+				"zh-TW": "返回"
+			});
+			tr("tab_content", {
+				zh: "正文",
+				en: "Content",
+				es: "Contenido",
+				de: "Inhalt",
+				"zh-TW": "正文"
+			});
+			tr("tab_refs", {
+				zh: "参考资料",
+				en: "References",
+				es: "Referencias",
+				de: "Quellen",
+				"zh-TW": "參考資料"
+			});
+			tr("tab_gallery", {
+				zh: "图片集",
+				en: "Gallery",
+				es: "Galería",
+				de: "Galerie",
+				"zh-TW": "圖片集"
+			});
+			// Gallery editor
+			tr("gal_url_ph", {
+				zh: "输入图片 URL...",
+				en: "Enter image URL...",
+				es: "Introduce URL de imagen...",
+				de: "Bild-URL eingeben...",
+				"zh-TW": "輸入圖片 URL..."
+			});
+			tr("gal_add", {
+				zh: "添加",
+				en: "Add",
+				es: "Añadir",
+				de: "Hinzufügen",
+				"zh-TW": "添加"
+			});
+			tr("gal_load_fail", {
+				zh: "加载失败",
+				en: "Load failed",
+				es: "Error al cargar",
+				de: "Laden fehlgeschlagen",
+				"zh-TW": "加載失敗"
+			});
+			// Refs editor
+			tr("ref_title_ph", {
+				zh: "标题",
+				en: "Title",
+				es: "Título",
+				de: "Titel",
+				"zh-TW": "標題"
+			});
+			tr("ref_url_ph", {
+				zh: "URL",
+				en: "URL",
+				es: "URL",
+				de: "URL",
+				"zh-TW": "URL"
+			});
+			tr("ref_add", {
+				zh: "添加",
+				en: "Add",
+				es: "Añadir",
+				de: "Hinzufügen",
+				"zh-TW": "添加"
+			});
+			// Profile
+			tr("profile_pages", {
+				zh: "词条",
+				en: "Pages",
+				es: "Páginas",
+				de: "Seiten",
+				"zh-TW": "詞條"
+			});
+			tr("profile_public", {
+				zh: "公开",
+				en: "Public",
+				es: "Público",
+				de: "Öffentlich",
+				"zh-TW": "公開"
+			});
+			tr("profile_private", {
+				zh: "私有",
+				en: "Private",
+				es: "Privado",
+				de: "Privat",
+				"zh-TW": "私有"
+			});
+			tr("profile_my", {
+				zh: "我的词条",
+				en: "My Pages",
+				es: "Mis Páginas",
+				de: "Meine Seiten",
+				"zh-TW": "我的詞條"
+			});
+			tr("profile_no_pages", {
+				zh: "还没有词条",
+				en: "No pages yet",
+				es: "Sin páginas aún",
+				de: "Noch keine Seiten",
+				"zh-TW": "還沒有詞條"
+			});
+			tr("profile_joined", {
+				zh: "注册于",
+				en: "Registered",
+				es: "Registrado",
+				de: "Registriert",
+				"zh-TW": "註冊於"
+			});
+			tr("profile_hint", {
+				zh: "点击右上角「创建」开始撰写",
+				en: "Click \"Create\" to start writing",
+				es: "Haz clic en \"Crear\" para empezar",
+				de: "Klicke auf \"Erstellen\" um zu beginnen",
+				"zh-TW": "點擊右上角「創建」開始撰寫"
+			});
+			tr("terms_btn", {
+				zh: "用户协议",
+				en: "Terms of Service",
+				es: "Términos del servicio",
+				de: "Nutzungsbedingungen",
+				"zh-TW": "用戶協議"
+			});
+			tr("terms_title", {
+				zh: "用户协议",
+				en: "Terms of Service",
+				es: "Términos del servicio",
+				de: "Nutzungsbedingungen",
+				"zh-TW": "用戶協議"
+			});
+			// Login / Register modal
+			tr("login_title", {
+				zh: "登录 Jacky 账号",
+				en: "Login to Jacky",
+				es: "Iniciar sesión en Jacky",
+				de: "Bei Jacky anmelden",
+				"zh-TW": "登錄 Jacky 帳號"
+			});
+			tr("reg_title", {
+				zh: "注册 Jacky 账号",
+				en: "Register Jacky",
+				es: "Registrarse en Jacky",
+				de: "Jacky-Konto registrieren",
+				"zh-TW": "註冊 Jacky 帳號"
+			});
+			tr("login_user_ph", {
+				zh: "用户名",
+				en: "Username",
+				es: "Nombre de usuario",
+				de: "Benutzername",
+				"zh-TW": "用戶名"
+			});
+			tr("login_pass_ph", {
+				zh: "密码",
+				en: "Password",
+				es: "Contraseña",
+				de: "Passwort",
+				"zh-TW": "密碼"
+			});
+			tr("login_pass2_ph", {
+				zh: "再次输入密码",
+				en: "Confirm password",
+				es: "Confirmar contraseña",
+				de: "Passwort bestätigen",
+				"zh-TW": "再次輸入密碼"
+			});
+			tr("reg_btn", {
+				zh: "注册",
+				en: "Register",
+				es: "Registrarse",
+				de: "Registrieren",
+				"zh-TW": "註冊"
+			});
+			tr("login_switch_reg", {
+				zh: "没有账号？点击注册",
+				en: "No account? Register",
+				es: "¿Sin cuenta? Regístrate",
+				de: "Kein Konto? Registrieren",
+				"zh-TW": "沒有帳號？點擊註冊"
+			});
+			tr("login_switch_login", {
+				zh: "已有账号？返回登录",
+				en: "Have an account? Login",
+				es: "¿Tienes cuenta? Inicia sesión",
+				de: "Bereits ein Konto? Anmelden",
+				"zh-TW": "已有帳號？返回登錄"
+			});
+			tr("cancel", {
+				zh: "取消",
+				en: "Cancel",
+				es: "Cancelar",
+				de: "Abbrechen",
+				"zh-TW": "取消"
+			});
+			// Confirm modal
+			tr("confirm_title", {
+				zh: "确认",
+				en: "Confirm",
+				es: "Confirmar",
+				de: "Bestätigen",
+				"zh-TW": "確認"
+			});
+			tr("confirm_yes", {
+				zh: "确定",
+				en: "OK",
+				es: "Aceptar",
+				de: "OK",
+				"zh-TW": "確定"
+			});
+			tr("confirm_no", {
+				zh: "取消",
+				en: "Cancel",
+				es: "Cancelar",
+				de: "Abbrechen",
+				"zh-TW": "取消"
+			});
+			tr("unsaved_title", {
+				zh: "未保存的更改",
+				en: "Unsaved changes",
+				es: "Cambios no guardados",
+				de: "Ungespeicherte Änderungen",
+				"zh-TW": "未保存的更改"
+			});
+			tr("unsaved_msg", {
+				zh: "你有未保存的更改，确定要离开吗？",
+				en: "You have unsaved changes. Leave?",
+				es: "Tienes cambios sin guardar. ¿Salir?",
+				de: "Sie haben ungespeicherte Änderungen. Verlassen?",
+				"zh-TW": "你有未保存的更改，確定要離開嗎？"
+			});
+			tr("confirm_delete_comment", {
+				zh: "确定删除这条评论吗？<br>所有回复也将一并删除。",
+				en: "Delete this comment?<br>All replies will also be deleted.",
+				es: "¿Eliminar este comentario?<br>Todas las respuestas también se eliminarán.",
+				de: "Diesen Kommentar löschen?<br>Alle Antworten werden ebenfalls gelöscht.",
+				"zh-TW": "確定刪除這條評論嗎？<br>所有回覆也將一併刪除。"
+			});
+			tr("confirm_delete_page", {
+				zh: "确定要删除「{0}」吗？<br>此操作不可撤销。",
+				en: "Delete 「{0}」?<br>This action cannot be undone.",
+				es: "¿Eliminar 「{0}」?<br>Esta acción no se puede deshacer.",
+				de: "「{0}」löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden.",
+				"zh-TW": "確定要刪除「{0}」嗎？<br>此操作不可撤銷。"
+			});
+			tr("confirm_del_image", {
+				zh: "确定删除这张图片吗？",
+				en: "Delete this image?",
+				es: "¿Eliminar esta imagen?",
+				de: "Dieses Bild löschen?",
+				"zh-TW": "確定刪除這張圖片嗎？"
+			});
+			tr("confirm_del_ref", {
+				zh: "确定删除这个链接吗？",
+				en: "Delete this link?",
+				es: "¿Eliminar este enlace?",
+				de: "Diesen Link löschen?",
+				"zh-TW": "確定刪除這個鏈接嗎？"
+			});
+			// Toasts / Messages
+			tr("toast_welcome", {
+				zh: "欢迎回来！{0}",
+				en: "Welcome back! {0}",
+				es: "¡Bienvenido! {0}",
+				de: "Willkommen zurück! {0}",
+				"zh-TW": "歡迎回來！{0}"
+			});
+			tr("toast_reg", {
+				zh: "注册成功，欢迎{0}",
+				en: "Registered! Welcome {0}",
+				es: "¡Registrado! Bienvenido {0}",
+				de: "Registriert! Willkommen {0}",
+				"zh-TW": "註冊成功，歡迎{0}"
+			});
+			tr("toast_logout", {
+				zh: "已退出登录",
+				en: "Logged out",
+				es: "Sesión cerrada",
+				de: "Abgemeldet",
+				"zh-TW": "已退出登錄"
+			});
+			tr("toast_login_first", {
+				zh: "请先登录",
+				en: "Please login first",
+				es: "Inicia sesión primero",
+				de: "Bitte zuerst anmelden",
+				"zh-TW": "請先登錄"
+			});
+			tr("toast_enter_comment", {
+				zh: "请输入评论内容",
+				en: "Please enter a comment",
+				es: "Por favor escribe un comentario",
+				de: "Bitte gib einen Kommentar ein",
+				"zh-TW": "請輸入評論內容"
+			});
+			tr("toast_enter_reply", {
+				zh: "请输入回复内容",
+				en: "Please enter a reply",
+				es: "Por favor escribe una respuesta",
+				de: "Bitte gib eine Antwort ein",
+				"zh-TW": "請輸入回覆內容"
+			});
+			tr("toast_comment_sent", {
+				zh: "评论已发送",
+				en: "Comment sent",
+				es: "Comentario enviado",
+				de: "Kommentar gesendet",
+				"zh-TW": "評論已發送"
+			});
+			tr("toast_reply_sent", {
+				zh: "回复已发送",
+				en: "Reply sent",
+				es: "Respuesta enviada",
+				de: "Antwort gesendet",
+				"zh-TW": "回覆已發送"
+			});
+			tr("toast_mass_delete", {
+				zh: "内容被大幅删减（超过50%），已阻止保存",
+				en: "Content reduced by >50%, save blocked",
+				es: "Contenido reducido >50%, guardado bloqueado",
+				de: "Inhalt um >50% reduziert, Speichern blockiert",
+				"zh-TW": "內容被大幅刪減（超過50%），已阻止保存"
+			});
+			tr("toast_comment_deleted", {
+				zh: "评论已删除",
+				en: "Comment deleted",
+				es: "Comentario eliminado",
+				de: "Kommentar gelöscht",
+				"zh-TW": "評論已刪除"
+			});
+			tr("toast_page_deleted", {
+				zh: "已删除",
+				en: "Deleted",
+				es: "Eliminado",
+				de: "Gelöscht",
+				"zh-TW": "已刪除"
+			});
+			tr("toast_content_empty", {
+				zh: "内容不能为空",
+				en: "Content cannot be empty",
+				es: "El contenido no puede estar vacío",
+				de: "Inhalt darf nicht leer sein",
+				"zh-TW": "內容不能為空"
+			});
+			tr("slug_empty_alert", {
+				zh: "请填写百科ID",
+				en: "Please enter a page slug",
+				es: "Por favor ingresa el slug",
+				de: "Bitte gib einen Slug ein",
+				"zh-TW": "請填寫百科ID"
+			});
+			tr("slug_invalid_alert", {
+				zh: "百科标识只能包含英文、数字、- 和 _",
+				en: "Slug can only contain letters, numbers, - and _",
+				es: "El slug solo puede contener letras, números, - y _",
+				de: "Der Slug darf nur Buchstaben, Zahlen, - und _ enthalten",
+				"zh-TW": "百科標識只能包含英文、數字、- 和 _"
+			});
+			tr("slug_exists_alert", {
+				zh: "百科标识「{0}」已被占用",
+				en: "Slug 「{0}」is already taken",
+				es: "El slug 「{0}」ya está en uso",
+				de: "Der Slug 「{0}」ist bereits vergeben",
+				"zh-TW": "百科標識「{0}」已被佔用"
+			});
+			tr("toast_slug_exists", {
+				zh: "词条ID「{0}」已存在",
+				en: "Page ID 「{0}」 already exists",
+				es: "El ID 「{0}」 ya existe",
+				de: "Seiten-ID 「{0}」 existiert bereits",
+				"zh-TW": "詞條ID「{0}」已存在"
+			});
+			tr("toast_page_created", {
+				zh: "词条已创建！",
+				en: "Page created!",
+				es: "¡Página creada!",
+				de: "Seite erstellt!",
+				"zh-TW": "詞條已創建！"
+			});
+			tr("toast_page_saved", {
+				zh: "已保存！",
+				en: "Saved!",
+				es: "¡Guardado!",
+				de: "Gespeichert!",
+				"zh-TW": "已保存！"
+			});
+			tr("toast_owner_only", {
+				zh: "只有创建者才能删除",
+				en: "Only the owner can delete",
+				es: "Solo el propietario puede eliminar",
+				de: "Nur der Besitzer kann löschen",
+				"zh-TW": "只有創建者才能刪除"
+			});
+			tr("toast_fill_all", {
+				zh: "请填写所有字段",
+				en: "Please fill all fields",
+				es: "Por favor completa todos los campos",
+				de: "Bitte fülle alle Felder aus",
+				"zh-TW": "請填寫所有字段"
+			});
+			tr("toast_invalid_chars", {
+				zh: "用户名包含非法字符",
+				en: "Username contains invalid characters",
+				es: "El nombre de usuario contiene caracteres inválidos",
+				de: "Benutzername enthält ungültige Zeichen",
+				"zh-TW": "用戶名包含非法字符"
+			});
+			tr("toast_pass_mismatch", {
+				zh: "两次密码不一致",
+				en: "Passwords do not match",
+				es: "Las contraseñas no coinciden",
+				de: "Passwörter stimmen nicht überein",
+				"zh-TW": "兩次密碼不一致"
+			});
+			tr("toast_pass_short", {
+				zh: "密码至少3个字符",
+				en: "Password must be at least 3 characters",
+				es: "La contraseña debe tener al menos 3 caracteres",
+				de: "Passwort muss mindestens 3 Zeichen haben",
+				"zh-TW": "密碼至少3個字符"
+			});
+			tr("toast_user_exists", {
+				zh: "用户名已存在",
+				en: "Username already exists",
+				es: "El nombre de usuario ya existe",
+				de: "Benutzername existiert bereits",
+				"zh-TW": "用戶名已存在"
+			});
+			tr("toast_wrong_pass", {
+				zh: "密码错误",
+				en: "Wrong password",
+				es: "Contraseña incorrecta",
+				de: "Falsches Passwort",
+				"zh-TW": "密碼錯誤"
+			});
+			tr("toast_user_not_found", {
+				zh: "用户不存在",
+				en: "User not found",
+				es: "Usuario no encontrado",
+				de: "Benutzer nicht gefunden",
+				"zh-TW": "用戶不存在"
+			});
+			// Search
+			tr("search_results", {
+				zh: "找到 {0} 个结果",
+				en: "{0} results found",
+				es: "{0} resultados encontrados",
+				de: "{0} Ergebnisse gefunden",
+				"zh-TW": "找到 {0} 個結果"
+			});
+			tr("search_no_results", {
+				zh: "未找到结果",
+				en: "No results found",
+				es: "Sin resultados",
+				de: "Keine Ergebnisse",
+				"zh-TW": "未找到結果"
+			});
+			tr("search_no_results_q", {
+				zh: "没有与「{0}」相关的词条",
+				en: "No pages related to 「{0}」",
+				es: "Sin páginas relacionadas con 「{0}」",
+				de: "Keine Seiten zu 「{0}」",
+				"zh-TW": "沒有與「{0}」相關的詞條"
+			});
+			// Edit / Delete actions
+			tr("tb_bold", {
+				zh: "粗体",
+				en: "Bold",
+				es: "Negrita",
+				de: "Fett",
+				"zh-TW": "粗體"
+			});
+			tr("tb_italic", {
+				zh: "斜体",
+				en: "Italic",
+				es: "Cursiva",
+				de: "Kursiv",
+				"zh-TW": "斜體"
+			});
+			tr("tb_strike", {
+				zh: "删除线",
+				en: "Strikethrough",
+				es: "Tachado",
+				de: "Durchgestrichen",
+				"zh-TW": "刪除線"
+			});
+			tr("tb_u", {
+				zh: "下划线",
+				en: "Underline",
+				es: "Subrayado",
+				de: "Unterstrichen",
+				"zh-TW": "下劃線"
+			});
+			tr("tb_h1", {
+				zh: "标题1",
+				en: "Heading 1",
+				es: "Título 1",
+				de: "Überschrift 1",
+				"zh-TW": "標題1"
+			});
+			tr("tb_h2", {
+				zh: "标题2",
+				en: "Heading 2",
+				es: "Título 2",
+				de: "Überschrift 2",
+				"zh-TW": "標題2"
+			});
+			tr("tb_h3", {
+				zh: "标题3",
+				en: "Heading 3",
+				es: "Título 3",
+				de: "Überschrift 3",
+				"zh-TW": "標題3"
+			});
+			tr("tb_link", {
+				zh: "链接",
+				en: "Link",
+				es: "Enlace",
+				de: "Link",
+				"zh-TW": "鏈接"
+			});
+			tr("tb_image", {
+				zh: "图片",
+				en: "Image",
+				es: "Imagen",
+				de: "Bild",
+				"zh-TW": "圖片"
+			});
+			tr("tb_ul", {
+				zh: "无序列表",
+				en: "Bullet list",
+				es: "Lista sin orden",
+				de: "Aufzählungsliste",
+				"zh-TW": "無序列表"
+			});
+			tr("tb_ol", {
+				zh: "有序列表",
+				en: "Numbered list",
+				es: "Lista ordenada",
+				de: "Nummerierte Liste",
+				"zh-TW": "有序列表"
+			});
+			tr("tb_quote", {
+				zh: "引用",
+				en: "Quote",
+				es: "Cita",
+				de: "Zitat",
+				"zh-TW": "引用"
+			});
+			tr("tb_code", {
+				zh: "代码",
+				en: "Code",
+				es: "Código",
+				de: "Code",
+				"zh-TW": "代碼"
+			});
+			tr("tb_hr", {
+				zh: "分割线",
+				en: "Divider",
+				es: "Separador",
+				de: "Trennlinie",
+				"zh-TW": "分割線"
+			});
+			tr("dark_mode", {
+				zh: "☾ 深色模式",
+				en: "☾ Dark Mode",
+				es: "☾ Modo Oscuro",
+				de: "☾ Dunkelmodus",
+				"zh-TW": "☾ 深色模式"
+			});
+			tr("light_mode", {
+				zh: "☀ 浅色模式",
+				en: "☀ Light Mode",
+				es: "☀ Modo Claro",
+				de: "☀ Hellmodus",
+				"zh-TW": "☀ 淺色模式"
+			});
+			tr("edit", {
+				zh: "编辑",
+				en: "Edit",
+				es: "Editar",
+				de: "Bearbeiten",
+				"zh-TW": "編輯"
+			});
+			tr("del", {
+				zh: "删除",
+				en: "Delete",
+				es: "Eliminar",
+				de: "Löschen",
+				"zh-TW": "刪除"
+			});
+			tr("create", {
+				zh: "创建",
+				en: "Create",
+				es: "Crear",
+				de: "Erstellen",
+				"zh-TW": "創建"
+			});
+
+			let currentLang = (() => {
+				const s = localStorage.getItem("pedia_lang");
+				if (s) return s;
+				const l = navigator.language || "zh";
+				if (l === "zh-TW" || l === "zh-HK") return "zh-TW";
+				const sh = l.split("-")[0];
+				const sup = {
+					zh: "zh",
+					en: "en",
+					es: "es",
+					de: "de"
+				};
+				return sup[sh] || "zh";
+			})();
+
+			function t(key, ...args) {
+				const k = TRANSLATIONS[key];
+				if (!k) return key;
+				let val = k[currentLang] || k["zh"] || key;
+				args.forEach((a, i) => {
+					val = val.replace(new RegExp("\\{" + i + "\\}", "g"), String(a));
+				});
+				return val;
+			}
+
+			function renderLangSelect() {
+				const ids = ["langSelect", "mobLangSelect"];
+				ids.forEach(id => {
+					const sel = document.getElementById(id);
+					if (!sel) return;
+					sel.innerHTML = "";
+					LANGS.forEach(l => {
+						const o = document.createElement("option");
+						o.value = l.v;
+						o.textContent = t(l.k);
+						sel.appendChild(o);
+					});
+					sel.value = currentLang;
+					sel.onchange = () => changeLanguage(sel.value);
+				});
+			}
+
+			function changeLanguage(lang) {
+				currentLang = lang;
+				localStorage.setItem("pedia_lang", lang);
+				renderLangSelect();
+				if (typeof refreshUILanguage === "function") refreshUILanguage();
+				updateDarkBtn();
+				// Re-render current view
+				if (S.view === "welcomeScreen" || S.view === "welcome") home();
+				else if (S.view === "allScreen") {
+					renderAllTags();
+					renderAllGrid();
+				} else if (S.view === "pageScreen" && S.slug) {
+					goTo(S.slug, true);
+				} else if (S.view === "profileScreen") {
+					openProfile(true);
+				} else if (S.view === "searchScreen" && $('qryInp').value) sr($('qryInp').value);
+			}
+
+			// ─── Dark Mode ───
+			function toggleDark() {
+				document.body.classList.toggle("dark");
+				localStorage.setItem("pedia_dark", document.body.classList.contains("dark") ? "1" : "0");
+				updateDarkBtn();
+			}
+
+			function updateDarkBtn() {
+				const isDark = document.body.classList.contains("dark");
+				const mobBtn = document.querySelector("#mobMenu .dark-toggle-btn");
+				if (mobBtn) mobBtn.textContent = isDark ? t("light_mode") : t("dark_mode");
+				const deskBtn = document.getElementById("darkBtn");
+				if (deskBtn) deskBtn.textContent = isDark ? "☀" : "☾";
+			}
+
+			function refreshUILanguage() {
+				const L = id => document.getElementById(id);
+				const setT = (id, val) => {
+					const e = L(id);
+					if (e) e.textContent = val;
+				};
+				const setPH = (id, val) => {
+					const e = L(id);
+					if (e) e.placeholder = val;
+				};
+
+				setT("loadingTxt", t("loading"));
+				const an = L("allNavBtn");
+				if (an) {
+					const lb = an.querySelector(".nav-lb");
+					if (lb) lb.textContent = t("nav_all");
+				}
+				const cn = L("createNavBtn");
+				if (cn) {
+					const lb = cn.querySelector(".nav-lb");
+					if (lb) lb.textContent = t("nav_create");
+				}
+				document.title = t("page_title");
+				setPH("qryInp", t("search_ph"));
+				setT("searchBtn", t("search_btn"));
+				const ms = L("mobSearchBtn");
+				if (ms) {
+					const lb = ms.querySelector(".nav-lb");
+					if (lb) lb.textContent = t("nav_search");
+				}
+				setT("mobAllBtn", t("nav_all"));
+				setT("mobCreateBtn", t("nav_create"));
+				setPH("searchScrInp", t("search_ph"));
+				setT("searchScrBack", t("mob_back"));
+				setT("heroSub", t("hero_sub"));
+				setT("randomBtn", t("hero_random"));
+				setT("rankBtn", t("hero_rank"));
+				setT("termsBtn", t("terms_btn"));
+				setT("rankTitle", t("rank_title"));
+				setT("hotSectionTitle", t("hot_title"));
+				setT("newSectionTitle", t("new_title"));
+				setT("allHeader", t("all_title"));
+				setT("sortLbl", t("sort_lbl"));
+				setT("galTitle", t("gallery_title"));
+				setT("refsTitle", t("refs_title"));
+				setT("commentsTitle", t("comments_title"));
+				setPH("commentInput", t("comment_ph"));
+				setT("commentBtn", t("comment_btn"));
+				setPH("editTitle", t("edit_title_ph"));
+				setPH("editSlug", t("edit_slug_ph"));
+				setT("editOpenLabel", t("edit_open"));
+				setT("editSaveBtnTxt", t("edit_save"));
+				setT("tagHdr", t("tag_hdr"));
+				setPH("tagCustomInp", t("tag_ph"));
+				setT("tagAddBtn", t("tag_add"));
+				setPH("editTa", t("md_ph"));
+				setPH("galUrl", t("gal_url_ph"));
+				setT("galAddBtn", t("gal_add"));
+				setPH("refTitle", t("ref_title_ph"));
+				setPH("refUrl", t("ref_url_ph"));
+				setT("refAddBtn", t("ref_add"));
+				setT("stPagesLbl", t("profile_pages"));
+				setT("stPubLbl", t("profile_public"));
+				setT("stPriLbl", t("profile_private"));
+				setPH("loginUser", t("login_user_ph"));
+				setPH("loginPass", t("login_pass_ph"));
+				setPH("regUser", t("login_user_ph"));
+				setPH("regPass", t("login_pass_ph"));
+				setPH("regPass2", t("login_pass2_ph"));
+				setT("modalCancel", t("cancel"));
+				setT("confirmTitle", t("confirm_title"));
+				setT("confirmNo", t("confirm_no"));
+				setT("confirmYes", t("confirm_yes"));
+				setT("termsTitle", t("terms_title"));
+				setT("termsBack", t("mob_back"));
+
+				// Editor tabs
+				const tabs = document.querySelectorAll(".edit-tab");
+				if (tabs.length >= 3) {
+					tabs[0].textContent = t("tab_content");
+					tabs[1].textContent = t("tab_refs");
+					tabs[2].textContent = t("tab_gallery");
+				}
+
+				// Sort buttons
+				const sortBtns = document.querySelectorAll("#sortBar .sort-btn");
+				sortBtns.forEach(b => {
+					const s = b.dataset.sort;
+					if (s === "timeD") b.textContent = t("sort_timeD");
+					else if (s === "timeA") b.textContent = t("sort_timeA");
+					else if (s === "alphaA") b.textContent = t("sort_alphaA");
+					else if (s === "alphaD") b.textContent = t("sort_alphaD");
+				});
+
+				// Toolbar tooltips
+				const tbMap = {
+					bold: "tb_bold",
+					italic: "tb_italic",
+					strike: "tb_strike",
+					u: "tb_u",
+					h1: "tb_h1",
+					h2: "tb_h2",
+					h3: "tb_h3",
+					link: "tb_link",
+					image: "tb_image",
+					ul: "tb_ul",
+					ol: "tb_ol",
+					quote: "tb_quote",
+					code: "tb_code",
+					hr: "tb_hr"
+				};
+				document.querySelectorAll(".tb-btn").forEach(btn => {
+					const cmd = btn.dataset.cmd;
+					if (cmd && tbMap[cmd]) btn.title = t(tbMap[cmd]);
+				});
+
+				// Preview placeholder & word count
+				const ta = L("editTa");
+				const prev = document.querySelector("#mdPrev p");
+				if (prev && ta && !ta.value) prev.textContent = t("preview_ph");
+				wc();
+
+				updateDarkBtn();
+				// Re-render nav, and re-render current view with proper t() calls
+				nav();
+			}
+
+			async function load(key) {
+				try {
+					let r = await fetch(DB_R + key);
+					let t = await r.text();
+					return t ? JSON.parse(t) : {}
+				} catch {
+					return {}
+				}
+			}
+			async function save(key, v) {
+				let p = new URLSearchParams();
+				p.append('key', key);
+				p.append('value', JSON.stringify(v));
+				await fetch(DB_W, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					body: p
+				})
+			}
+			async function sha(s) {
+				const d = new TextEncoder().encode(s);
+				const h = await crypto.subtle.digest('SHA-256', d);
+				return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('')
+			}
+
+			async function apiPost(path, body) {
+				const r = await fetch(API_BASE + path, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: 'Bearer ' + SUPA_KEY
+					},
+					body: JSON.stringify(body)
+				});
+				const t = await r.text();
+				if (!r.ok) {
+					let m = t;
+					try {
+						const j = JSON.parse(t);
+						if (j.error) m = j.error
+					} catch {}
+					throw new Error(m)
+				}
+				return t ? JSON.parse(t) : null;
+			}
+			async function supaGet(path) {
+				const r = await fetch(SUPA_URL + path, {
+					headers: {
+						apikey: SUPA_KEY
+					}
+				});
+				if (!r.ok) throw new Error(await r.text());
+				return r.json();
+			}
+			async function supaPost(path, body) {
+				const r = await fetch(SUPA_URL + path, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						apikey: SUPA_KEY,
+						Prefer: 'return=minimal'
+					},
+					body: JSON.stringify(body)
+				});
+				if (!r.ok) throw new Error(await r.text());
+			}
+			async function supaDelete(path) {
+				const r = await fetch(SUPA_URL + path, {
+					method: 'DELETE',
+					headers: {
+						apikey: SUPA_KEY
+					}
+				});
+				if (!r.ok) throw new Error(await r.text());
+			}
+
+			// Load pedia index from Supabase
+			async function loadIndex() {
+				const arr = await supaGet(
+					'/pedia?select=slug,title,owner_id,allow_others,tags,views,created,updated,users(name)');
+				const idx = {};
+				arr.forEach(row => {
+					idx[row.slug] = {
+						title: row.title,
+						owner_id: row.owner_id,
+						owner_name: row.users ? row.users.name || '' : '',
+						allow_others: row.allow_others,
+						tags: row.tags || [],
+						views: row.views,
+						created: row.created,
+						updated: row.updated
+					};
+				});
+				return idx;
+			}
+			async function upsertIndexEntry(slug, data) {
+				try {
+					await fetch(SUPA_URL + '/pedia', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							apikey: SUPA_KEY,
+							Prefer: 'resolution=merge-duplicates'
+						},
+						body: JSON.stringify({
+							slug,
+							title: data.title,
+							owner_id: data.owner_id,
+							allow_others: data.allow_others,
+							tags: data.tags || null,
+							views: data.views,
+							created: data.created,
+							updated: data.updated
+						})
+					});
+				} catch {}
+			}
+			async function deleteIndexEntry(slug) {
+				try {
+					await supaDelete('/pedia?slug=eq.' + slug)
+				} catch {}
+			}
+
+			let S = {
+				userId: localStorage.getItem('pedia_user_id') || '',
+				user: '',
+				userName: '',
+				userAvatar: '',
+				view: 'welcome',
+				slug: '',
+				index: {}
+			};
+			let loading = 0;
+
+			function ld(o) {
+				loading++;
+				if (o) $('loadingTxt').textContent = o;
+				$('loadingOverlay').classList.add('active')
+			}
+
+			function hid() {
+				loading = Math.max(0, loading - 1);
+				if (!loading) $('loadingOverlay').classList.remove('active')
+			}
+			async function wl(p, o) {
+				ld(o);
+				try {
+					return await p
+				} finally {
+					hid()
+				}
+			}
+
+			function screen(id) {
+				$$('.screen').forEach(s => s.classList.remove('active'));
+				$(id).classList.add('active');
+				S.view = id;
+				nav()
+			}
+
+			let tt;
+
+			function toast(m) {
+				clearTimeout(tt);
+				const t = $('toast');
+				t.textContent = m;
+				t.classList.add('show');
+				tt = setTimeout(() => t.classList.remove('show'), 2200)
+			}
+
+			// ─── Custom Confirm (no native confirm) ───
+			let confirmResolve = null;
+
+			function showConfirm(msg, title) {
+				return new Promise(resolve => {
+					confirmResolve = resolve;
+					$('confirmTitle').textContent = title || t("confirm_title");
+					$('confirmMsg').innerHTML = msg;
+					$('confirmNo').style.display = '';
+					$('confirmModal').classList.add('active');
+				});
+			}
+
+			function showAlert(msg, title) {
+				return new Promise(resolve => {
+					confirmResolve = resolve;
+					$('confirmTitle').textContent = title || t("confirm_title");
+					$('confirmMsg').innerHTML = msg;
+					$('confirmNo').style.display = 'none';
+					$('confirmModal').classList.add('active');
+				});
+			}
+			$('confirmYes').addEventListener('click', () => {
+				$('confirmModal').classList.remove('active');
+				if (confirmResolve) {
+					confirmResolve(true);
+					confirmResolve = null
+				}
+			});
+			$('confirmNo').addEventListener('click', () => {
+				$('confirmModal').classList.remove('active');
+				if (confirmResolve) {
+					confirmResolve(false);
+					confirmResolve = null
+				}
+			});
+			$('confirmModal').addEventListener('click', e => {
+				if (e.target === $('confirmModal')) {
+					$('confirmModal').classList.remove('active');
+					if (confirmResolve) {
+						confirmResolve(false);
+						confirmResolve = null
+					}
+				}
+			});
+
+			// ─── URL Routing ───
+			function setURL(slug) {
+				const url = new URL(location);
+				url.searchParams.delete('view');
+				url.searchParams.delete('user');
+				if (slug) url.searchParams.set('id', slug);
+				else url.searchParams.delete('id');
+				const state = slug ? {
+					view: 'page',
+					slug
+				} : {
+					view: 'home'
+				};
+				if (slug) history.pushState(state, '', url);
+				else history.replaceState(state, '', url);
+			}
+
+			function pushView(view, param) {
+				const url = new URL(location);
+				url.searchParams.delete('id');
+				url.searchParams.delete('view');
+				url.searchParams.delete('user');
+				if (view === 'all') url.searchParams.set('view', 'all');
+				else if (view === 'profile') url.searchParams.set('user', param);
+				history.pushState({
+					view,
+					param: param || ''
+				}, '', url);
+			}
+			window.addEventListener('popstate', async e => {
+				if (!await checkEditDirty()) {
+					history.pushState(null, '', location.href);
+					return
+				}
+				const s = e.state;
+				if (!s || s.view === 'home') {
+					home()
+				} else if (s.view === 'page' && s.slug) {
+					goTo(s.slug, true)
+				} else if (s.view === 'all') {
+					allWiki(true)
+				} else if (s.view === 'profile' && s.param) {
+					showUserPages(s.param, true)
+				} else if (s.view === 'edit') {
+					editPage()
+				} else {
+					home()
+				}
+			});
+
+			// ─── Nav ───
+			function nav() {
+				const r = $('navRight');
+				if (S.user) {
+					r.innerHTML =
+						`<div class="user-btn" id="profileBtn2"><div class="user-avatar-wrap">${S.userAvatar?`<img src="${esc(S.userAvatar)}" alt="">`:'<span class="av-initial">'+esc((S.userName||S.user)[0])+'</span>'}</div><span class="user-name"><a class="user-link" onclick="event.stopPropagation();showUserPages('${esc(S.userName||S.user)}')">${esc(S.userName||S.user)}</a></span></div><button class="nav-btn" id="logoutBtn2">${t("logout")}</button>`;
+					$('profileBtn2')?.addEventListener('click', openProfile);
+					$('logoutBtn2')?.addEventListener('click', logout);
+					$('mobUserArea').innerHTML =
+						`<div class="mob-user-row" id="mobProfileRow"><div class="mob-user-av">${S.userAvatar?`<img src="${esc(S.userAvatar)}" alt="">`:'<span class="av-init">'+esc((S.userName||S.user)[0])+'</span>'}</div><span class="mob-user-nm">${esc(S.userName||S.user)}</span></div><button class="mob-logout-btn" id="mobLogoutBtn">${t("logout_mob")}</button>`;
+					$('mobProfileRow')?.addEventListener('click', () => {
+						closeMenu();
+						openProfile()
+					});
+					$('mobLogoutBtn')?.addEventListener('click', () => {
+						closeMenu();
+						logout()
+					});
+				} else {
+					r.innerHTML = `<button class="nav-btn primary" id="loginBtn2">${t("login_btn_txt")}</button>`;
+					$('loginBtn2')?.addEventListener('click', () => openLogin());
+					$('mobUserArea').innerHTML = `<button class="mob-login-btn" id="mobLoginBtn">${t("login_reg")}</button>`;
+					$('mobLoginBtn')?.addEventListener('click', () => {
+						closeMenu();
+						openLogin()
+					});
+				}
+				$$('.nav-link').forEach(b => b.classList.remove('active'));
+				if (S.view === 'allScreen') $('allNavBtn').classList.add('active');
+			}
+
+			// ─── Login ───
+			let regMode = false;
+
+			function openLogin(m) {
+				regMode = m === 'reg';
+				$('loginModal').classList.add('active');
+				upLogin()
+			}
+
+			function upLogin() {
+				$('modalTitle').textContent = regMode ? t("reg_title") : t("login_title");
+				$('loginUser').style.display = '';
+				$('loginPass').style.display = '';
+				$('regUser').style.display = regMode ? '' : 'none';
+				$('regPass').style.display = regMode ? '' : 'none';
+				$('regPass2').style.display = regMode ? '' : 'none';
+				$('modalBtn').textContent = regMode ? t("reg_btn") : t("login_btn_txt");
+				$('modalSwitch').textContent = regMode ? t("login_switch_login") : t("login_switch_reg");
+				$('modalErr').style.display = 'none';
+			}
+			$('modalSwitch').addEventListener('click', () => {
+				regMode = !regMode;
+				upLogin()
+			});
+			$('modalCancel').addEventListener('click', () => $('loginModal').classList.remove('active'));
+			$('modalBtn').addEventListener('click', async () => {
+				const e = $('modalErr');
+				e.style.display = 'none';
+				const btn = $('modalBtn');
+				btn.disabled = true;
+				try {
+					if (!regMode) {
+						const u = $('loginUser').value.trim(),
+							p = $('loginPass').value.trim();
+						if (!u || !p) {
+							e.textContent = t("toast_fill_all");
+							e.style.display = 'block';
+							return
+						}
+						const h = await sha(p);
+						const data = await wl(apiPost('/api/auth/login', {
+							name: u,
+							pass: h
+						}), t("load_verify"));
+						S.userId = String(data.id);
+						S.user = data.name;
+						S.userName = data.name;
+						S.userAvatar = data.avatar || '';
+						localStorage.setItem('pedia_user_id', S.userId);
+						commentUserCache[S.userId] = {
+							name: S.userName,
+							avatar: S.userAvatar
+						};
+						$('loginModal').classList.remove('active');
+						toast(t("toast_welcome", data.name));
+						nav();
+						home();
+					} else {
+						const u = $('regUser').value.trim(),
+							p1 = $('regPass').value.trim(),
+							p2 = $('regPass2').value.trim();
+						if (!u || !p1 || !p2) {
+							e.textContent = t("toast_fill_all");
+							e.style.display = 'block';
+							return
+						}
+						if (!/^[A-Za-z0-9_\-áéíóúñÁÉÍÓÚÑäöüßÄÖÜ]+$/.test(u)) {
+							e.textContent = t("toast_invalid_chars");
+							e.style.display = 'block';
+							return
+						}
+						if (p1 !== p2) {
+							e.textContent = t("toast_pass_mismatch");
+							e.style.display = 'block';
+							return
+						}
+						if (p1.length < 3) {
+							e.textContent = t("toast_pass_short");
+							e.style.display = 'block';
+							return
+						}
+						const h = await sha(p1);
+						const data = await wl(apiPost('/api/auth/register', {
+							name: u,
+							pass: h,
+							time: new Date().toISOString()
+						}), t("load_registering"));
+						S.userId = String(data.id);
+						S.user = data.name;
+						S.userName = data.name;
+						S.userAvatar = data.avatar || '';
+						localStorage.setItem('pedia_user_id', S.userId);
+						commentUserCache[S.userId] = {
+							name: S.userName,
+							avatar: S.userAvatar
+						};
+						$('loginModal').classList.remove('active');
+						toast(t("toast_reg", data.name));
+						nav();
+						home();
+					}
+				} catch (err) {
+					const msg = err.message;
+					if (msg.includes('duplicate') || msg.includes('already')) e.textContent = t("toast_user_exists");
+					else if (msg.includes('Wrong password') || msg.includes('wrong')) e.textContent = t(
+						"toast_wrong_pass");
+					else if (msg.includes('not found')) e.textContent = t("toast_user_not_found");
+					else e.textContent = msg;
+					e.style.display = 'block';
+				} finally {
+					btn.disabled = false
+				}
+			});
+
+			function logout() {
+				S.userId = '';
+				S.user = '';
+				S.userName = '';
+				S.userAvatar = '';
+				localStorage.removeItem('pedia_user_id');
+				nav();
+				toast(t("toast_logout"));
+				home()
+			}
+
+			// ─── Home ───
+			const SLOGANS = {
+				zh: [
+					'美国有维基，世界看杰基',
+					'美国有维基，世界看杰基',
+					'美国有维基，世界看杰基',
+					'美国有维基，世界看杰基',
+					'美国有维基，世界看杰基',
+					'探索世界，从杰基开始',
+					'世界的知识，汇聚于杰基',
+					'让知识连接世界',
+					'世界有答案，杰基有知识',
+					'知识无界，探索无限',
+					'下一代百科，从杰基开始',
+					'让知识触手可及',
+					'重新定义百科',
+					'为知识而生',
+					'探索，从未停止',
+					'记录世界，启迪未来',
+					'让每一份知识都有价值',
+					'知识，让世界更近',
+					'发现知识，发现世界',
+					'连接每一个答案',
+					'杰基百科，记录世界',
+					'Jackypedia，探索世界',
+					'世界因知识而精彩，知识因杰基而汇聚',
+					'知识无止境，杰基不停步',
+					'杰基百科，为世界而写',
+					'看什么 Slogan，快去看百科',
+					'你发现了一条稀有广告语',
+					'本 Slogan 每次刷新都有可能不同',
+					'世界很大，服务器很小',
+					'知识属于 Jackypedia，讨论属于 Jacky 论坛'
+				],
+				en: [
+					'America has Wikipedia, the world has Jackypedia',
+					'Explore the world, starting with Jacky',
+					'All the world\'s knowledge, gathered at Jacky',
+					'Connecting knowledge across the world',
+					'The world has answers, Jacky has knowledge',
+					'Knowledge without borders, explore without limits',
+					'The next-gen encyclopedia starts here',
+					'Making knowledge accessible to all',
+					'Redefining the encyclopedia',
+					'Born for knowledge',
+					'Never stop exploring',
+					'Recording the world, inspiring the future',
+					'Every piece of knowledge matters',
+					'Knowledge brings the world closer',
+					'Discover knowledge, discover the world',
+					'Connecting every answer',
+					'Jackypedia, recording the world',
+					'The world shines with knowledge, Jacky brings it together',
+					'Knowledge has no limits, Jacky never stops',
+					'Jackypedia, written for the world',
+					'Stop reading slogans, go read some wikis!',
+					'You found a rare advertising slogan!',
+					'This slogan changes every time you refresh',
+					'The world is big, the server is small',
+					'Knowledge belongs to Jackypedia, discussion belongs to Jacky Forum'
+				],
+				es: [
+					'América tiene Wikipedia, el mundo tiene Jackypedia',
+					'Explora el mundo, empezando por Jacky',
+					'Todo el conocimiento del mundo, reunido en Jacky',
+					'Conectando el conocimiento a través del mundo',
+					'El mundo tiene respuestas, Jacky tiene conocimiento',
+					'Conocimiento sin fronteras, explora sin límites',
+					'La enciclopedia de próxima generación comienza aquí',
+					'Haciendo el conocimiento accesible para todos',
+					'Redefiniendo la enciclopedia',
+					'Nacido para el conocimiento',
+					'Nunca dejes de explorar',
+					'Grabando el mundo, inspirando el futuro',
+					'Cada pieza de conocimiento importa',
+					'El conocimiento acerca el mundo',
+					'Descubre conocimiento, descubre el mundo',
+					'Conectando cada respuesta',
+					'Jackypedia, grabando el mundo',
+					'El mundo brilla con conocimiento, Jacky lo reúne',
+					'El conocimiento no tiene límites, Jacky nunca se detiene',
+					'Jackypedia, escrita para el mundo',
+					'¡Deja de leer eslóganes, ve a leer wikis!',
+					'¡Encontraste un eslogan publicitario raro!',
+					'Este eslogan cambia cada vez que actualizas',
+					'El mundo es grande, el servidor es pequeño',
+					'El conocimiento pertenece a Jackypedia, la discusión pertenece a Jacky Forum'
+				],
+				de: [
+					'Amerika hat Wikipedia, die Welt hat Jackypedia',
+					'Entdecke die Welt, beginnend mit Jacky',
+					'Das ganze Wissen der Welt, versammelt bei Jacky',
+					'Wissen verbindet die Welt',
+					'Die Welt hat Antworten, Jacky hat Wissen',
+					'Wissen ohne Grenzen, erkunde unbegrenzt',
+					'Die nächste Generation von Enzyklopädien beginnt hier',
+					'Wissen für alle zugänglich machen',
+					'Die Enzyklopädie neu definieren',
+					'Für Wissen geboren',
+					'Höre nie auf zu entdecken',
+					'Die Welt aufzeichnen, die Zukunft inspirieren',
+					'Jedes Stück Wissen zählt',
+					'Wissen bringt die Welt näher',
+					'Entdecke Wissen, entdecke die Welt',
+					'Jede Antwort verbinden',
+					'Jackypedia, zeichnet die Welt auf',
+					'Die Welt glänzt mit Wissen, Jacky bringt es zusammen',
+					'Wissen kennt keine Grenzen, Jacky hört nie auf',
+					'Jackypedia, für die Welt geschrieben',
+					'Hör auf Slogans zu lesen, lies Wikis!',
+					'Du hast einen seltenen Werbeslogan gefunden!',
+					'Dieser Slogan ändert sich bei jedem Neuladen',
+					'Die Welt ist groß, der Server ist klein',
+					'Wissen gehört zu Jackypedia, Diskussion gehört zu Jacky Forum'
+				],
+				'zh-TW': [
+					'美國有維基，世界看傑基',
+					'美國有維基，世界看傑基',
+					'美國有維基，世界看傑基',
+					'美國有維基，世界看傑基',
+					'美國有維基，世界看傑基',
+					'探索世界，從傑基開始',
+					'世界的知識，匯聚於傑基',
+					'讓知識連接世界',
+					'世界有答案，傑基有知識',
+					'知識無界，探索無限',
+					'下一代百科，從傑基開始',
+					'讓知識觸手可及',
+					'重新定義百科',
+					'為知識而生',
+					'探索，從未停止',
+					'記錄世界，啟迪未來',
+					'讓每一份知識都有價值',
+					'知識，讓世界更近',
+					'發現知識，發現世界',
+					'連接每一個答案',
+					'傑基百科，記錄世界',
+					'Jackypedia，探索世界',
+					'世界因知識而精彩，知識因傑基而匯聚',
+					'知識無止境，傑基不停步',
+					'傑基百科，為世界而寫',
+					'看什麼 Slogan，快去看百科',
+					'你發現了一條稀有廣告語',
+					'本 Slogan 每次重新整理都有可能不同',
+					'世界很大，伺服器很小',
+					'知識屬於 Jackypedia，討論屬於 Jacky 論壇'
+				]
+			};
+			async function home() {
+				setURL('');
+				$('qryInp').value = '';
+				$('searchScrInp').value = '';
+				hideSearchDD();
+				const slogans = SLOGANS[currentLang] || SLOGANS.zh;
+				$('heroSlogan').textContent = slogans[Math.floor(Math.random() * slogans.length)];
+				$('heroTitle').textContent = Math.random() < .01 ? 'JaCkYpEdIa' : 'Jackypedia';
+				// Load announcements
+				load('jackypedia_announcements').then(t => {
+					$('announceBody').textContent = t && typeof t === 'string' ? t : '';
+					$('announceBody').style.display = t && typeof t === 'string' && t ? '' : 'none';
+				}).catch(() => {
+					$('announceBody').style.display = 'none'
+				});
+				S.index = await wl(loadIndex(), t("load_list"));
+				const entries = Object.entries(S.index);
+				// Stats — total visits in textdb
+				const tv = await load('jackypedia_total_visits');
+				const hv = (tv && tv.count ? tv.count : 0) + 1;
+				await save('jackypedia_total_visits', {
+					count: hv
+				});
+				$('statsBody').innerHTML = '<span>' + t("stats_pages", entries.length) + '</span><span>' + t("stats_visits",
+					hv) + '</span>';
+				const hot = entries.filter(([, m]) => m.views).sort((a, b) => (b[1].views || 0) - (a[1].views || 0)).slice(0,
+					12);
+				const latest = entries.sort((a, b) => ((b[1].created || '') > (a[1].created || '') ? 1 : -1)).slice(0, 12);
+				$('hotCount').textContent = entries.length ? 'Top ' + Math.min(hot.length || 6, 6) : '';
+				$('newCount').textContent = latest.length ? String(latest.length) : '';
+				$('hotGrid').innerHTML = hot.length ? hot.map(([slug, meta]) => card(slug, meta)).join('') :
+					'<div class="empty" style="grid-column:1/-1;padding:20px"><p>' + t("no_hot") + '</p></div>';
+				$('newGrid').innerHTML = latest.length ? latest.map(([slug, meta]) => card(slug, meta)).join('') :
+					'<div class="empty" style="grid-column:1/-1;padding:20px"><p>' + t("no_new") + '</p></div>';
+				screen('welcomeScreen');
+			}
+
+			function card(slug, meta) {
+				const views = meta.views ? `<span>${meta.views}</span>` : '';
+				const date = meta.updated ? new Date(meta.updated).toLocaleDateString() : '';
+				const tags = (meta.tags || []).map(t =>
+					`<span class="tag" onclick="event.stopPropagation();filterByTag('${esc(t)}')">${esc(t)}</span>`).join('');
+				return `<div class="card anim-fade-up" onclick="goTo('${slug}')" style="animation-delay:${Math.random()*.12}s"><h3>${esc(meta.title||slug)}</h3><p>${meta.owner_name?`<a class="user-link" onclick="event.stopPropagation();showUserPages('${esc(meta.owner_name)}')">${esc(meta.owner_name)}</a>`:''}</p><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${tags}</div><div class="card-meta">${views?views+' ':'<span></span>'}${date?'<span>'+date+'</span>':''}</div></div>`;
+			}
+
+			function randomPage() {
+				const slugs = Object.keys(S.index);
+				if (!slugs.length) {
+					toast(t("no_new"));
+					return
+				}
+				goTo(slugs[Math.floor(Math.random() * slugs.length)]);
+			}
+
+			// ─── All Wiki ───
+			let sortMode = 'timeD',
+				activeTag = '';
+
+			function sortEntries(entries, mode) {
+				return entries.sort((a, b) => {
+					const ta = a[1].title || a[0],
+						tb = b[1].title || b[0];
+					const da = a[1].updated || a[1].created || '',
+						db = b[1].updated || b[1].created || '';
+					if (mode === 'timeD') return da > db ? -1 : da < db ? 1 : 0;
+					if (mode === 'timeA') return da < db ? -1 : da > db ? 1 : 0;
+					if (mode === 'alphaA') return ta.localeCompare(tb);
+					if (mode === 'alphaD') return tb.localeCompare(ta);
+					return 0;
+				});
+			}
+
+			function renderAllGrid() {
+				let entries = Object.entries(S.index);
+				if (activeTag === '__other__') entries = entries.filter(([, m]) => (m.tags || []).some(t => !PRESET_TAGS
+					.includes(t)));
+				else if (activeTag) entries = entries.filter(([, m]) => (m.tags || []).includes(activeTag));
+				entries = sortEntries(entries, sortMode);
+				$('allGrid').innerHTML = entries.length ? entries.map(([slug, meta]) => card(slug, meta)).join('') :
+					'<div class="empty" style="grid-column:1/-1;padding:60px 20px"><h2>' + t("no_new") + '</h2><p>' + t(
+						"login_to_create") + '</p></div>';
+			}
+
+			function renderAllTags() {
+				const tagSet = new Set();
+				Object.values(S.index).forEach(m => (m.tags || []).forEach(t => tagSet.add(t)));
+				const allTags = Array.from(tagSet);
+				const presetTags = allTags.filter(t => PRESET_TAGS.includes(t)).sort();
+				const customTags = allTags.filter(t => !PRESET_TAGS.includes(t));
+				let html = '<span class="tag' + (activeTag === '' ? ' active' : '') + '" onclick="filterByTag(' + `''` + ')">' +
+					t("filter_all") + '</span>';
+				presetTags.forEach(t => {
+					html +=
+						`<span class="tag${t===activeTag?' active':''}" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`
+				});
+				if (customTags.length) html +=
+					`<span class="tag${activeTag==='__other__'?' active':''}" onclick="filterByTag('__other__')">${t("filter_other")}</span>`;
+				$('allTags').innerHTML = html;
+			}
+
+			function filterByTag(t) {
+				if (t === '' || t === activeTag) {
+					activeTag = '';
+				} else activeTag = t;
+				if (S.view === 'allScreen') {
+					renderAllGrid();
+					renderAllTags()
+				} else allWiki();
+			}
+			async function allWiki(noHistory) {
+				if (!S.index || !Object.keys(S.index).length) S.index = await wl(loadIndex(), t("load_list"));
+				if (!noHistory) pushView('all');
+				const active = document.querySelector('#sortBar .sort-btn.active');
+				if (active) sortMode = active.dataset.sort;
+				renderAllTags();
+				renderAllGrid();
+				screen('allScreen');
+			}
+			$('sortBar').addEventListener('click', e => {
+				const b = e.target.closest('.sort-btn');
+				if (!b) return;
+				$$('#sortBar .sort-btn').forEach(btn => btn.classList.remove('active'));
+				b.classList.add('active');
+				sortMode = b.dataset.sort;
+				renderAllGrid();
+			});
+			$('allNavBtn').addEventListener('click', async () => {
+				if (!await checkEditDirty()) return;
+				activeTag = '';
+				allWiki()
+			});
+
+			// ─── Navigate with URL ───
+			async function goTo(slug, noHistory) {
+				if (!slug) return;
+				S.slug = slug;
+				if (!noHistory) setURL(slug);
+				screen('pageScreen');
+				$('pageTitle').textContent = '...';
+				$('pageMeta').innerHTML = '';
+				$('pageActions').innerHTML = '';
+				$('pageContent').innerHTML = '';
+				$('commentList').innerHTML = '';
+
+				S.index = await wl(loadIndex(), t("load_list"));
+				const meta = S.index[slug];
+				$('pageTitle').textContent = meta ? (meta.title || slug) : slug;
+
+				if (meta) {
+					const canEdit = S.user && (meta.allow_others !== false || parseInt(meta.owner_id) === parseInt(S
+						.userId));
+					const dt = meta.created ? new Date(meta.created).toLocaleString() : '';
+					const upd = meta.updated ? new Date(meta.updated).toLocaleString() : '';
+					const views = meta.views || 0;
+					$('pageMeta').innerHTML = `
+      <span>${meta.owner_name?`<a class="user-link" onclick="showUserPages('${esc(meta.owner_name)}')">${esc(meta.owner_name)}</a>`:t("unknown_author")}</span>
+      ${dt?' <span class="dot"></span> <span>'+t("created_label")+' '+dt+'</span>':''}
+      ${views?' <span class="dot"></span> <span>'+t("page_views",views)+'</span>':''}`;
+					const tags = meta.tags || [];
+					$('pageTags').innerHTML = tags.length ? tags.map(t =>
+						`<span class="tag" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('') : '';
+					$('pageActions').innerHTML =
+						(canEdit ? `<button onclick="editPage('${slug}')">${t("edit")}</button>` : '') +
+						(parseInt(meta.owner_id) === parseInt(S.userId) ?
+							`<button class="danger" onclick="delPage('${slug}')">${t("del")}</button>` : '');
+					// Load comments
+					loadComments(slug);
+				} else {
+					$('pageMeta').innerHTML = '<span style="color:var(--orange)">' + t("page_not_found") + '</span>';
+					$('pageActions').innerHTML = S.user ? `<button onclick="editPage('${slug}')">${t("create")}</button>` :
+						'';
+					$('commentsSection').style.display = 'none';
+				}
+
+				const data = await wl(load('zhujingqi_pedia_' + slug), t("load_content"));
+				if (data && data.content) {
+					$('pageContent').innerHTML = DOMPurify.sanitize(marked.parse(data.content));
+					trackView(slug)
+				} else if (meta) $('pageContent').innerHTML = '<p style="color:var(--text2);padding:20px 0">' + t(
+					"page_empty") + '</p>';
+				else $('pageContent').innerHTML = '<div class="empty" style="padding:60px 20px"><h2>' + t("page_not_found") +
+					'</h2><p>「' + esc(slug) + '」' + t("page_not_created") + (S.user ? '，' + t("profile_hint") : '，' + t(
+						"login_to_create")) + '</p></div>';
+				// Render gallery
+				const imgs = data?.images || [];
+				if (imgs.length) {
+					$('gallerySection').style.display = '';
+					$('galleryGrid').innerHTML = imgs.map((url, i) =>
+						`<div class="gal-thumb anim-fade" onclick="openLightbox(${i})"><img src="${esc(url)}" onerror="this.parentElement.style.display='none'" loading="lazy"></div>`
+					).join('');
+					window.__galImgs = imgs;
+				} else {
+					$('gallerySection').style.display = 'none'
+				}
+				// Render references
+				const refs = data?.references || [];
+				if (refs.length) {
+					$('refsSection').style.display = '';
+					$('refsList').innerHTML = refs.map((r, i) =>
+						`<div class="ref-li">${r.title?esc(r.title)+' — ':''}<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a></div>`
+					).join('');
+				} else {
+					$('refsSection').style.display = 'none'
+				}
+			}
+
+			async function trackView(slug) {
+				if (!S.index[slug]) return;
+				S.index[slug].views = (S.index[slug].views || 0) + 1;
+				await upsertIndexEntry(slug, S.index[slug]);
+			}
+
+			// ─── Comments (Threaded, with Avatars from Supabase) ───
+			let commentData = null;
+			let commentUserCache = {};
+			const AVATAR_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#D4A5A5', '#9B59B6', '#3498DB',
+				'#E67E22', '#2ECC71', '#E74C3C', '#1ABC9C'
+			];
+
+			function avatarColor(s) {
+				let h = 0;
+				for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % AVATAR_COLORS.length;
+				return AVATAR_COLORS[h];
+			}
+
+			// userCache: { userId -> {name, avatar} }
+			function renderCommentTree(comments, parentId, dep, slugContext, userCache) {
+				dep = dep || 0;
+				if (dep > 8) return '';
+				const children = comments.filter(c => c.parentId === parentId).sort((a, b) => a.id - b.id);
+				if (!children.length) return '';
+				const s = slugContext || S.slug;
+				return children.map(c => {
+					const uid = c.userId;
+					const cu = uid ? userCache[uid] : null;
+					const displayName = cu ? cu.name : (c.userName || c.user || '?');
+					const displayAvatar = cu ? cu.avatar : null;
+					const avHtml = displayAvatar ? `<img src="${esc(displayAvatar)}" alt="">` : '';
+					const initial = displayName ? esc(displayName[0]).toUpperCase() : '?';
+					const nested = renderCommentTree(comments, c.id, dep + 1, s, userCache);
+					return `<div class="comment-item" data-cid="${c.id}">
+      <div class="comment-hdr">
+        <div class="comment-av" style="background:${avatarColor(uid||displayName)}">${avHtml||initial}</div>
+        <span class="comment-author"><a class="user-link" onclick="showUserPages('${esc(displayName)}')">${esc(displayName)}</a></span>
+        <span class="comment-time">${c.time?new Date(c.time).toLocaleString():''}</span>
+      </div>
+      <div class="comment-body">${esc(c.text)}</div>
+      <div class="comment-actions">
+        <button onclick="showReplyForm(${c.id})">${t("reply")}</button>
+        ${(uid===S.userId||(!uid&&c.user===S.user))?`<button class="del" onclick="delComment('${s}',${c.id})">${t("del")}</button>`:''}
+      </div>
+      <div class="comment-reply-form" id="replyForm${c.id}">
+        <textarea id="replyInput${c.id}" placeholder="${t("reply_ph",esc(displayName))}" rows="1"></textarea>
+        <button onclick="submitReply(${c.id})">${t("comment_btn")}</button>
+      </div>
+      ${nested?`<div class="comment-nested">${nested}</div>`:''}
+    </div>`;
+				}).join('');
+			}
+
+			async function fetchCommentUsers(comments) {
+				if (!comments || !comments.length) return {};
+				const ids = [],
+					names = [];
+				comments.forEach(c => {
+					if (c.userId && !commentUserCache[c.userId]) ids.push(c.userId);
+					if (!c.userId && c.user && !commentUserCache['n_' + c.user]) names.push(c.user);
+				});
+				if (ids.length) {
+					try {
+						const arr = await supaGet('/users?id=in.(' + ids.join(',') + ')&select=id,name,avatar');
+						arr.forEach(u => {
+							if (u) commentUserCache[u.id] = {
+								name: u.name,
+								avatar: u.avatar || ''
+							}
+						});
+					} catch {}
+				}
+				if (names.length) {
+					try {
+						const enc = names.map(n => encodeURIComponent(n));
+						const arr = await supaGet('/users?name=in.(' + enc.join(',') + ')&select=name,avatar');
+						(arr || []).forEach(u => {
+							if (u) commentUserCache['n_' + u.name] = {
+								name: u.name,
+								avatar: u.avatar || ''
+							}
+						});
+					} catch {}
+				}
+				return commentUserCache;
+			}
+
+			async function loadComments(slug) {
+				$('commentsSection').style.display = '';
+				$('commentForm').style.display = S.user ? '' : 'none';
+				if (!S.user) $('commentList').innerHTML = '<div class="empty-comments">' + t("login_comment") + '</div>';
+				commentData = await load('zhujingqi_pedia_' + slug);
+				await fetchCommentUsers(commentData?.comments);
+				renderComments(slug);
+			}
+
+			function renderComments(slug) {
+				const list = $('commentList');
+				const comments = commentData?.comments || [];
+				if (!comments.length && S.user) {
+					list.innerHTML = '<div class="empty-comments">' + t("no_comments") + '</div>';
+					return
+				}
+				list.innerHTML = renderCommentTree(comments, null, 0, slug, commentUserCache);
+			}
+			$('commentBtn').addEventListener('click', async () => {
+				if (!S.user) {
+					toast(t("toast_login_first"));
+					openLogin();
+					return
+				}
+				const input = $('commentInput');
+				const text = input.value.trim();
+				if (!text) {
+					toast(t("toast_enter_comment"));
+					return
+				}
+				const slug = S.slug;
+				if (!slug || !S.index[slug]) return;
+				const data = await wl(load('zhujingqi_pedia_' + slug), '提交中...');
+				if (!data.comments) data.comments = [];
+				data.comments.push({
+					id: Date.now(),
+					userId: S.userId,
+					userName: S.userName || S.user,
+					text,
+					time: new Date().toISOString(),
+					parentId: null
+				});
+				await save('zhujingqi_pedia_' + slug, data);
+				await updateRankCache(S.userName || S.user, {
+					comments: 1
+				});
+				commentData = data;
+				commentUserCache[S.userId] = {
+					name: S.userName || S.user,
+					avatar: S.userAvatar || ''
+				};
+				renderComments(slug);
+				input.value = '';
+				toast(t("toast_comment_sent"));
+			});
+			$('commentInput').addEventListener('keydown', e => {
+				if (e.key === 'Enter' && !e.shiftKey) {
+					e.preventDefault();
+					$('commentBtn').click()
+				}
+			});
+
+			function showReplyForm(cid) {
+				const f = $('replyForm' + cid);
+				if (!f) return;
+				const all = document.querySelectorAll('.comment-reply-form.active');
+				all.forEach(a => {
+					if (a !== f) a.classList.remove('active')
+				});
+				f.classList.toggle('active');
+				if (f.classList.contains('active')) {
+					const inp = $('replyInput' + cid);
+					if (inp) {
+						inp.focus();
+						inp.value = ''
+					}
+				}
+			}
+			async function submitReply(cid) {
+				if (!S.user) {
+					toast(t("toast_login_first"));
+					openLogin();
+					return
+				}
+				const input = $('replyInput' + cid);
+				if (!input) return;
+				const text = input.value.trim();
+				if (!text) {
+					toast(t("toast_enter_reply"));
+					return
+				}
+				const slug = S.slug;
+				if (!slug || !S.index[slug]) return;
+				const data = await wl(load('zhujingqi_pedia_' + slug), '提交中...');
+				if (!data.comments) data.comments = [];
+				data.comments.push({
+					id: Date.now(),
+					userId: S.userId,
+					userName: S.userName || S.user,
+					text,
+					time: new Date().toISOString(),
+					parentId: cid
+				});
+				await save('zhujingqi_pedia_' + slug, data);
+				await updateRankCache(S.userName || S.user, {
+					comments: 1
+				});
+				commentData = data;
+				commentUserCache[S.userId] = {
+					name: S.userName || S.user,
+					avatar: S.userAvatar || ''
+				};
+				renderComments(slug);
+				toast(t("toast_reply_sent"));
+			}
+			async function delComment(slug, cid) {
+				const ok = await showConfirm(t("confirm_delete_comment"));
+				if (!ok) return;
+				const data = await load('zhujingqi_pedia_' + slug);
+				if (data.comments) {
+					const toRemove = new Set([cid]);
+					let prevSize = 0;
+					while (prevSize !== toRemove.size) {
+						prevSize = toRemove.size;
+						data.comments.forEach(c => {
+							if (toRemove.has(c.parentId)) toRemove.add(c.id)
+						});
+					}
+					// Update rank cache before removing
+					const cc = {};
+					data.comments.forEach(c => {
+						if (toRemove.has(c.id)) {
+							const un = c.userName || c.user || '';
+							if (un) cc[un] = (cc[un] || 0) + 1
+						}
+					});
+					for (const [un, cnt] of Object.entries(cc)) await updateRankCache(un, {
+						comments: -cnt
+					});
+					data.comments = data.comments.filter(c => !toRemove.has(c.id));
+				}
+				await save('zhujingqi_pedia_' + slug, data);
+				commentData = data;
+				renderComments(slug);
+				toast(t("toast_comment_deleted"));
+			}
+
+			let editDirty = false;
+			async function checkEditDirty() {
+				if (S.view === 'editScreen' && editDirty) {
+					return await showConfirm(t("unsaved_msg"), t("unsaved_title"));
+				}
+				return true;
+			}
+
+			// ─── Editor ───
+			const PRESET_TAGS = ['学习', '搞笑', '科技', '人文', '小众', '常识'];
+			let editGallery = [],
+				editRefs = [],
+				editTags = [];
+
+			function switchEditTab(tab) {
+				$$('.edit-tab').forEach(b => b.classList.toggle('active', b.dataset.etab === tab));
+				$('toolbar').style.display = tab === 'content' ? '' : 'none';
+				$('editorBody').style.display = tab === 'content' ? 'flex' : 'none';
+				$('galEdit').classList.toggle('active', tab === 'gallery');
+				$('refEdit').classList.toggle('active', tab === 'refs');
+				renderGalEdit();
+				renderRefEdit();
+			}
+			$('editTabs').addEventListener('click', e => {
+				const b = e.target.closest('.edit-tab');
+				if (!b) return;
+				switchEditTab(b.dataset.etab);
+			});
+
+			// ─── Tags Editor ───
+			function renderEditTags() {
+				const presets = $('tagPresets');
+				presets.innerHTML = PRESET_TAGS.map(t =>
+					`<span class="tag${editTags.includes(t)?' selected':''}" data-tag="${t}" onclick="toggleEditTag('${t}')">${t}</span>`
+				).join('');
+				$('tagSel').innerHTML = editTags.map((t, i) =>
+					`<span class="tag selected" onclick="removeEditTag(${i})">${t} ✕</span>`).join('');
+			}
+
+			function toggleEditTag(t) {
+				const idx = editTags.indexOf(t);
+				if (idx > -1) editTags.splice(idx, 1);
+				else editTags.push(t);
+				editDirty = true;
+				renderEditTags();
+			}
+
+			function removeEditTag(i) {
+				editTags.splice(i, 1);
+				editDirty = true;
+				renderEditTags();
+			}
+			$('tagAddBtn').addEventListener('click', () => {
+				const v = $('tagCustomInp').value.trim();
+				if (!v) return;
+				if (editTags.includes(v)) {
+					toast(t("tag_exists"));
+					return
+				}
+				if (editTags.length >= 5) {
+					toast(t("tag_max"));
+					return
+				}
+				editTags.push(v);
+				editDirty = true;
+				$('tagCustomInp').value = '';
+				renderEditTags();
+			});
+			$('tagCustomInp').addEventListener('keydown', e => {
+				if (e.key === 'Enter') $('tagAddBtn').click()
+			});
+
+			function renderGalEdit() {
+				$('galList').innerHTML = editGallery.map((url, i) => `
+    <div class="gal-item"><div class="gal-img-wrap"><img src="${esc(url)}" onerror="this.outerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:11px\\'>'+t("gal_load_fail")+'</div>'"></div><button class="gal-del" onclick="removeGalItem(${i})">✕</button></div>
+  `).join('');
+			}
+
+			function removeGalItem(i) {
+				showConfirm(t("confirm_del_image")).then(ok => {
+					if (ok) {
+						editGallery.splice(i, 1);
+						renderGalEdit();
+						editDirty = true
+					}
+				});
+			}
+			$('galAddBtn').addEventListener('click', () => {
+				const v = $('galUrl').value.trim();
+				if (!v) return;
+				editGallery.push(v);
+				$('galUrl').value = '';
+				renderGalEdit();
+				editDirty = true;
+			});
+			$('galUrl').addEventListener('keydown', e => {
+				if (e.key === 'Enter') $('galAddBtn').click()
+			});
+
+			function renderRefEdit() {
+				$('refList').innerHTML = editRefs.map((r, i) => `
+    <div class="ref-item"><span class="ref-num">[${i+1}]</span><span class="ref-t">${esc(r.title||'')}</span><span class="ref-u">${esc(r.url||'')}</span><button class="ref-del" onclick="removeRefItem(${i})">✕</button></div>
+  `).join('');
+			}
+
+			function removeRefItem(i) {
+				showConfirm(t("confirm_del_ref")).then(ok => {
+					if (ok) {
+						editRefs.splice(i, 1);
+						renderRefEdit();
+						editDirty = true
+					}
+				});
+			}
+			$('refAddBtn').addEventListener('click', () => {
+				const t = $('refTitle').value.trim(),
+					u = $('refUrl').value.trim();
+				if (!t && !u) return;
+				editRefs.push({
+					title: t,
+					url: u
+				});
+				$('refTitle').value = '';
+				$('refUrl').value = '';
+				renderRefEdit();
+				editDirty = true;
+			});
+			$('refUrl').addEventListener('keydown', e => {
+				if (e.key === 'Enter') $('refAddBtn').click()
+			});
+
+			function editPage(slug) {
+				if (!S.user) {
+					toast(t("toast_login_first"));
+					openLogin();
+					return
+				}
+				editDirty = false;
+				editGallery = [];
+				editRefs = [];
+				editTags = [];
+				screen('editScreen');
+				S.slug = slug || '';
+				const url = new URL(location);
+				url.searchParams.set('view', 'edit');
+				url.searchParams.delete('id');
+				url.searchParams.delete('user');
+				history.pushState({
+					view: 'edit'
+				}, '', url);
+				$('editTitle').value = '';
+				$('editSlug').value = slug || '';
+				$('editTa').value = '';
+				$('editOpen').checked = true;
+				$('editSlug').classList.remove('err');
+				wc();
+				$('mdPrev').innerHTML = '<p style="color:var(--text3);margin:0">' + t("preview_ph") + '</p>';
+				switchEditTab('content');
+				if (slug && S.index[slug]) {
+					$('editTitle').value = S.index[slug].title || '';
+					$('editOpen').checked = S.index[slug].allow_others !== false;
+					$('editSlug').readOnly = true;
+					$('editSlug').style.background = 'var(--bg3)'
+				} else {
+					$('editSlug').readOnly = false;
+					$('editSlug').style.background = ''
+				}
+				if (slug) load('zhujingqi_pedia_' + slug).then(d => {
+					if (d && d.content) {
+						$('editTa').value = d.content;
+						pr();
+						wc()
+					}
+					if (d && d.images) editGallery = d.images.slice();
+					if (d && d.references) editRefs = d.references.slice();
+					if (d && d.tags) editTags = d.tags.slice();
+					renderEditTags();
+				});
+				renderEditTags();
+				$('editTitle').focus();
+			}
+			$('editTa').addEventListener('input', () => {
+				editDirty = true;
+				pr();
+				wc()
+			});
+			$('editTitle').addEventListener('input', () => {
+				editDirty = true
+			});
+			$('editSlug').addEventListener('input', () => {
+				editDirty = true
+			});
+			$('editOpen').addEventListener('change', () => {
+				editDirty = true
+			});
+
+			function pr() {
+				$('mdPrev').innerHTML = $('editTa').value ? DOMPurify.sanitize(marked.parse($('editTa').value)) :
+					'<p style="color:var(--text3);margin:0">' + t("preview_ph") + '</p>'
+			}
+
+			function wc() {
+				$('wordC').textContent = t("word_count", $('editTa').value.length)
+			}
+			$('editBack').addEventListener('click', async () => {
+				if (!await checkEditDirty()) return;
+				if (S.slug) goTo(S.slug);
+				else home()
+			});
+
+			const TBC = {
+				bold: ['**', '**', 2],
+				italic: ['*', '*', 1],
+				strike: ['~~', '~~', 2],
+				u: ['_', '_', 2],
+				h1: ['\n# ', '', 0],
+				h2: ['\n## ', '', 0],
+				h3: ['\n### ', '', 0],
+				link: ['[', '](url)', 0],
+				image: ['![', '](url)', 0],
+				ul: ['\n- ', '', 0],
+				ol: ['\n1. ', '', 0],
+				quote: ['\n> ', '', 0],
+				code: ['\n```\n', '\n```\n', 0],
+				hr: ['\n---\n', '', 0]
+			};
+			$('toolbar').addEventListener('click', e => {
+				const b = e.target.closest('.tb-btn');
+				if (!b) return;
+				const cmd = b.dataset.cmd;
+				if (!cmd) return;
+				const ta = $('editTa'),
+					s = ta.selectionStart,
+					en = ta.selectionEnd,
+					sel = ta.value.substring(s, en);
+				const conf = TBC[cmd];
+				if (!conf) return;
+				let [pre, suf] = conf, txt = pre + sel + suf, cur = s + pre.length + (sel ? sel.length : 0);
+				if (!sel && (cmd === 'link')) {
+					txt = '[](url)';
+					cur = s + txt.length
+				}
+				if (!sel && (cmd === 'image')) {
+					txt = '![](url)';
+					cur = s + txt.length
+				}
+				ta.value = ta.value.substring(0, s) + txt + ta.value.substring(en);
+				ta.focus();
+				ta.setSelectionRange(cur, cur);
+				editDirty = true;
+				pr();
+				wc();
+			});
+
+			// ─── Save ───
+			$('editSave').addEventListener('click', async () => {
+				if (!S.user) return;
+				const btn = $('editSave');
+				const title = $('editTitle').value.trim() || '无标题';
+				const rawSlug = S.slug || ($('editSlug').value.trim().toLowerCase());
+				const c = $('editTa').value.trim();
+				if (!c) {
+					toast(t("toast_content_empty"));
+					return
+				}
+				if (!S.slug) {
+					if (!rawSlug) {
+						showAlert(t("slug_empty_alert"));
+						return
+					}
+					if (!/^[a-z0-9-_]+$/.test(rawSlug)) {
+						showAlert(t("slug_invalid_alert"));
+						return
+					}
+				}
+				let slug = rawSlug.replace(/[^a-z0-9-]/g, '');
+				if (!slug) slug = 'undefined';
+				S.index = await wl(loadIndex(), t("load_list"));
+				if (!S.index || typeof S.index !== 'object') S.index = {};
+				if (!S.slug && S.index[slug]) {
+					showAlert(t("slug_exists_alert", slug));
+					return
+				}
+				const isNew = !S.index[slug],
+					open = $('editOpen').checked;
+				btn.classList.add('loading');
+				try {
+					await wl((async () => {
+						// Preserve comments when editing
+						const existing = await load('zhujingqi_pedia_' + slug);
+						if (!isNew && existing.content && existing.content.length > 100 && c.length <
+							existing.content.length * 0.5) {
+							throw new Error(t("toast_mass_delete"));
+						}
+						await save('zhujingqi_pedia_' + slug, {
+							content: c,
+							owner: S.user,
+							allowOthers: open,
+							comments: existing.comments || [],
+							images: editGallery,
+							references: editRefs,
+							tags: editTags
+						});
+						S.index[slug] = {
+							title,
+							owner_id: parseInt(S.index[slug]?.owner_id || S.userId),
+							owner_name: S.index[slug]?.owner_name || S.userName,
+							allow_others: open,
+							tags: editTags,
+							views: S.index[slug]?.views || 0,
+							created: S.index[slug]?.created || new Date().toISOString(),
+							updated: new Date().toISOString()
+						};
+						await upsertIndexEntry(slug, S.index[slug]);
+						// Update rank cache
+						if (isNew) await updateRankCache(S.userName || S.user, {
+							wikis: 1
+						});
+					})(), isNew ? t("edit_creating") : t("edit_saving"));
+					toast(isNew ? t("toast_page_created") : t("toast_page_saved"));
+					editDirty = false;
+					S.slug = slug;
+					goTo(slug);
+				} catch (e) {
+					toast(e.message)
+				} finally {
+					btn.classList.remove('loading')
+				}
+			});
+
+			// ─── Delete (uses custom confirm) ───
+			async function delPage(slug) {
+				if (!S.user) return;
+				const ok = await showConfirm(t("confirm_delete_page", esc(S.index[slug]?.title || slug)));
+				if (!ok) return;
+				if (parseInt(S.index[slug]?.owner_id) !== parseInt(S.userId)) {
+					toast(t("toast_owner_only"));
+					return
+				}
+				await wl((async () => {
+					// Subtract comments before deleting
+					try {
+						const pageData = await load('zhujingqi_pedia_' + slug);
+						if (pageData && pageData.comments) {
+							const cc = {};
+							pageData.comments.forEach(c => {
+								const un = c.userName || c.user || '';
+								if (un) cc[un] = (cc[un] || 0) + 1
+							});
+							for (const [un, cnt] of Object.entries(cc)) await updateRankCache(un, {
+								comments: -cnt
+							});
+						}
+					} catch {}
+					delete S.index[slug];
+					await deleteIndexEntry(slug);
+					await save('zhujingqi_pedia_' + slug, {
+						content: '',
+						owner: '',
+						allowOthers: true
+					});
+					await updateRankCache(S.userName || S.user, {
+						wikis: -1
+					});
+				})(), t("load_deleting"));
+				toast(t("toast_page_deleted"));
+				home();
+			}
+
+			// ─── Search ───
+			async function sr(q) {
+				if (q == null) q = $('qryInp').value.trim().toLowerCase();
+				if (!q) {
+					screen(S.slug ? 'pageScreen' : 'welcomeScreen');
+					return
+				}
+				S.index = await wl(loadIndex(), t("load_searching"));
+				const r = Object.entries(S.index).filter(([s, m]) => s.includes(q) || (m.title || '').toLowerCase().includes(
+					q)).slice(0, 40);
+				$('searchRes').innerHTML = r.length ?
+					'<div style="font-size:13px;color:var(--text2);margin-bottom:16px">' + t("search_results", r.length) +
+					'</div>' + r.map(([s, m]) =>
+						`<div class="anim-fade" onclick="goTo('${s}')" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border)"><h3 style="font-size:15px;font-weight:500;margin-bottom:2px">${esc(m.title||s)}</h3><p style="font-size:13px;color:var(--text2)">${m.owner_name?`<a class="user-link" onclick="event.stopPropagation();showUserPages('${esc(m.owner_name)}')">${esc(m.owner_name)}</a>`:''}</p><div style="font-size:11px;color:var(--accent);margin-top:2px">${s}</div></div>`
+					).join('') :
+					'<div class="empty" style="padding:60px 20px"><h2>' + t("search_no_results") + '</h2><p>' + t(
+						"search_no_results_q", esc(q)) + '</p></div>';
+				screen('searchScreen');
+			}
+			// ─── Search Dropdown ───
+			let sdTimer = null,
+				sdTagFilter = '',
+				sdSortMode = '';
+
+			function hideSearchDD() {
+				const d = $('searchDD');
+				if (d) d.classList.remove('show')
+			}
+
+			function showSearchDD() {
+				const d = $('searchDD');
+				if (d) d.classList.add('show')
+			}
+
+			function renderSDFooter() {
+				const tagSel = $('sdTag'),
+					sortSel = $('sdSort');
+				if (!tagSel) return;
+				// Populate sort options
+				const sortOpts = [{
+					v: '',
+					k: 'relevance'
+				}, {
+					v: 'timeD',
+					k: 'sort_timeD'
+				}, {
+					v: 'alphaA',
+					k: 'sort_alphaA'
+				}];
+				const curSort = sortSel.value;
+				sortSel.innerHTML = sortOpts.map(o => `<option value="${o.v}">${t('sd_'+o.k)}</option>`).join('');
+				sortSel.value = curSort;
+				// Populate tag filter
+				const allTags = new Set();
+				if (S.index) Object.values(S.index).forEach(m => (m.tags || []).forEach(t => allTags.add(t)));
+				const curVal = tagSel.value;
+				tagSel.innerHTML = '<option value="">' + t("filter_all") + '</option>';
+				Array.from(allTags).sort().forEach(t => {
+					const o = document.createElement('option');
+					o.value = t;
+					o.textContent = t;
+					tagSel.appendChild(o);
+				});
+				tagSel.value = curVal;
+				tagSel.onchange = () => {
+					sdTagFilter = tagSel.value;
+					doSearchDD()
+				};
+				sortSel.onchange = () => {
+					sdSortMode = sortSel.value;
+					doSearchDD()
+				};
+			}
+
+			async function doSearchDD() {
+				const q = $('qryInp').value.trim().toLowerCase();
+				const dd = $('searchDD');
+				if (!dd) return;
+				const hint = $('sdHint'),
+					results = $('sdResults'),
+					footer = $('sdFooter');
+				if (!q) {
+					hint.style.display = '';
+					results.innerHTML = '';
+					footer.style.display = '';
+					return
+				}
+				hint.style.display = 'none';
+				if (!S.index || !Object.keys(S.index).length) S.index = await loadIndex();
+				let entries = Object.entries(S.index);
+				// Filter by query
+				entries = entries.filter(([s, m]) => (s.includes(q) || (m.title || '').toLowerCase().includes(q)));
+				// Filter by tag
+				if (sdTagFilter) entries = entries.filter(([, m]) => (m.tags || []).includes(sdTagFilter));
+				// Sort
+				if (sdSortMode === 'timeD') entries.sort((a, b) => ((b[1].updated || b[1].created || '') > (a[1].updated ||
+					a[1].created || '') ? 1 : -1));
+				else if (sdSortMode === 'alphaA') entries.sort((a, b) => (a[1].title || a[0]).localeCompare(b[1].title || b[
+					0]));
+				// Relevance is default (no sort)
+				entries = entries.slice(0, 20);
+				if (entries.length) {
+					results.innerHTML = entries.map(([s, m]) =>
+						`<div class="sd-item anim-fade" onclick="hideSearchDD();goTo('${esc(s)}')" style="animation-delay:${Math.random()*.06}s"><span class="sd-t">${esc(m.title||s)}</span><span class="sd-s">${s}</span><span class="sd-o">${m.owner_name?esc(m.owner_name):''}</span></div>`
+					).join('');
+				} else {
+					results.innerHTML = '<div class="sd-hint" style="padding:12px 16px">' + t("search_no_results") +
+						'</div>';
+				}
+				footer.style.display = entries.length > 0 ? '' : 'none';
+			}
+
+			$('qryInp').addEventListener('focus', () => {
+				sdTagFilter = '';
+				sdSortMode = '';
+				const sortSel = $('sdSort');
+				if (sortSel) sortSel.value = '';
+				const tagSel = $('sdTag');
+				if (tagSel) tagSel.value = '';
+				showSearchDD();
+				renderSDFooter();
+				if ($('qryInp').value.trim()) doSearchDD();
+			});
+			$('qryInp').addEventListener('input', () => {
+				clearTimeout(sdTimer);
+				sdTimer = setTimeout(doSearchDD, 200);
+			});
+			$('qryInp').addEventListener('keydown', e => {
+				if (e.key === 'Escape') {
+					hideSearchDD();
+					$('qryInp').blur()
+				}
+				if (e.key === 'Enter') {
+					hideSearchDD();
+					sr()
+				}
+			});
+			document.addEventListener('click', e => {
+				const dd = $('searchDD');
+				if (dd && dd.classList.contains('show') && !e.target.closest('#navSearchWrap')) hideSearchDD();
+			});
+			$('searchBtn').addEventListener('click', async () => {
+				if (!await checkEditDirty()) return;
+				hideSearchDD();
+				sr()
+			});
+
+			// ─── Mobile Menu ───
+			function closeMenu() {
+				$('mobMenu').classList.remove('active')
+			}
+			$('hamburgerBtn').addEventListener('click', () => {
+				$('mobMenu').classList.toggle('active')
+			});
+			document.addEventListener('click', e => {
+				if ($('mobMenu').classList.contains('active') && !e.target.closest('.nav-hamburger') && !e.target
+					.closest('#mobMenu')) {
+					closeMenu();
+				}
+			});
+			$('mobAllBtn').addEventListener('click', async () => {
+				closeMenu();
+				if (!await checkEditDirty()) return;
+				activeTag = '';
+				allWiki()
+			});
+			$('mobCreateBtn').addEventListener('click', async () => {
+				closeMenu();
+				if (!S.user) {
+					toast(t("toast_login_first"));
+					openLogin();
+					return
+				}
+				if (!await checkEditDirty()) return;
+				editPage()
+			});
+			$('mobSearchBtn').addEventListener('click', async () => {
+				if (!await checkEditDirty()) return;
+				closeMenu();
+				$('searchScrInp').value = '';
+				$('searchRes').innerHTML = '';
+				screen('searchScreen');
+				setTimeout(() => $('searchScrInp').focus(), 150);
+			});
+			$('searchScrBack').addEventListener('click', () => {
+				if (S.slug) goTo(S.slug);
+				else home()
+			});
+			$('searchScrInp').addEventListener('keydown', async e => {
+				if (e.key === 'Enter') {
+					if (!await checkEditDirty()) return;
+					const q = e.target.value.trim().toLowerCase();
+					await sr(q);
+				}
+			});
+
+			// ─── Leaderboard Cache ───
+			async function getRankCache() {
+				try {
+					return await load(K.rankCache)
+				} catch {
+					return {}
+				}
+			}
+			async function setRankCache(v) {
+				await save(K.rankCache, v)
+			}
+			async function updateRankCache(user, delta) {
+				const c = await getRankCache();
+				if (!c[user]) c[user] = {
+					wikis: 0,
+					edits: 0,
+					comments: 0
+				};
+				const u = c[user];
+				if (delta.wikis != null) u.wikis += delta.wikis;
+				if (delta.comments != null) u.comments += delta.comments;
+				if (u.wikis < 0) u.wikis = 0;
+				if (u.comments < 0) u.comments = 0;
+				await setRankCache(c);
+			}
+
+			// ─── Leaderboard ───
+			async function showRank() {
+				if (!await checkEditDirty()) return;
+				screen('rankScreen');
+				const body = $('rankBody');
+				body.innerHTML = '<div class="empty" style="padding:60px 20px"><h2>' + t("rank_loading") + '</h2></div>';
+				S.index = await wl(loadIndex(), t("rank_loading"));
+				let cache = await getRankCache();
+				// Auto-rebuild cache if empty (first deployment)
+				if (!Object.keys(cache).length) {
+					const slugs = Object.keys(S.index);
+					for (let s = 0; s < slugs.length; s += 20) {
+						await Promise.all(slugs.slice(s, s + 20).map(async slug => {
+							try {
+								const d = await load('zhujingqi_pedia_' + slug);
+								if (d && d.comments) {
+									const cc = {};
+									d.comments.forEach(c => {
+										const un = c.userName || c.user || '';
+										if (un) cc[un] = (cc[un] || 0) + 1
+									});
+									for (const [un, cnt] of Object.entries(cc)) {
+										if (!cache[un]) cache[un] = {
+											wikis: 0,
+											edits: 0,
+											comments: 0
+										};
+										cache[un].comments += cnt;
+									}
+								}
+							} catch {}
+						}));
+					}
+					// Fill wikis/edits from index into cache
+					Object.entries(S.index).forEach(([slug, m]) => {
+						if (!m.owner_name) return;
+						if (!cache[m.owner_name]) cache[m.owner_name] = {
+							wikis: 0,
+							edits: 0,
+							comments: 0
+						};
+						cache[m.owner_name].wikis = (cache[m.owner_name].wikis || 0) + 1;
+					});
+					await setRankCache(cache);
+				}
+				// Count wikis from index
+				const created = {};
+				Object.entries(S.index).forEach(([slug, m]) => {
+					if (!m.owner_name) return;
+					created[m.owner_name] = (created[m.owner_name] || 0) + 1;
+				});
+				// Fetch ALL users from Supabase
+				let allUsers = [];
+				try {
+					allUsers = await supaGet('/users?select=name,avatar,time&order=name.asc');
+				} catch {}
+				if (!allUsers || !allUsers.length) {
+					body.innerHTML = '<div class="empty" style="padding:60px 20px"><h2>' + t("rank_empty") + '</h2></div>';
+					return
+				}
+				// Build rows: wikis from index, comments from cache
+				const rows = allUsers.map(u => ({
+					name: u.name,
+					avatar: u.avatar || '',
+					time: u.time || '',
+					wikis: created[u.name] || 0,
+					cmts: (cache[u.name] && cache[u.name].comments) || 0
+				}));
+				rows.sort((a, b) => b.wikis - a.wikis || b.cmts - a.cmts);
+				const medals = ['gold', 'silver', 'bronze'];
+				let html = '<table class="rank-table"><thead><tr>' +
+					'<th style="width:36px">#</th>' +
+					'<th>' + t("rank_user") + '</th>' +
+					'<th style="text-align:center;width:64px">' + t("rank_wikis") + '</th>' +
+					'<th style="text-align:center;width:56px">' + t("rank_comments") + '</th>' +
+					'</tr></thead><tbody>';
+				for (let i = 0; i < rows.length; i++) {
+					const r = rows[i];
+					const rank = i + 1;
+					const cls = rank <= 3 ? medals[rank - 1] : 'norm';
+					const time = r.time ? new Date(r.time).toLocaleDateString() : '';
+					const isMe = S.userName === r.name;
+					html += `<tr onclick="showUserPages('${esc(r.name)}')">
+      <td><span class="rank-num ${cls}" style="display:inline-flex">${rank}</span></td>
+      <td><div class="rank-av">${r.avatar?`<img src="${esc(r.avatar)}" alt="">`:esc(r.name[0]||'?')}</div><span class="rank-un">${esc(r.name)}${isMe?' <span style="font-size:11px;color:var(--accent)">('+t("rank_me")+')</span>':''}</span>${time?`<span class="rank-join">${time}</span>`:''}</td>
+      <td class="rank-stats">${r.wikis}</td>
+      <td class="rank-stats">${r.cmts}</td>
+    </tr>`;
+				}
+				html += '</tbody></table>';
+				body.innerHTML = html;
+			}
+			$('rankBack').addEventListener('click', () => {
+				if (S.slug) goTo(S.slug);
+				else home()
+			});
+
+			// ─── Profile ───
+			function renderProfileDesc(el, text) {
+				el.textContent = text || '';
+				el.className = 'profile-desc' + (text ? '' : ' empty');
+			}
+			async function openProfile(noHistory) {
+				if (!S.user) return;
+				S.index = await wl(loadIndex(), t("loading"));
+				const my = Object.entries(S.index).filter(([, m]) => parseInt(m.owner_id) === parseInt(S.userId));
+				const pub = my.filter(([, m]) => m.allow_others !== false).length;
+				const pri = my.length - pub;
+				$('profileAv').innerHTML = S.userAvatar ? `<img src="${esc(S.userAvatar)}" alt="">` :
+					'<span class="av-initial" style="font-size:28px;font-weight:600;color:var(--text2)">' + esc((S
+						.userName || S.user)[0]) + '</span>';
+				$('profileNm').textContent = S.userName || S.user;
+				$('profileJn').textContent = '';
+				$('stPages').textContent = my.length;
+				$('stPub').textContent = pub;
+				$('stPri').textContent = pri;
+				if (S.userId) supaGet('/users?id=eq.' + S.userId + '&select=time,avatar,description').then(arr => {
+					if (arr && arr[0]) {
+						if (arr[0].time) $('profileJn').textContent = t("profile_joined") + ' ' + new Date(arr[0]
+							.time).toLocaleString();
+						if (arr[0].avatar && arr[0].avatar !== S.userAvatar) {
+							S.userAvatar = arr[0].avatar;
+							$('profileAv').innerHTML = `<img src="${esc(S.userAvatar)}" alt="">`
+						}
+						renderProfileDesc($('profileDesc'), arr[0].description || '')
+					}
+				});
+				const lst = $('profileLst');
+				if (!my.length) lst.innerHTML = '<div class="empty" style="padding:40px 20px"><h2>' + t("profile_no_pages") +
+					'</h2><p>' + t("profile_hint") + '</p></div>';
+				else lst.innerHTML = '<div class="profile-lst-t">' + t("profile_my") + '</div>' + my.sort((a, b) => ((b[1]
+					.updated || b[1].created) > (a[1].updated || a[1].created) ? 1 : -1)).map(([slug, meta]) => {
+					const lbl = meta.allow_others !== false ? t("profile_public") : t("profile_private");
+					const dt = meta.updated ? new Date(meta.updated).toLocaleDateString() : '';
+					const tags = (meta.tags || []).map(t =>
+						`<span class="tag" onclick="event.stopPropagation();filterByTag('${esc(t)}')">${esc(t)}</span>`
+					).join('');
+					return `<div class="profile-it anim-fade" style="animation-delay:${Math.random()*.1}s"><div class="it-inf" onclick="goTo('${slug}')"><div class="it-t">${esc(meta.title||slug)}</div><div class="it-m">${lbl}${dt?' · '+dt:''}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${tags}</div></div><div class="it-act"><button onclick="event.stopPropagation();editPage('${slug}')">${t("edit")}</button><button class="del" onclick="event.stopPropagation();delPage('${slug}')">${t("del")}</button></div></div>`
+				}).join('');
+				screen('profileScreen');
+				if (!noHistory) pushView('profile', S.userName || S.user);
+			}
+			$('createNavBtn').addEventListener('click', async () => {
+				if (!S.user) {
+					toast(t("toast_login_first"));
+					openLogin();
+					return
+				}
+				if (!await checkEditDirty()) return;
+				editPage()
+			});
+
+			// ─── User Pages ───
+			async function showUserPages(user, noHistory) {
+				if (!user) return;
+				S.index = await wl(loadIndex(), t("loading"));
+				const my = Object.entries(S.index).filter(([, m]) => m.owner_name === user);
+				const isMe = user === S.user;
+				$('profileAv').innerHTML =
+					'<span class="av-initial" style="font-size:28px;font-weight:600;color:var(--text2)">' + esc(user[0]) +
+					'</span>';
+				$('profileNm').textContent = user;
+				$('profileJn').textContent = '';
+				$('stPages').textContent = my.length;
+				$('stPub').textContent = my.filter(([, m]) => m.allow_others !== false).length;
+				$('stPri').textContent = my.filter(([, m]) => m.allow_others === false).length;
+				supaGet('/users?name=eq.' + encodeURIComponent(user) + '&select=time,avatar,description').then(arr => {
+					if (arr && arr[0]) {
+						if (arr[0].time) $('profileJn').textContent = t("profile_joined") + ' ' + new Date(arr[0]
+							.time).toLocaleString();
+						if (arr[0].avatar) {
+							const ua = arr[0].avatar;
+							if (isMe) S.userAvatar = ua;
+							$('profileAv').innerHTML = `<img src="${esc(ua)}" alt="">`
+						}
+						renderProfileDesc($('profileDesc'), arr[0].description || '')
+					}
+				});
+				const lst = $('profileLst');
+				if (!my.length) lst.innerHTML = '<div class="empty" style="padding:40px 20px"><h2>' + t("profile_no_pages") +
+					'</h2></div>';
+				else lst.innerHTML = '<div class="profile-lst-t">' + t("profile_pages") + '</div>' + my.sort((a, b) => ((b[1]
+					.updated || b[1].created) > (a[1].updated || a[1].created) ? 1 : -1)).map(([slug, meta]) => {
+					const dt = meta.updated ? new Date(meta.updated).toLocaleDateString() : '';
+					const tags = (meta.tags || []).map(t =>
+						`<span class="tag" onclick="event.stopPropagation();filterByTag('${esc(t)}')">${esc(t)}</span>`
+					).join('');
+					return `<div class="profile-it anim-fade" style="animation-delay:${Math.random()*.1}s"><div class="it-inf" onclick="goTo('${slug}')"><div class="it-t">${esc(meta.title||slug)}</div><div class="it-m">${dt||''}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${tags}</div></div>${isMe?`<div class="it-act"><button onclick="event.stopPropagation();editPage('${slug}')">${t("edit")}</button><button class="del" onclick="event.stopPropagation();delPage('${slug}')">${t("del")}</button></div>`:''}</div>`
+				}).join('');
+				screen('profileScreen');
+				if (!noHistory) pushView('profile', user);
+			}
+
+			// ─── Keys ───
+			document.addEventListener('keydown', e => {
+				const c = e.ctrlKey || e.metaKey;
+				if (e.key === 'Escape') {
+					if ($('loginModal').classList.contains('active')) $('loginModal').classList.remove('active');
+					else if ($('confirmModal').classList.contains('active')) $('confirmNo').click();
+					else if (S.view === 'editScreen') $('editBack').click()
+				}
+				if (c && e.key === 's' && S.view === 'editScreen') {
+					e.preventDefault();
+					$('editSave').click()
+				}
+				if (c && e.key === 'b' && S.view === 'editScreen') {
+					e.preventDefault();
+					document.querySelector('[data-cmd="bold"]')?.click()
+				}
+				if (c && e.key === 'i' && S.view === 'editScreen') {
+					e.preventDefault();
+					document.querySelector('[data-cmd="italic"]')?.click()
+				}
+				if (e.key === 'Enter' && $('loginModal').classList.contains('active')) $('modalBtn').click();
+			});
+
+			// ─── Lightbox ───
+			let lbIdx = 0,
+				lbZoom = 1,
+				lbX = 0,
+				lbY = 0,
+				lbDrag = null;
+
+			function openLightbox(i) {
+				const imgs = window.__galImgs || [];
+				if (!imgs.length) return;
+				lbIdx = i;
+				lbZoom = 1;
+				lbX = 0;
+				lbY = 0;
+				updateLightbox();
+				$('lightbox').classList.add('active');
+				document.body.style.overflow = 'hidden';
+			}
+
+			function closeLightbox() {
+				$('lightbox').classList.remove('active');
+				document.body.style.overflow = '';
+			}
+
+			function updateLightbox() {
+				const imgs = window.__galImgs || [];
+				$('lbImg').src = imgs[lbIdx] || '';
+				$('lbImg').style.transform = 'translate(' + lbX + 'px,' + lbY + 'px) scale(' + lbZoom + ')';
+				$('lbCounter').textContent = (lbIdx + 1) + ' / ' + imgs.length;
+			}
+			$('lbClose').addEventListener('click', closeLightbox);
+			$('lbPrev').addEventListener('click', () => {
+				const imgs = window.__galImgs || [];
+				if (imgs.length) {
+					lbIdx = (lbIdx - 1 + imgs.length) % imgs.length;
+					lbZoom = 1;
+					lbX = 0;
+					lbY = 0;
+					updateLightbox()
+				}
+			});
+			$('lbNext').addEventListener('click', () => {
+				const imgs = window.__galImgs || [];
+				if (imgs.length) {
+					lbIdx = (lbIdx + 1) % imgs.length;
+					lbZoom = 1;
+					lbX = 0;
+					lbY = 0;
+					updateLightbox()
+				}
+			});
+			$('lightbox').addEventListener('click', e => {
+				if (e.target === $('lightbox')) closeLightbox()
+			});
+			document.addEventListener('keydown', e => {
+				if (!$('lightbox').classList.contains('active')) return;
+				const imgs = window.__galImgs || [];
+				if (e.key === 'Escape') closeLightbox();
+				if (e.key === 'ArrowLeft' && imgs.length) {
+					lbIdx = (lbIdx - 1 + imgs.length) % imgs.length;
+					lbZoom = 1;
+					lbX = 0;
+					lbY = 0;
+					updateLightbox()
+				}
+				if (e.key === 'ArrowRight' && imgs.length) {
+					lbIdx = (lbIdx + 1) % imgs.length;
+					lbZoom = 1;
+					lbX = 0;
+					lbY = 0;
+					updateLightbox()
+				}
+				if (e.key === '+' || e.key === '=') {
+					e.preventDefault();
+					lbZoom = Math.min(5, lbZoom + .25);
+					updateLightbox()
+				}
+				if (e.key === '-') {
+					e.preventDefault();
+					lbZoom = Math.max(.25, lbZoom - .25);
+					updateLightbox()
+				}
+				if (e.key === '0') {
+					lbZoom = 1;
+					lbX = 0;
+					lbY = 0;
+					updateLightbox()
+				}
+			});
+			$('lbImgWrap').addEventListener('wheel', e => {
+				e.preventDefault();
+				const old = lbZoom;
+				lbZoom = Math.max(.25, Math.min(5, lbZoom + (e.deltaY > 0 ? -.25 : .25)));
+				// Adjust position so zoom centers on cursor
+				const r = $('lbImgWrap').getBoundingClientRect();
+				lbX -= (e.clientX - r.left - r.width / 2) * (lbZoom / old - 1);
+				lbY -= (e.clientY - r.top - r.height / 2) * (lbZoom / old - 1);
+				updateLightbox();
+			}, {
+				passive: false
+			});
+			$('lbImg').addEventListener('mousedown', e => {
+				e.preventDefault();
+				lbDrag = {
+					sx: e.clientX,
+					sy: e.clientY,
+					ox: lbX,
+					oy: lbY
+				};
+				$('lbImg').style.cursor = 'grabbing';
+			});
+			document.addEventListener('mousemove', e => {
+				if (!lbDrag) return;
+				lbX = lbDrag.ox + (e.clientX - lbDrag.sx);
+				lbY = lbDrag.oy + (e.clientY - lbDrag.sy);
+				updateLightbox();
+			});
+			document.addEventListener('mouseup', () => {
+				if (!lbDrag) return;
+				lbDrag = null;
+				$('lbImg').style.cursor = 'grab';
+			});
+
+			function esc(s) {
+				const d = document.createElement('div');
+				d.textContent = s;
+				return d.innerHTML
+			}
+
+			// ─── Terms of Service ───
+			function showTerms() {
+				$('termsBody').innerHTML =
+					'<div class="terms-body">' +
+					'<h2>一、总则</h2>' +
+					'<p>Jacky 账号（以下简称「本账号」）是由 zhujingqi.com 提供的统一账户系统，适用于 Jacky 论坛、Jacky Chat 及 Jackypedia 等所有关联服务。使用本账号即表示您同意本协议全部条款。</p>' +
+					'<h2>二、账号注册与管理</h2>' +
+					'<ul>' +
+					'<li>用户须提供准确的信息完成注册，并对账号下的一切行为负责。</li>' +
+					'<li>禁止注册多个垃圾账号、恶意占用用户名、或冒用他人身份。</li>' +
+					'<li>如发现账号存在安全风险，zhujingqi.com 有权暂停或终止服务。</li>' +
+					'</ul>' +
+					'<h2>三、用户行为规范</h2>' +
+					'<ul>' +
+					'<li>用户不得利用本服务发布违法或侵犯他人合法权益的内容。</li>' +
+					'<li>禁止以任何形式攻击、干扰服务正常运行。</li>' +
+					'<li>用户在 Jackypedia 的编辑应符合客观、中立的原则，禁止恶意篡改或破坏。</li>' +
+					'</ul>' +
+					'<h2>四、内容权利</h2>' +
+					'<p>用户在 Jackypedia 创建的内容，知识产权归用户本人所有。用户授予 zhujingqi.com 在全球范围内的免费、不可撤销的展示与分发许可。用户承诺上传内容不侵犯第三方权利。</p>' +
+					'<h2>五、免责声明</h2>' +
+					'<p>本服务不担保无中断、无错误或完全安全。zhujingqi.com 不对用户间纠纷或第三方内容承担责任。</p>' +
+					'<h2>六、协议修改</h2>' +
+					'<p>zhujingqi.com 有权随时修改本协议，修改后的协议一经发布即生效。继续使用服务即视为接受修改。</p>' +
+					'<h2>七、联系我们</h2>' +
+					'<p>如有任何疑问，请<a href="/me/contact.html">联系管理员</a>。</p>' +
+					'</div>';
+				screen('termsScreen');
+				pushView('terms');
+			}
+			$('termsBack').addEventListener('click', () => {
+				if (S.slug) goTo(S.slug);
+				else home()
+			});
+
+			function $$(s, c) {
+				return (c || document).querySelectorAll(s)
+			}
+
+			document.addEventListener('contextmenu', e => {
+				const a = e.target.closest(
+					'#pageContent,.comments-section,.refs-section,.lightbox,.gallery-section,.gal-edit');
+				if (!a) e.preventDefault();
+			});
+			$('logoBtn').addEventListener('click', async () => {
+				if (!await checkEditDirty()) return;
+				home()
+			});
+			(async () => {
+				// Apply initial dark mode
+				if (localStorage.getItem("pedia_dark") === "1") {
+					document.body.classList.add("dark");
+					updateDarkBtn();
+				}
+				// Apply initial language
+				renderLangSelect();
+				refreshUILanguage();
+
+				if (S.userId) {
+					try {
+						const arr = await supaGet('/users?id=eq.' + S.userId + '&select=name,avatar');
+						if (arr && arr[0]) {
+							S.user = arr[0].name;
+							S.userName = arr[0].name;
+							S.userAvatar = arr[0].avatar || '';
+							commentUserCache[S.userId] = {
+								name: S.userName,
+								avatar: S.userAvatar
+							}
+						}
+					} catch {}
+				}
+				nav();
+				const p = new URLSearchParams(location.search);
+				const id = p.get('id'),
+					view = p.get('view'),
+					user = p.get('user');
+				if (id) await goTo(id);
+				else if (view === 'all') await allWiki();
+				else if (view === 'edit') {
+					if (S.user) editPage();
+					else await home()
+				} else if (user) await showUserPages(user);
+				else await home()
+			})();
+		</script>
+	</body>
+</html>
