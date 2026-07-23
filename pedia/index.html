@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 	<head>
@@ -841,7 +842,8 @@
 
 			/* ─── Page View + Comments ─── */
 			#pageScreen {
-				overflow-y: auto
+				overflow-y: auto;
+				scroll-behavior: smooth
 			}
 
 			.page-wrap {
@@ -1027,9 +1029,10 @@
 
 			/* ─── Comments ─── */
 			.comments-section {
-				margin-top: 48px;
-				padding-top: 32px;
-				border-top: 1px solid var(--border)
+				padding-top: 16px;
+				margin-top: 32px;
+				border-top: 1px solid var(--border);
+				scroll-margin-top: 80px
 			}
 
 			.comments-title {
@@ -2020,7 +2023,18 @@
 				border: 1px solid var(--border);
 				position: relative;
 				aspect-ratio: 16/9;
-				background: var(--bg2)
+				background: var(--bg2);
+				cursor: grab;
+				transition: transform .15s, box-shadow .15s
+			}
+			.gal-edit .gal-item.dragging {
+				opacity: .4;
+				transform: scale(.95)
+			}
+			.gal-edit .gal-item.drag-over {
+				border-color: var(--accent);
+				box-shadow: 0 0 0 2px var(--accent);
+				transform: scale(1.02)
 			}
 
 			.gal-edit .gal-item .gal-img-wrap {
@@ -2385,7 +2399,8 @@
 			.gallery-section {
 				margin-top: 32px;
 				padding-top: 24px;
-				border-top: 1px solid var(--border)
+				border-top: 1px solid var(--border);
+				scroll-margin-top: 80px
 			}
 
 			.gallery-title {
@@ -3734,6 +3749,13 @@
 				de: "Erstellt",
 				"zh-TW": "創建"
 			});
+			tr("updated_label", {
+				zh: "修改",
+				en: "Modified",
+				es: "Modificado",
+				de: "Geändert",
+				"zh-TW": "修改"
+			});
 			tr("page_views", {
 				zh: "{0} 次浏览",
 				en: "{0} views",
@@ -3748,6 +3770,20 @@
 				es: "Galería",
 				de: "Galerie",
 				"zh-TW": "圖片集"
+			});
+			tr("jump_gallery", {
+				zh: "图片集",
+				en: "Gallery",
+				es: "Galería",
+				de: "Galerie",
+				"zh-TW": "圖片集"
+			});
+			tr("jump_comments", {
+				zh: "评论",
+				en: "Comments",
+				es: "Comentarios",
+				de: "Kommentare",
+				"zh-TW": "評論"
 			});
 			tr("refs_title", {
 				zh: "参考资料",
@@ -5353,8 +5389,8 @@
 					hv) + '</span>';
 				const hot = entries.filter(([, m]) => m.views).sort((a, b) => (b[1].views || 0) - (a[1].views || 0)).slice(0,
 					12);
-				const latest = entries.sort((a, b) => ((b[1].created || '') > (a[1].created || '') ? 1 : -1)).slice(0, 12);
-				$('hotCount').textContent = entries.length ? 'Top ' + Math.min(hot.length || 6, 6) : '';
+				const latest = entries.sort((a, b) => ((b[1].updated || b[1].created || '') > (a[1].updated || a[1].created || '') ? 1 : -1)).slice(0, 12);
+				$('hotCount').textContent = entries.length ? 'Top ' + Math.min(hot.length || 12, 12) : '';
 				$('newCount').textContent = latest.length ? String(latest.length) : '';
 				$('hotGrid').innerHTML = hot.length ? hot.map(([slug, meta]) => card(slug, meta)).join('') :
 					'<div class="empty" style="grid-column:1/-1;padding:20px"><p>' + t("no_hot") + '</p></div>';
@@ -5483,6 +5519,7 @@
 					$('pageMeta').innerHTML = `
       <span>${meta.owner_name?`<a class="user-link" onclick="showUserPages('${esc(meta.owner_name)}')">${esc(meta.owner_name)}</a>`:t("unknown_author")}</span>
       ${dt?' <span class="dot"></span> <span>'+t("created_label")+' '+dt+'</span>':''}
+      ${upd&&upd!==dt?' <span class="dot"></span> <span>'+t("updated_label")+' '+upd+'</span>':''}
       ${views?' <span class="dot"></span> <span>'+t("page_views",views)+'</span>':''}`;
 					const tags = meta.tags || [];
 					$('pageTags').innerHTML = tags.length ? tags.map(t =>
@@ -5490,7 +5527,9 @@
 					$('pageActions').innerHTML =
 						(canEdit ? `<button onclick="editPage('${slug}')">${t("edit")}</button>` : '') +
 						(parseInt(meta.owner_id) === parseInt(S.userId) ?
-							`<button class="danger" onclick="delPage('${slug}')">${t("del")}</button>` : '');
+							`<button class="danger" onclick="delPage('${slug}')">${t("del")}</button>` : '') +
+						`<button class="jump-btn" onclick="document.getElementById('gallerySection').scrollIntoView({behavior:'smooth'})" id="jumpGalBtn" style="display:none">${t("jump_gallery")}</button>` +
+						`<button class="jump-btn" onclick="document.getElementById('commentsSection').scrollIntoView({behavior:'smooth'})">${t("jump_comments")}</button>`;
 					// Load comments
 					loadComments(slug);
 				} else {
@@ -5513,6 +5552,7 @@
 				const imgs = data?.images || [];
 				if (imgs.length) {
 					$('gallerySection').style.display = '';
+					$('jumpGalBtn').style.display = '';
 					$('galleryGrid').innerHTML = imgs.map((url, i) =>
 						`<div class="gal-thumb anim-fade" onclick="openLightbox(${i})"><img src="${esc(url)}" onerror="this.parentElement.style.display='none'" loading="lazy"></div>`
 					).join('');
@@ -5777,7 +5817,7 @@
 
 			// ─── Editor ───
 			const PRESET_TAGS = ['学习', '搞笑', '科技', '人文', '小众', '常识'];
-			let editGallery = [],
+			let editGallery = [];
 				editRefs = [],
 				editTags = [];
 
@@ -5841,8 +5881,56 @@
 
 			function renderGalEdit() {
 				$('galList').innerHTML = editGallery.map((url, i) => `
-    <div class="gal-item"><div class="gal-img-wrap"><img src="${esc(url)}" onerror="this.outerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:11px\\'>'+t("gal_load_fail")+'</div>'"></div><button class="gal-del" onclick="removeGalItem(${i})">✕</button></div>
+    <div class="gal-item" draggable="true" data-idx="${i}"><div class="gal-img-wrap"><img src="${esc(url)}" draggable="false" onerror="imgError(this)"></div><button class="gal-del" draggable="false" onclick="removeGalItem(${i})">✕</button></div>
   `).join('');
+			}
+			function imgError(el){el.outerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:11px">'+t("gal_load_fail")+'</div>'}
+			function initGalDrag(){
+				const list=$('galList');
+				if(!list)return;
+				let dragIdx=-1;
+				list.addEventListener('dragstart',e=>{
+					const item=e.target.closest('.gal-item');
+					if(!item)return;
+					dragIdx=parseInt(item.dataset.idx);
+					item.classList.add('dragging');
+					e.dataTransfer.effectAllowed='move';
+					e.dataTransfer.setData('text/plain',dragIdx);
+				});
+				list.addEventListener('dragend',e=>{
+					const item=e.target.closest('.gal-item');
+					if(item)item.classList.remove('dragging');
+					list.querySelectorAll('.gal-item.drag-over').forEach(el=>el.classList.remove('drag-over'));
+					dragIdx=-1;
+				});
+				list.addEventListener('dragover',e=>{
+					e.preventDefault();
+					e.dataTransfer.dropEffect='move';
+				});
+				list.addEventListener('dragenter',e=>{
+					e.preventDefault();
+					const item=e.target.closest('.gal-item');
+					if(!item||parseInt(item.dataset.idx)===dragIdx)return;
+					item.classList.add('drag-over');
+				});
+				list.addEventListener('dragleave',e=>{
+					const item=e.target.closest('.gal-item');
+					if(item)item.classList.remove('drag-over');
+				});
+				list.addEventListener('drop',e=>{
+					e.preventDefault();
+					if(dragIdx<0)return;
+					const item=e.target.closest('.gal-item');
+					let targetIdx=item?parseInt(item.dataset.idx):editGallery.length-1;
+					if(dragIdx===targetIdx){dragIdx=-1;list.querySelectorAll('.gal-item.drag-over').forEach(el=>el.classList.remove('drag-over'));return}
+					const arr=editGallery.splice(dragIdx,1);
+					if(targetIdx>dragIdx)targetIdx--;
+					editGallery.splice(targetIdx,0,arr[0]);
+					dragIdx=-1;
+					list.querySelectorAll('.gal-item.drag-over').forEach(el=>el.classList.remove('drag-over'));
+					renderGalEdit();
+					editDirty=true;
+				});
 			}
 
 			function removeGalItem(i) {
@@ -6776,6 +6864,7 @@
 					} catch {}
 				}
 				nav();
+				initGalDrag();
 				const p = new URLSearchParams(location.search);
 				const id = p.get('id'),
 					view = p.get('view'),
