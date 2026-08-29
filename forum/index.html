@@ -172,6 +172,22 @@
 					</div>
 					<input id="warnText" class="warnText" placeholder="自定义遮罩显示文字（可不填）" maxlength="40">
 				</div>
+				<div class="scopeRow">
+					<div class="scopeLabel" id="scopeTitleLabel">谁可以看</div>
+					<div class="scopeChips" id="scopeChips">
+						<span class="scopeChip active" data-scope="public">公开</span>
+						<span class="scopeChip" data-scope="followers">仅粉丝</span>
+						<span class="scopeChip" data-scope="private">仅自己</span>
+						<span class="scopeChip" data-scope="custom">自定义</span>
+					</div>
+					<div class="scopeCustomPanel" id="scopeCustomPanel">
+						<div class="scopeCustomTabs">
+							<button class="scopeTab active" data-tab="allow" id="scopeAllowTab">允许查看</button>
+							<button class="scopeTab" data-tab="deny" id="scopeDenyTab">禁止查看</button>
+						</div>
+						<div class="scopeCustomContent" id="scopeCustomContent"></div>
+					</div>
+				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
 				</div>
@@ -325,6 +341,7 @@
 		<script src="js/config.js"></script>
 		<script src="js/content.js"></script>
 		<script src="js/search.js"></script>
+		<script src="js/scope.js"></script>
 		<script src="js/editor.js"></script>
 		<script src="js/auth.js"></script>
 		<script src="js/posts.js"></script>

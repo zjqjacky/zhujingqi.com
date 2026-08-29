@@ -434,6 +434,11 @@ async function viewUser(uid) {
 						shopBtn.textContent = t("profile_shop");
 						shopBtn.onclick = () => openShop();
 						actions.appendChild(shopBtn);
+						const groupsBtn = document.createElement("button");
+						groupsBtn.className = "profileBtn half";
+						groupsBtn.textContent = t("profile_groups");
+						groupsBtn.onclick = openGroupManager;
+						actions.appendChild(groupsBtn);
 						const settingsBtn = document.createElement("button");
 						settingsBtn.className = "profileBtn half";
 						settingsBtn.innerHTML = '<svg class="pbIcon" viewBox="0 0 46.21739 46.21739" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g transform="translate(-216.8913,-156.8913)"><g fill="none" fill-rule="nonzero" stroke="currentColor" stroke-linejoin="miter" stroke-miterlimit="10"><path d="M229.30778,180c0,-5.90515 4.78707,-10.69222 10.69222,-10.69222c5.90515,0 10.69222,4.78707 10.69222,10.69222c0,5.90515 -4.78707,10.69222 -10.69222,10.69222c-5.90515,0 -10.69222,-4.78707 -10.69222,-10.69222z" stroke-width="7" stroke-linecap="butt"/><path d="M240,159.8913v8.31417" stroke-width="6" stroke-linecap="round"/><path d="M240,191.79453v8.31417" stroke-width="6" stroke-linecap="round"/><path d="M219.89131,180h8.31417" stroke-width="6" stroke-linecap="round"/><path d="M251.79453,180h8.31417" stroke-width="6" stroke-linecap="round"/><path d="M225.78101,165.78101l5.87901,5.87901" stroke-width="6" stroke-linecap="round"/><path d="M248.52518,188.33999l5.87901,5.87901" stroke-width="6" stroke-linecap="round"/><path d="M225.78101,194.219l5.87901,-5.87901" stroke-width="6" stroke-linecap="round"/><path d="M248.33999,171.66001l5.87901,-5.87901" stroke-width="6" stroke-linecap="round"/></g></g></svg>' + t("profile_settings");

@@ -113,7 +113,12 @@ $("sendBtn").onclick = async () => {
 			content: finalContent,
 			time: new Date().toISOString(),
 			author: currentUser.id,
-			tag: tag
+			tag: tag,
+			scope: selectedScope,
+			allow_user_ids: scopeAllowUsers,
+			allow_tag_ids: scopeAllowGroups,
+			deny_user_ids: scopeDenyUsers,
+			deny_tag_ids: scopeDenyGroups
 		});
 	} catch (e) {
 		if (e.message === "JWT_EXPIRED") return;
@@ -133,6 +138,7 @@ $("sendBtn").onclick = async () => {
 	$("isSensitive").checked = false;
 	$("warnText").value = "";
 	$("warnText").classList.remove("show");
+	resetScopeState();
 	show("main");
 	loadStats();
 	loadPosts(1);

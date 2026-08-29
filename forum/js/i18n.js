@@ -1770,6 +1770,167 @@ const TRANSLATIONS = {
 		es: "Completa la verificación primero",
 		de: "Bitte zuerst die Verifizierung abschließen",
 		"zh-TW": "請先完成人機驗證"
+	},
+	scope_title: {
+		zh: "谁可以看",
+		en: "Who can see",
+		es: "Quién puede ver",
+		de: "Wer kann sehen",
+		"zh-TW": "誰可以看"
+	},
+	scope_public: {
+		zh: "公开",
+		en: "Public",
+		es: "Público",
+		de: "Öffentlich",
+		"zh-TW": "公開"
+	},
+	scope_followers: {
+		zh: "仅粉丝",
+		en: "Followers only",
+		es: "Solo seguidores",
+		de: "Nur Follower",
+		"zh-TW": "僅粉絲"
+	},
+	scope_private: {
+		zh: "仅自己",
+		en: "Only me",
+		es: "Solo yo",
+		de: "Nur ich",
+		"zh-TW": "僅自己"
+	},
+	scope_custom: {
+		zh: "自定义",
+		en: "Custom",
+		es: "Personalizado",
+		de: "Benutzerdefiniert",
+		"zh-TW": "自訂"
+	},
+	scope_custom_hint: {
+		zh: "选择特定用户或分组",
+		en: "Select specific users or groups",
+		es: "Seleccionar usuarios o grupos específicos",
+		de: "Bestimmte Benutzer oder Gruppen auswählen",
+		"zh-TW": "選擇特定用戶或分組"
+	},
+	scope_allow_title: {
+		zh: "允许查看",
+		en: "Allow to see",
+		es: "Permitir ver",
+		de: "Erlauben zu sehen",
+		"zh-TW": "允許查看"
+	},
+	scope_deny_title: {
+		zh: "禁止查看",
+		en: "Block from seeing",
+		es: "Bloquear",
+		de: "Blockieren",
+		"zh-TW": "禁止查看"
+	},
+	scope_select_groups: {
+		zh: "选择分组",
+		en: "Select groups",
+		es: "Seleccionar grupos",
+		de: "Gruppen auswählen",
+		"zh-TW": "選擇分組"
+	},
+	scope_select_users: {
+		zh: "选择用户",
+		en: "Select users",
+		es: "Seleccionar usuarios",
+		de: "Benutzer auswählen",
+		"zh-TW": "選擇用戶"
+	},
+	scope_badge_public: {
+		zh: "",
+		en: "",
+		es: "",
+		de: "",
+		"zh-TW": ""
+	},
+	scope_badge_followers: {
+		zh: "仅粉丝可见",
+		en: "Followers only",
+		es: "Solo seguidores",
+		de: "Nur Follower",
+		"zh-TW": "僅粉絲可見"
+	},
+	scope_badge_private: {
+		zh: "仅自己可见",
+		en: "Only me",
+		es: "Solo yo",
+		de: "Nur ich",
+		"zh-TW": "僅自己可見"
+	},
+	scope_badge_custom: {
+		zh: "自定义可见",
+		en: "Custom visibility",
+		es: "Visibilidad personalizada",
+		de: "Benutzerdefinierte Sichtbarkeit",
+		"zh-TW": "自訂可見"
+	},
+	profile_groups: {
+		zh: "分组管理",
+		en: "Groups",
+		es: "Grupos",
+		de: "Gruppen",
+		"zh-TW": "分組管理"
+	},
+	groups_new: {
+		zh: "新建分组",
+		en: "New group",
+		es: "Nuevo grupo",
+		de: "Neue Gruppe",
+		"zh-TW": "新建分組"
+	},
+	groups_name_ph: {
+		zh: "分组名称",
+		en: "Group name",
+		es: "Nombre del grupo",
+		de: "Gruppenname",
+		"zh-TW": "分組名稱"
+	},
+	groups_delete_confirm: {
+		zh: "确定删除此分组？",
+		en: "Delete this group?",
+		es: "¿Eliminar este grupo?",
+		de: "Diese Gruppe löschen?",
+		"zh-TW": "確定刪除此分組？"
+	},
+	groups_add_user: {
+		zh: "添加用户",
+		en: "Add user",
+		es: "Agregar usuario",
+	 de: "Benutzer hinzufügen",
+		"zh-TW": "添加用戶"
+	},
+	groups_search_users_ph: {
+		zh: "搜索用户名...",
+		en: "Search usernames...",
+		es: "Buscar usuarios...",
+		de: "Benutzernamen suchen...",
+		"zh-TW": "搜尋使用者名稱..."
+	},
+	groups_remove_user: {
+		zh: "移除",
+		en: "Remove",
+		es: "Eliminar",
+		de: "Entfernen",
+		"zh-TW": "移除"
+	},
+	groups_empty: {
+		zh: "暂无分组",
+		en: "No groups yet",
+		es: "Sin grupos",
+		de: "Noch keine Gruppen",
+		"zh-TW": "暫無分組"
+	},
+	groups_no_members: {
+		zh: "暂无成员",
+		en: "No members yet",
+		es: "Sin miembros",
+		de: "Noch keine Mitglieder",
+		"zh-TW": "暫無成員"
 	}
 };
 const PAGE_TITLE_TRANS = {

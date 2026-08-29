@@ -322,13 +322,26 @@ setT("welcomeTitle", t("login_title"));
 	}
 	renderLangSelect(document.getElementById("langSelect"));
 renderLangSelect(document.getElementById("langSelectReg"));
-setT("closeModal", t("modal_close"));
+	setT("closeModal", t("modal_close"));
 	setT("captchaBtn", t("captcha_btn"));
 	setT("captchaTitle", t("captcha_modal_title"));
 	setT("captchaHint", t("captcha_slider_hint"));
 	setT("captchaCloseBtn", t("modal_close"));
 	setT("rankToggleCoins", t("profile_coins"));
 	setT("rankToggleFollowers", t("followers"));
+	const scopeTitle = $("scopeTitleLabel");
+	if (scopeTitle) scopeTitle.textContent = t("scope_title");
+	const scopeChipsEl = $("scopeChips");
+	if (scopeChipsEl) {
+		scopeChipsEl.querySelectorAll(".scopeChip").forEach(c => {
+			const key = "scope_" + c.dataset.scope;
+			c.textContent = t(key);
+		});
+	}
+	const allowTabEl = $("scopeAllowTab");
+	if (allowTabEl) allowTabEl.textContent = t("scope_allow_title");
+	const denyTabEl = $("scopeDenyTab");
+	if (denyTabEl) denyTabEl.textContent = t("scope_deny_title");
 	const nb = document.getElementById("notifBtn");
 	if (nb) {
 		const nl = nb.querySelector("#notifLabel");

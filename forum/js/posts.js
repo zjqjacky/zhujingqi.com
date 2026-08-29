@@ -389,6 +389,7 @@ async function loadPosts(page = 1, container = $("posts")) {
 				'<span>' + getRoleBadge(p.users) + '</span>' +
 				'</span>' +
 				'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
+				(p.scope && p.scope !== "public" ? getScopeBadgeHTML(p.scope) : '') +
 				(guestMode ? '' :
 					'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id +
 					'">+</button><div class="sharePopover"><button data-copy="' + p.id +
