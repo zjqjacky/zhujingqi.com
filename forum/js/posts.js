@@ -390,7 +390,7 @@ async function loadPosts(page = 1, container = $("posts")) {
 				'</span>' +
 				'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
 				((currentUser && (p.author === currentUser.id || currentUser.role?.includes?.('owner'))) ?
-				'<button class="visBtn" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>' : '') +
+				'<button class="visBtn" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><span class="visBtnIcon"></span></button>' : '') +
 				(guestMode ? '' :
 					'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id +
 					'">+</button><div class="sharePopover"><button data-copy="' + p.id +

@@ -998,6 +998,21 @@ body.dark .post.custom-bg::before {
 	color: var(--text);
 }
 
+.visBtnIcon {
+	width: 16px;
+	height: 16px;
+	display: block;
+	background: var(--text);
+	-webkit-mask-image: url(icon/user.svg);
+	mask-image: url(icon/user.svg);
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+}
+
 .visBtn svg {
 	width: 16px;
 	height: 16px;
