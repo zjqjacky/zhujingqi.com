@@ -339,10 +339,6 @@ renderLangSelect(document.getElementById("langSelectReg"));
 			c.textContent = t(key);
 		});
 	}
-	const allowTabEl = $("scopeAllowTab");
-	if (allowTabEl) allowTabEl.textContent = t("scope_allow_title");
-	const denyTabEl = $("scopeDenyTab");
-	if (denyTabEl) denyTabEl.textContent = t("scope_deny_title");
 	const nb = document.getElementById("notifBtn");
 	if (nb) {
 		const nl = nb.querySelector("#notifLabel");

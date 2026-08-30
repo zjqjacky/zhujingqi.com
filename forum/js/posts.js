@@ -391,8 +391,19 @@ async function loadPosts(page = 1, container = $("posts")) {
 				'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
 				'</div>' +
 				'<div class="postHeaderActions">' +
-				((currentUser && (p.author === currentUser.id || currentUser.role?.includes?.('owner'))) ?
-				'<button class="visBtn" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>' : '') +
+				(function() {
+					const isAuthor = currentUser && p.author === currentUser.id;
+					const isOwner = currentUser && currentUser.role?.includes?.('owner');
+					const vis = Array.isArray(p.visible_to) ? p.visible_to : null;
+					const isPublic = !vis || vis.includes('*');
+					// 作者始终看到按钮；owner 仅对非公开帖显示红色按钮
+					if (isAuthor) {
+						return '<button class="visBtn" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>';
+					} else if (isOwner && !isPublic) {
+						return '<button class="visBtn visBtn-restricted" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>';
+					}
+					return '';
+				})() +
 				(guestMode ? '' :
 					'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id +
 					'">+</button><div class="sharePopover"><button data-copy="' + p.id +
