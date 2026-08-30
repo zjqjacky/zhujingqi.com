@@ -1464,11 +1464,11 @@ const TRANSLATIONS = {
 		"zh-TW": "關於"
 	},
 	about_content: {
-		zh: "<b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br><br><b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br><b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br><b>【提醒】</b>请勿发布违法内容，请勿滥用。<br><br>如遇BUG，欢迎汇报至 <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> 或 <a href=\"https://zhujingqi.com/me/contact.html\">联系</a><br>",
-		en: "<b>Jacky Forum</b> is a web forum built with HTML, CSS & JavaScript, using SQL for the database.<br><br><b>[How it works]</b> User, post, comment, and like data are stored in the database, accessed via API.<br><b>[Features]</b> Login/registration, posting & commenting, likes & deletes, user list, profile pages, theme switching.<br><b>[Notice]</b> Do not post illegal content. Do not abuse.<br><br>Report bugs to <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> or <a href=\"https://zhujingqi.com/me/contact.html\">Contact</a><br>",
-		es: "<b>Jacky Forum</b> es un foro web construido con HTML, CSS y JavaScript, usando SQL para la base de datos.<br><br><b>[Cómo funciona]</b> Datos de usuarios, publicaciones, comentarios y me gusta se almacenan en la base de datos, accedidos vía API.<br><b>[Funciones]</b> Inicio de sesión/registro, publicaciones y comentarios, me gusta y eliminación, lista de usuarios, perfiles, cambio de tema.<br><b>[Aviso]</b> No publiques contenido ilegal. No abuses.<br><br>Reporta errores a <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> o <a href=\"https://zhujingqi.com/me/contact.html\">Contacto</a><br>",
-		de: "<b>Jacky Forum</b> ist ein Webforum, erstellt mit HTML, CSS und JavaScript, mit SQL-Datenbank.<br><br><b>[Funktionsweise]</b> Benutzer-, Post-, Kommentar- und Like-Daten werden in der Datenbank gespeichert und über API abgerufen.<br><b>[Funktionen]</b> Anmeldung/Registrierung, Posten & Kommentieren, Likes & Löschen, Benutzerliste, Profile, Themenwechsel.<br><b>[Hinweis]</b> Keine illegalen Inhalte posten. Nicht missbrauchen.<br><br>Fehler melden an <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> oder <a href=\"https://zhujingqi.com/me/contact.html\">Kontakt</a><br>",
-		"zh-TW": "<b>Jacky 論壇</b>是一款網頁論壇，前端使用 HTML、CSS 與 JavaScript 編寫，資料庫使用SQL。<br><br><b>【原理】</b>用戶、帖子、評論、按讚資料儲存在資料庫，通過 API 讀取和更新內容。<br><b>【功能】</b>用戶登入註冊系統、發帖和評論、按讚和刪除、用戶列表、個人主頁、主題切換。<br><b>【提醒】</b>請勿發佈違法內容，請勿濫用。<br><br>如遇BUG，歡迎回報至 <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> 或 <a href=\"https://zhujingqi.com/me/contact.html\">聯繫</a><br>"
+		zh: "<b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br><br><b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br><b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br><b>【提醒】</b>请勿发布违法内容，请勿滥用。<br><br>如遇BUG，欢迎汇报至 <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> 或 <a href=\"https://zhujingqi.com/me/#contact\">联系</a><br>",
+		en: "<b>Jacky Forum</b> is a web forum built with HTML, CSS & JavaScript, using SQL for the database.<br><br><b>[How it works]</b> User, post, comment, and like data are stored in the database, accessed via API.<br><b>[Features]</b> Login/registration, posting & commenting, likes & deletes, user list, profile pages, theme switching.<br><b>[Notice]</b> Do not post illegal content. Do not abuse.<br><br>Report bugs to <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> or <a href=\"https://zhujingqi.com/me/#contact\">Contact</a><br>",
+		es: "<b>Jacky Forum</b> es un foro web construido con HTML, CSS y JavaScript, usando SQL para la base de datos.<br><br><b>[Cómo funciona]</b> Datos de usuarios, publicaciones, comentarios y me gusta se almacenan en la base de datos, accedidos vía API.<br><b>[Funciones]</b> Inicio de sesión/registro, publicaciones y comentarios, me gusta y eliminación, lista de usuarios, perfiles, cambio de tema.<br><b>[Aviso]</b> No publiques contenido ilegal. No abuses.<br><br>Reporta errores a <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> o <a href=\"https://zhujingqi.com/me/#contact\">Contacto</a><br>",
+		de: "<b>Jacky Forum</b> ist ein Webforum, erstellt mit HTML, CSS und JavaScript, mit SQL-Datenbank.<br><br><b>[Funktionsweise]</b> Benutzer-, Post-, Kommentar- und Like-Daten werden in der Datenbank gespeichert und über API abgerufen.<br><b>[Funktionen]</b> Anmeldung/Registrierung, Posten & Kommentieren, Likes & Löschen, Benutzerliste, Profile, Themenwechsel.<br><b>[Hinweis]</b> Keine illegalen Inhalte posten. Nicht missbrauchen.<br><br>Fehler melden an <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> oder <a href=\"https://zhujingqi.com/me/#contact\">Kontakt</a><br>",
+		"zh-TW": "<b>Jacky 論壇</b>是一款網頁論壇，前端使用 HTML、CSS 與 JavaScript 編寫，資料庫使用SQL。<br><br><b>【原理】</b>用戶、帖子、評論、按讚資料儲存在資料庫，通過 API 讀取和更新內容。<br><b>【功能】</b>用戶登入註冊系統、發帖和評論、按讚和刪除、用戶列表、個人主頁、主題切換。<br><b>【提醒】</b>請勿發佈違法內容，請勿濫用。<br><br>如遇BUG，歡迎回報至 <a href=\"mailto:jacky@zhujingqi.com\">jacky@zhujingqi.com</a> 或 <a href=\"https://zhujingqi.com/me/#contact\">聯繫</a><br>"
 	},
 	sponsor_title: {
 		zh: "赞助",
@@ -1835,18 +1835,18 @@ const TRANSLATIONS = {
 		"zh-TW": "選擇分組"
 	},
 	scope_select_users: {
-		zh: "选择用户",
-		en: "Select users",
-		es: "Seleccionar usuarios",
-		de: "Benutzer auswählen",
-		"zh-TW": "選擇用戶"
+		zh: "可见用户",
+		en: "Visible users",
+		es: "Usuarios visibles",
+		de: "Sichtbare Benutzer",
+		"zh-TW": "可見用戶"
 	},
 	scope_badge_public: {
-		zh: "",
-		en: "",
-		es: "",
-		de: "",
-		"zh-TW": ""
+		zh: "公开",
+		en: "Public",
+		es: "Público",
+		de: "Öffentlich",
+		"zh-TW": "公開"
 	},
 	scope_badge_followers: {
 		zh: "仅粉丝可见",

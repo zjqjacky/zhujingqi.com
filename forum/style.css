@@ -975,6 +975,40 @@ body.dark .post.custom-bg::before {
 	opacity: 1;
 }
 
+.visBtn {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	border: 1px solid var(--border);
+	background: transparent;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: .8;
+	flex-shrink: 0;
+	transition: opacity .15s;
+}
+
+.visBtn:hover {
+	opacity: 1;
+}
+
+.visBtn {
+	color: var(--text);
+}
+
+.visBtn svg {
+	width: 16px;
+	height: 16px;
+	stroke: currentColor;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	display: block;
+}
+
 .sharePopover {
 	position: absolute;
 	top: calc(100% + 4px);
@@ -3073,28 +3107,9 @@ body.dark #searchBall img {
 	border-color: var(--green);
 }
 
-.scopeCustomPanel {
-	display: none;
-	margin-top: 6px;
-	padding: 10px;
-	border: 1px solid var(--border);
-	border-radius: 12px;
-	background: var(--card);
-}
-
-.scopeCustomPanel.show {
-	display: block;
-}
-
-.scopeCustomTabs {
-	display: flex;
-	gap: 4px;
-	margin-bottom: 10px;
-}
-
 .scopeTab {
 	padding: 5px 12px;
-	border-radius: 8px;
+	border-radius: 999px;
 	background: transparent;
 	border: 1px solid var(--border);
 	cursor: pointer;
@@ -3106,6 +3121,12 @@ body.dark #searchBall img {
 	background: var(--green);
 	color: #fff;
 	border-color: var(--green);
+}
+
+.scopeCustomTabs {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 10px;
 }
 
 .scopePickerSection {
@@ -3122,28 +3143,6 @@ body.dark #searchBall img {
 	display: flex;
 	gap: 6px;
 	flex-wrap: wrap;
-}
-
-.scopeGroupChip {
-	padding: 4px 10px;
-	border-radius: 999px;
-	background: var(--bg);
-	border: 1px solid var(--border);
-	cursor: pointer;
-	user-select: none;
-	white-space: nowrap;
-	font-size: 12px;
-	transition: .2s;
-}
-
-.scopeGroupChip:hover {
-	border-color: var(--green);
-}
-
-.scopeGroupChip.active {
-	background: var(--green);
-	color: #fff;
-	border-color: var(--green);
 }
 
 .scopePickerSearch input {
@@ -3223,7 +3222,7 @@ body.dark #searchBall img {
 
 .scopeBtn {
 	padding: 8px 20px;
-	border-radius: 20px;
+	border-radius: 999px;
 	border: none;
 	background: var(--green);
 	color: #fff;
@@ -3279,20 +3278,9 @@ body.dark #searchBall img {
 	border-bottom: none;
 }
 
-.groupManagerInfo {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
 .groupManagerName {
 	font-weight: 600;
 	font-size: 14px;
-}
-
-.groupManagerCount {
-	font-size: 12px;
-	color: var(--sub);
 }
 
 .groupManagerActions {
@@ -3321,23 +3309,60 @@ body.dark #searchBall img {
 	color: #e74c3c;
 }
 
-.groupEditorMembers {
-	margin-top: 10px;
+.scopeGroupsBar {
+	margin-bottom: 8px;
 }
 
-.groupMemberList {
-	max-height: 100px;
-	overflow-y: auto;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
-.groupMemberSelected {
+.scopeGroupsChips {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 4px;
-	margin-top: 6px;
+}
+
+.scopeGroupChip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	cursor: pointer;
+	font-size: 12px;
+	transition: .2s;
+}
+
+.scopeGroupChip:hover {
+	border-color: var(--green);
+}
+
+.scopeGroupChip.active {
+	background: var(--green);
+	color: #fff;
+	border-color: var(--green);
+}
+
+.scopeGroupChipAdd {
+	font-size: 14px;
+	padding: 2px 8px;
+}
+
+.visUser {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 0;
+	font-size: 13px;
+}
+
+.visTag {
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	font-size: 12px;
+	display: inline-block;
+	margin-bottom: 8px;
 }
 
 .voteWhoRow {

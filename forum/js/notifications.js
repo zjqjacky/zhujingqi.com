@@ -117,7 +117,8 @@ async function openSinglePost(postId) {
 		'<span>' + getRoleBadge(post.users) + '</span>' +
 		'</span>' +
 		'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
-		(post.scope && post.scope !== "public" ? getScopeBadgeHTML(post.scope) : '') +
+		((currentUser && (post.author === currentUser.id || currentUser.role?.includes?.('owner'))) ?
+		'<button class="visBtn" onclick="showVisibleToModal(' + post.id + ')" title="' + t("scope_select_users") + '"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>' : '') +
 		(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post
 			.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id +
 			'">' + t("post_share") + '</button></div></div>') +
