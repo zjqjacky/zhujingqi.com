@@ -1,20 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
-	var switchButton = document.getElementById('switch-style');
-	var a = document.getElementById('maincss');
-	var b = document.getElementById('barcss');
-	var dark = document.getElementById('darkcss');
-	switchButton.addEventListener('click', function() {
-		if (a.disabled) {
-			a.disabled = false;
-			b.disabled = false;
-			dark.disabled = true;
-		} else {
-			a.disabled = true;
-			b.disabled = true;
-			dark.disabled = false;
-		}
-	});
-});
+
 const c = document.getElementById("bgt");
 const s = Array.from(c.children);
 for (let i = s.length - 1; i > 0; i--) {

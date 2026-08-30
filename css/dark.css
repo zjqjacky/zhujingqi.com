@@ -1,204 +1,197 @@
-body {
-	margin: 0px;
+body.dark-mode {
 	background-color: #161616;
 	color: #ebebeb;
 }
 
-a {
+body.dark-mode a:link,
+body.dark-mode a:visited {
+	color: #fffab2;
 	text-decoration: none;
 }
 
-a:link {
-	color: #fffab2;
-}
-
-a:visited {
-	color: #fffab2;
-}
-
-a:hover {
+body.dark-mode a:hover {
 	color: #ffd362;
 	text-decoration: underline;
 }
 
-a:active {
+body.dark-mode a:active {
 	color: orangered;
 	text-decoration: underline wavy;
 }
 
-.text {
+body.dark-mode *::selection {
+	background-color: #444;
+	color: #ffffff;
+}
+
+/* === 导航栏 === */
+body.dark-mode .bar {
+	background-color: #1e1e1e;
+}
+
+body.dark-mode .bar a {
+	color: #e0e0e0;
+}
+
+body.dark-mode .bar a:hover {
+	background-color: #333;
+	color: #fff;
+}
+
+body.dark-mode .bar a.active {
+	background-color: #2a7a4a;
+	color: #fff;
+}
+
+body.dark-mode .bar .zjq {
+	background-color: #5a4e00;
+}
+
+/* === 文本卡片 === */
+body.dark-mode .text {
 	background-color: #262626;
 	color: #efefef;
-	border-radius: 20px;
-	padding: 20px;
-	margin: 10px;
-	transition: 0.2s;
 }
 
-.text:hover {
-	background-color: #2f2f2f;
-	transition: 0.2s;
+
+/* === 通知消息 === */
+body.dark-mode .msg {
+	background-color: #2a2a2a;
+	color: #e0e0e0;
+	border-color: #0077cc;
 }
 
-*::selection {
-	background-color: #cbcbcb;
-	color: #000000;
+body.dark-mode .msgclosebtn {
+	color: #e0e0e0;
 }
 
-.card {
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-	transition: 0.3s;
-	overflow: hidden;
-	border-radius: 20px;
-	background-color: #262626;
-	color: #efefef;
-	margin: 10px;
-	padding: 20px;
-	animation: appear 1s ease-in-out;
+body.dark-mode .msgclosebtn:hover {
+	color: #ff4444;
 }
 
-.card:hover {
-	box-shadow: 2px 8px 16px 2px rgba(255, 255, 255, 0.2);
+/* === 页脚 === */
+body.dark-mode .bottom {
+	background-color: #1a1a1a;
+	color: #888;
 }
 
-.scroll-container {
-	position: absolute;
-	left: 50%;
-	background-color: #262626;
-	color: #efefef;
-	border-radius: 20px;
-	padding: 20px;
-	transition: 0.2s;
-	width: 45%;
-	height: 80px;
-	overflow: hidden;
-	border-radius: 20px;
+body.dark-mode .bottom a {
+	color: #888;
 }
 
-.scroll-list {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	animation: scroll-up 8s linear infinite;
+body.dark-mode .bottom a:hover {
+	color: #aaa;
 }
 
-.scroll-list li {
-	height: 40px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+/* === 首页 Hero 区域 === */
+body.dark-mode .hero-l h1 {
+	color: #e0e0e0;
 }
 
-.scroll-list a {
-	color: #feffac;
+body.dark-mode .bgt {
+	color: rgba(255, 255, 255, 0.04);
 }
 
-.social-icons {
-    display: flex;
-    gap: 5px;
+/* === 通用卡片 === */
+body.dark-mode .c {
+	background-color: #2a2a2a;
+	color: #e0e0e0;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-.social-icons a {
-    display: inline-block;
-    transition: transform 0.3s ease;
+body.dark-mode .c:hover {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-.social-icons img {
-    width: 24px;
-    height: 24px;
-    filter: invert(70%);
+body.dark-mode .c h3 {
+	color: #e0e0e0;
 }
 
-.social-icons a:hover {
-    transform: scale(1.2);
+body.dark-mode .ct,
+body.dark-mode .r {
+	background-color: #2a2a2a;
+	color: #e0e0e0;
 }
 
-.msg {
-	position: fixed;
-	right: 20px;
-	top: 60px;
-	border-radius: 30px;
-	background-color: #f3f3f3;
-	color: #000000;
-	border: 5px solid #00aaff;
-	padding: 5px 20px 5px 20px;
-	z-index: 999;
-	animation: slide 1s ease-in-out;
+body.dark-mode .ct:hover,
+body.dark-mode .r:hover {
+	background-color: #2a2a2a;
 }
 
-@keyframes slide {
-	0% {
-		transform: translateX(100%);
-		opacity: 0;
-	}
-
-	80% {
-		transform: translateX(-20px);
-		opacity: 1;
-	}
-
-	100% {
-		transform: translateX(0);
-		opacity: 1;
-	}
+body.dark-mode .r h3 {
+	color: #e0e0e0;
 }
 
-.msgclosebtn {
-	font-size: 20px;
-	color: #000000;
-	cursor: pointer;
-	transition: 0.2s;
+/* === 卡片（game/tool 页面） === */
+body.dark-mode .card {
+	background-color: #2a2a2a;
+	color: #e0e0e0;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-.msgclosebtn:hover {
-	color: #ff0000;
-	cursor: pointer;
-	transition: 0.2s;
+body.dark-mode .card:hover {
+	box-shadow: 2px 8px 16px rgba(0, 0, 0, 0.5);
 }
 
-.bottom {
-    background-color: #262626;
-    color: #999999;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+body.dark-mode .card h2 {
+	color: #88bbff;
 }
 
-.bottom a {
-    color: #999999;
-    text-decoration: none;
-    margin-right: 15px;
+body.dark-mode .card p {
+	color: #aaa;
 }
 
-.bottom a:hover {
-    color: #aaaaaa;
+/* === 社交图标 === */
+body.dark-mode .s-ico img {
+	filter: invert(80%);
 }
 
-/*以下为未改动内容*/
-.bar {
-	overflow: hidden;
-	background-color: #b7f1d9;
-	font-size: 20px;
-	transition: 0.2s;
+/* === 滚动条 === */
+body.dark-mode ::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.05);
 }
 
-.bar a {
-	float: left;
-	display: block;
-	color: #000;
-	text-align: center;
-	padding: 15px 20px;
-	text-decoration: none;
-	transition: 0.2s;
+body.dark-mode ::-webkit-scrollbar-thumb {
+	background: #444;
 }
 
-.bar a:hover {
-	background-color: #c2ffe6;
-	color: black;
-	transition: 0.2s;
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+	background: #555;
 }
 
-.zjq {
-	background-color: #ffe93e;
+/* === 语言切换 === */
+body.dark-mode #switchlang select {
+	background: rgba(50, 50, 50, 0.6);
+	border-color: rgba(255, 255, 255, 0.15);
+	color: #e0e0e0;
+}
+
+body.dark-mode #switchlang select:hover {
+	background: rgba(60, 60, 60, 0.7);
+}
+
+/* === 植物 === */
+body.dark-mode #pot {
+	background: #5a4030;
+}
+
+body.dark-mode #stem {
+	background: #2a8a2a;
+}
+
+body.dark-mode .leaf {
+	background: #2a8a2a;
+}
+
+body.dark-mode #can {
+	background: #006699;
+}
+
+body.dark-mode #watered-count {
+	color: #ccc;
+}
+
+/* === 切换主题按钮 === */
+body.dark-mode #switch-theme-btn {
+	filter: invert(1);
 }

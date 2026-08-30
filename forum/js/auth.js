@@ -107,6 +107,7 @@ $("sendBtn").onclick = async () => {
 		finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 	}
 	const postId = Date.now();
+	const scope = computeVisibleTo();
 	try {
 		await apiPost("/api/posts", {
 			id: postId,
@@ -114,11 +115,8 @@ $("sendBtn").onclick = async () => {
 			time: new Date().toISOString(),
 			author: currentUser.id,
 			tag: tag,
-			scope: selectedScope,
-			allow_user_ids: scopeAllowUsers,
-			allow_tag_ids: scopeAllowGroups,
-			deny_user_ids: scopeDenyUsers,
-			deny_tag_ids: scopeDenyGroups
+			visible_to: scope.visible_to,
+			visible_not: scope.visible_not
 		});
 	} catch (e) {
 		if (e.message === "JWT_EXPIRED") return;

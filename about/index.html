@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>关于 - Zhujingqi</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="关于 zhujingqi.com，网站历史与主要内容介绍">
+		<link id="maincss" rel="stylesheet" href="/css/main.css">
+		<link id="mobilecss" rel="stylesheet" href="/css/mobile.css">
+		<link id="darkcss" rel="stylesheet" href="/css/dark.css">
+		<link rel="icon" type="image/x-icon" href="/img/zjq.svg">
+		<style>
+			.about-section {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 40px 20px;
+			}
+
+			.about-section h1 {
+				font-size: 36px;
+				margin-bottom: 40px;
+				color: #111;
+			}
+
+			.about-section p {
+				font-size: 17px;
+				line-height: 2;
+				color: #333;
+				margin-bottom: 24px;
+			}
+
+			.about-section h2 {
+				font-size: 24px;
+				margin: 48px 0 20px 0;
+				color: #111;
+				border-bottom: 2px solid #e0e0e0;
+				padding-bottom: 8px;
+			}
+
+			.about-section ul {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			.about-section li {
+				font-size: 16px;
+				line-height: 2;
+				color: #444;
+				padding: 6px 0;
+			}
+
+			.about-section li::before {
+				content: "·";
+				color: #007bff;
+				font-weight: bold;
+				margin-right: 8px;
+			}
+
+			.about-section a {
+				color: #007bff;
+				text-decoration: none;
+			}
+
+			.about-section a:hover {
+				text-decoration: underline;
+			}
+
+			.timeline {
+				border-left: 3px solid #b7f1d9;
+				padding-left: 24px;
+				margin: 20px 0;
+			}
+
+			.timeline-item {
+				margin-bottom: 24px;
+				position: relative;
+			}
+
+			.timeline-item::before {
+				content: "";
+				width: 12px;
+				height: 12px;
+				background: #b7f1d9;
+				border-radius: 50%;
+				position: absolute;
+				left: -33px;
+				top: 6px;
+			}
+
+			.timeline-year {
+				font-weight: bold;
+				color: #111;
+				font-size: 16px;
+			}
+
+			.timeline-desc {
+				color: #555;
+				font-size: 15px;
+				line-height: 1.8;
+				margin-top: 4px;
+			}
+
+			.copyright {
+				margin-top: 60px;
+				padding-top: 24px;
+				border-top: 1px solid #e0e0e0;
+				color: #888;
+				font-size: 14px;
+				line-height: 1.8;
+			}
+
+			body.dark-mode .about-section {
+				color: #e0e0e0;
+			}
+
+			body.dark-mode .about-section h1,
+			body.dark-mode .about-section h2 {
+				color: #e0e0e0;
+				border-bottom-color: #555;
+			}
+
+			body.dark-mode .about-section p {
+				color: #ccc;
+			}
+
+			body.dark-mode .about-section li {
+				color: #bbb;
+			}
+
+			body.dark-mode .about-section li::before {
+				color: #5b9cff;
+			}
+
+			body.dark-mode .about-section a {
+				color: #5b9cff;
+			}
+
+			body.dark-mode .timeline {
+				border-left-color: #2a7a4a;
+			}
+
+			body.dark-mode .timeline-item::before {
+				background: #2a7a4a;
+			}
+
+			body.dark-mode .timeline-year {
+				color: #e0e0e0;
+			}
+
+			body.dark-mode .timeline-desc {
+				color: #aaa;
+			}
+
+			body.dark-mode .copyright {
+				color: #777;
+				border-top-color: #444;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="/me/">介绍</a>
+			<a href="/game/">游戏</a>
+			<a href="/tool/">工具</a>
+			<a id="switch-theme-btn" style="position: absolute; right: 0px; padding: 5px; cursor: pointer;"><img src="/img/switch-theme.svg"
+					height="40px" width="auto" /></a>
+		</div>
+		<div class="about-section">
+			<h1><img src="/img/zjq.svg" style="height: 36px; vertical-align: middle;"> 关于本站</h1>
+
+			<p>
+				Zhujingqi.com 是一个融合个人创作与技术创新的平台，致力于展示作者在编程、创意设计及跨文化交流领域的独特视角。
+			</p>
+			<p>
+				网站内容涵盖多个维度，包括个人介绍、互动游戏、实用工具以及开源项目。在这里，访客可以深入了解作者的背景与兴趣，体验精心开发的各种互动工具和资源。
+			</p>
+
+			<h2>网站历史</h2>
+			<div class="timeline">
+				<div class="timeline-item">
+					<div class="timeline-year">2020</div>
+					<div class="timeline-desc">网站上线，仅有一个页面和一句话</div>
+				</div>
+				<div class="timeline-item">
+					<div class="timeline-year">2023</div>
+					<div class="timeline-desc">开始逐步建设与扩展</div>
+				</div>
+				<div class="timeline-item">
+					<div class="timeline-year">2025</div>
+					<div class="timeline-desc">网站基本构建完善</div>
+				</div>
+				<div class="timeline-item">
+					<div class="timeline-year">2026</div>
+					<div class="timeline-desc">发布更多游戏与实用工具，全面改版升级</div>
+				</div>
+			</div>
+			<p>
+				查看网站历史截图：<a href="https://web.archive.org/web/20250000000000*/https://zhujingqi.com">Wayback Machine</a>
+				· 旧版首页：<a href="/old/">怀旧版</a>
+			</p>
+
+			<h2>主要内容</h2>
+			<ul>
+				<li><a href="/me/">个人介绍</a> — 了解 Jacky</li>
+				<li><a href="/game/">游戏中心</a> — 自制互动游戏</li>
+				<li><a href="/tool/">工具大全</a> — 实用在线工具</li>
+				<li><a href="/forum/">Jacky 论坛</a> — 社区交流</li>
+				<li><a href="https://github.com/zjqjacky">GitHub</a> — 开源项目</li>
+			</ul>
+
+			<h2>联系方式</h2>
+			<p>
+				邮箱：<a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a><br>
+				GitHub：<a href="https://github.com/zjqjacky">github.com/zjqjacky</a><br>
+				更多联系方式请访问 <a href="/me/#contact">联系方式</a>
+			</p>
+
+			<div class="copyright">
+				© 2020–2026 zhujingqi.com · <a href="https://github.com/zjqjacky">GitHub</a> · <a href="mailto:jacky@zhujingqi.com">Contact</a>
+			</div>
+		</div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			<a href="/about">关于</a>
+			<a href="/money.html">赞助</a>
+		</div>
+		<script src="/js/theme.js"></script>
+	</body>
+</html>

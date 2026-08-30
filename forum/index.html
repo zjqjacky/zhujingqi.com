@@ -4,6 +4,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport"
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+		<meta name="description" content="Jacky 论坛 - 社区交流平台，发帖、评论与互动">
 		<title>Jacky 论坛 - Zhujingqi</title>
 		<link rel="icon" type="image/png" href="icon.svg">
 		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/icon.png">
@@ -106,11 +107,11 @@
 				<br>
 				<div id="announceBar"></div>
 				<br>
-				<div class="noticeItem" id="statsBox">
-					<strong id="statsTitle">全站统计</strong><br>
+				<details class="noticeItem" id="statsBox">
+					<summary id="statsTitle">全站统计</summary>
 					用户数：<span id="totalUsers">加载中...</span><br>
 					帖子数：<span id="totalPosts">加载中...</span>
-				</div>
+				</details>
 				<br>
 				<div class="noticeItem" style="font-size: 14px;" id="shareNotice">
 					分享 Jacky 论坛，<br>让好友加入！<br>
@@ -180,13 +181,6 @@
 						<span class="scopeChip" data-scope="private">仅自己</span>
 						<span class="scopeChip" data-scope="custom">自定义</span>
 					</div>
-					<div class="scopeCustomPanel" id="scopeCustomPanel">
-						<div class="scopeCustomTabs">
-							<button class="scopeTab active" data-tab="allow" id="scopeAllowTab">允许查看</button>
-							<button class="scopeTab" data-tab="deny" id="scopeDenyTab">禁止查看</button>
-						</div>
-						<div class="scopeCustomContent" id="scopeCustomContent"></div>
-					</div>
 				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
@@ -249,11 +243,6 @@
 					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
 					<h3>Zhujingqi</h3>
 					<p id="discWebsiteDesc">网站首页</p>
-				</a>
-				<a class="discoverCard" href="/hub/">
-					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
-					<h3 id="discCommunityTitle">社区</h3>
-					<p id="discCommunityDesc">Zhujingqi 社区</p>
 				</a>
 				<a class="discoverCard" href="/game/">
 					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>

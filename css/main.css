@@ -40,13 +40,8 @@ a:active {
 	border-radius: 20px;
 	padding: 20px;
 	margin: 10px;
-	transition: 0.2s;
 }
 
-.text:hover {
-	background-color: #f6f6f6;
-	transition: 0.2s;
-}
 
 .msg {
 	position: fixed;
@@ -108,4 +103,36 @@ a:active {
 
 .bottom a:hover {
 	color: #888888;
+}
+
+.bar {
+	overflow: hidden;
+	background-color: #b7f1d9;
+	font-size: 20px;
+	transition: 0.2s;
+}
+
+.bar a {
+	float: left;
+	display: block;
+	color: #000;
+	text-align: center;
+	padding: 15px 20px;
+	text-decoration: none;
+	transition: 0.2s;
+}
+
+.bar a:hover {
+	background-color: #c2ffe6;
+	color: black;
+	transition: 0.2s;
+}
+
+.bar a.active {
+	background-color: #6de6b3;
+	font-weight: bold;
+}
+
+#switch-theme-btn {
+	float: right;
 }

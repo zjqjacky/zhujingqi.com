@@ -152,11 +152,11 @@ async function loadStats(force = false) {
 		if ($("totalPosts")) $("totalPosts").textContent = d.postCount || 0;
 		if ($("statsBox")) {
 			$("statsBox").innerHTML = `
-								<strong>` + t("stats_title") + `</strong><br>
-								` + t("stats_users") + `：${d.userCount || 0}<br>
-								` + t("stats_posts") + `：${d.postCount || 0}<br>
-								` + t("stats_comments") + `：${d.commentCount || 0}<br>
-							`;
+							<summary id="statsTitle">` + t("stats_title") + `</summary>
+							` + t("stats_users") + `：${d.userCount || 0}<br>
+							` + t("stats_posts") + `：${d.postCount || 0}<br>
+							` + t("stats_comments") + `：${d.commentCount || 0}<br>
+						`;
 		}
 		totalPostCount = d.postCount || 0;
 		renderPager();
@@ -177,11 +177,11 @@ async function loadStats(force = false) {
 		if ($("totalPosts")) $("totalPosts").textContent = postCount || 0;
 		if ($("statsBox")) {
 			$("statsBox").innerHTML = `
-								<strong>` + t("stats_title") + `</strong><br>
-								` + t("stats_users") + `：${userCount || 0}<br>
-								` + t("stats_posts") + `：${postCount || 0}<br>
-								` + t("stats_comments") + `：${commentCount || 0}<br>
-							`;
+							<summary id="statsTitle">` + t("stats_title") + `</summary>
+							` + t("stats_users") + `：${userCount || 0}<br>
+							` + t("stats_posts") + `：${postCount || 0}<br>
+							` + t("stats_comments") + `：${commentCount || 0}<br>
+						`;
 		}
 		totalPostCount = postCount || 0;
 		renderPager();
@@ -293,12 +293,13 @@ setT("welcomeTitle", t("login_title"));
 	setT("discoverLogoText", t("discover_title"));
 	setT("noticeTitle", t("notice_title"));
 	setH("noticeWelcome", t("notice_welcome"));
-	setT("statsTitle", t("stats_title"));
+	const statsTitleEl = document.getElementById("statsTitle");
+	if (statsTitleEl) statsTitleEl.textContent = t("stats_title");
 	const ss = document.getElementById("statsBox");
 	if (ss) {
 		const d = statsCache.data;
 		if (d) {
-			ss.innerHTML = "<strong>" + t("stats_title") + "</strong><br>" + t("stats_users") + "：" + (d
+			ss.innerHTML = "<summary>" + t("stats_title") + "</summary>" + t("stats_users") + "：" + (d
 				.userCount || 0) + "<br>" + t("stats_posts") + "：" + (d.postCount || 0) + "<br>" + t(
 				"stats_comments") + "：" + (d.commentCount || 0);
 		}

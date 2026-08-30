@@ -1,11 +1,16 @@
 .hero {
 	position: relative;
-	height: 550px;
+	height: auto;
+	min-height: 420px;
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
-	padding-left: 40px;
+	justify-content: space-between;
+	padding: 20px 40px;
 	overflow: hidden;
+}
+
+.hero-l {
+	flex: 0 0 46%;
 }
 
 .hero-l h1 {
@@ -44,7 +49,7 @@
 }
 
 .hero-r .c:hover {
-	box-shadow: 2px 8px 16px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .bgt {
@@ -83,9 +88,26 @@
 
 .cr {
 	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.cr-top {
+	display: flex;
 	gap: 10px;
 	flex-wrap: nowrap;
-	align-items: stretch
+	align-items: stretch;
+}
+
+.cr-bottom {
+	display: flex;
+	gap: 10px;
+	align-items: stretch;
+	margin-left: 10px;
+}
+
+.cr-bottom .ct {
+	min-height: 80px;
 }
 
 .cc {
@@ -111,7 +133,7 @@
 }
 
 .c:hover {
-	box-shadow: 2px 8px 16px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .c h3 {
@@ -128,7 +150,17 @@
 }
 
 .ct:hover {
-	background-color: #f6f6f6;
+	background-color: #f3f3f3;
+}
+
+.plant-ct {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 20px;
+	padding: 20px 30px;
 }
 
 .fixh {
@@ -153,21 +185,15 @@
 }
 
 .r:hover {
-	background-color: #f6f6f6;
+	background-color: #f3f3f3;
 }
 
 .r h3 {
 	color: #000;
 }
 
-@media (max-width: 768px) {
-	.row {
-		flex-direction: column;
-	}
-}
-
 .arrow::after {
-	content: "➜";
+	content: "\27A4";
 	position: absolute;
 	opacity: 0;
 	transform: translateX(-10px);
@@ -198,18 +224,6 @@
 .s-ico a:hover {
 	transform: scale(1.2);
 }
-
-@media (max-width: 768px) {
-	.social-icons {
-		display: none;
-	}
-}
-
-/*
-::-webkit-scrollbar {
-	display: none;
-}
-*/
 
 ::-webkit-scrollbar {
 	width: 10px;
@@ -249,6 +263,8 @@
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;
+	animation: blink 4s infinite;
+	transform-origin: center;
 }
 
 .eye.left {
@@ -271,7 +287,6 @@
 .mouth {
 	width: 45px;
 	height: 4px;
-	background: black;
 	position: absolute;
 	bottom: 25px;
 	left: 50%;
@@ -303,18 +318,10 @@
 	}
 }
 
-.eye {
-	animation: blink 4s infinite;
-	transform-origin: center;
-}
-
 #plant-container {
 	position: relative;
-	width: 150px;
-	text-align: center;
-	left: 100px;
-	height: 10px;
-	top: -50px;
+	width: 50px;
+	height: 120px;
 }
 
 #pot {
@@ -323,7 +330,9 @@
 	background: #8d6e63;
 	border-radius: 0 0 20px 20px;
 	margin: 0 auto;
-	position: relative;
+	position: absolute;
+	bottom: 0;
+	left: 0;
 	cursor: pointer;
 }
 
@@ -358,10 +367,9 @@
 }
 
 #watered-count {
-	margin-top: -50px;
-	margin-left: 100px;
-	font-size: 16px;
-	width: 200px;
+	font-size: 14px;
+	flex-shrink: 0;
+	padding-right: 5px;
 }
 
 #can {
@@ -370,44 +378,30 @@
 	background: #00aaff;
 	border-radius: 0px 10px 10px 0px;
 	position: absolute;
-	top: -90px;
-	left: 70px;
+	top: 5px;
+	left: 50px;
 	opacity: 0;
 	transform: rotate(0deg) scale(0.95);
 	transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 #switchlang {
-	position: fixed;
-	top: 20px;
-	right: 60px;
+	float: right;
 	font-size: 15px;
-	opacity: 0.7;
+	padding: 12px 10px;
 }
-/*
-NAME DEFINITION:
-.hero hero
-.hero-l hero-left
-.hero-r hero-right
-.bgt background-text
-.xl x-large
-.l large
-.m medium
-.s small
-.cr card and right
-.cc card-container
-.rc right-container
-.c card
-.r right
-.ct card-text
-.fixh fixed-hight
-.arrow
-.s-ico social-icons
-.eye
-.eye.left
-.eye.right
-.pupil
-.mouth
-.face
-#switchlang
-*/
+
+#switchlang select {
+	background: rgba(255, 255, 255, 0.5);
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 20px;
+	padding: 4px 12px;
+	font-size: 14px;
+	cursor: pointer;
+	outline: none;
+	transition: background 0.2s;
+}
+
+#switchlang select:hover {
+	background: rgba(255, 255, 255, 0.7);
+}
