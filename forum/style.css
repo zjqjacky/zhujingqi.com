@@ -569,6 +569,7 @@ body.dark #profileCard {
 	white-space: pre-wrap;
 	display: flex;
 	flex-direction: column;
+	position: relative;
 }
 
 .postHeader {
@@ -949,9 +950,17 @@ body.dark .post.custom-bg::before {
 	color: var(--sub);
 }
 
+.postHeaderActions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
 .shareBtnWrapper {
 	position: relative;
 	flex-shrink: 0;
+	margin-right: 4px;
 }
 
 .shareBtn {
@@ -980,7 +989,7 @@ body.dark .post.custom-bg::before {
 	height: 26px;
 	border-radius: 50%;
 	border: 1px solid var(--border);
-	background: transparent;
+	background: var(--card);
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -988,29 +997,27 @@ body.dark .post.custom-bg::before {
 	opacity: .8;
 	flex-shrink: 0;
 	transition: opacity .15s;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 5;
 }
 
 .visBtn:hover {
 	opacity: 1;
 }
 
-.visBtn {
-	color: var(--text);
+.visBtnIcon {
+	width: 15px;
+	height: 15px;
+	display: block;
+	filter: invert(1) grayscale(1);
+	opacity: .85;
 }
 
-.visBtnIcon {
-	width: 16px;
-	height: 16px;
-	display: block;
-	background: var(--text);
-	-webkit-mask-image: url(icon/user.svg);
-	mask-image: url(icon/user.svg);
-	-webkit-mask-size: contain;
-	mask-size: contain;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	-webkit-mask-position: center;
-	mask-position: center;
+body.dark .visBtnIcon {
+	filter: none;
+	opacity: .9;
 }
 
 .visBtn svg {

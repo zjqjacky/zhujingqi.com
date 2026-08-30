@@ -389,13 +389,16 @@ async function loadPosts(page = 1, container = $("posts")) {
 				'<span>' + getRoleBadge(p.users) + '</span>' +
 				'</span>' +
 				'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
+				'</div>' +
+				'<div class="postHeaderActions">' +
 				((currentUser && (p.author === currentUser.id || currentUser.role?.includes?.('owner'))) ?
-				'<button class="visBtn" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><span class="visBtnIcon"></span></button>' : '') +
+				'<button class="visBtn" onclick="showVisibleToModal(' + p.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>' : '') +
 				(guestMode ? '' :
 					'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id +
 					'">+</button><div class="sharePopover"><button data-copy="' + p.id +
 					'">' + t("post_share") + '</button></div></div>') +
-				'</div></div>' +
+				'</div>' +
+				'</div>' +
 				'<div class="postTags">' +
 				(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
 				'</div>' +

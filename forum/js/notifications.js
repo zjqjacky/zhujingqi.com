@@ -118,7 +118,7 @@ async function openSinglePost(postId) {
 		'</span>' +
 		'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
 		((currentUser && (post.author === currentUser.id || currentUser.role?.includes?.('owner'))) ?
-		'<button class="visBtn" onclick="showVisibleToModal(' + post.id + ')" title="' + t("scope_select_users") + '"><span class="visBtnIcon"></span></button>' : '') +
+		'<button class="visBtn" onclick="showVisibleToModal(' + post.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>' : '') +
 		(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post
 			.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id +
 			'">' + t("post_share") + '</button></div></div>') +
