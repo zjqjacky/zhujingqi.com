@@ -38,6 +38,8 @@ refreshUILanguage(true);
 			}
 			if (data) {
 				currentUser = data;
+				if (data.name) localStorage.setItem("forumName_" + data.id, data.name);
+				if (data.avatar) localStorage.setItem("forumAvatar", data.avatar);
 				$("nav").classList.remove("hidden");
 				const initialPid = getUrlParam("pid");
 				const initialUid = getUrlParam("uid");

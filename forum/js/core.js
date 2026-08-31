@@ -45,7 +45,7 @@ function enterGuestMode() {
 	syncUrlFromQuery();
 	loadPosts(1);
 }
-let currentPage = "main";
+let currentPage = "welcomePage";
 const defaultTags = ["学习", "日常", "搞笑", "提问"];
 const defaultTagKeys = {
 	"学习": "tag_study",
@@ -224,12 +224,9 @@ function show(p) {
 			el.classList.add("hidden");
 		}
 	});
-	if (slide && prev) {
-		setTimeout(() => {
-			$(prev).classList.add("hidden");
-			$(prev).classList.remove("page-fade-out");
-		}, 280);
-	}
+	// 登录/注册页隐藏底部导航栏，其他页面显示（已登录或访客模式下）
+	const isAuthPage = p === "welcomePage" || p === "registerPage";
+	if ($("nav")) $("nav").classList.toggle("hidden", isAuthPage);
 	if (p !== "profilePage" && p !== "postPage") {
 	history.replaceState(null, "", location.pathname);
 }

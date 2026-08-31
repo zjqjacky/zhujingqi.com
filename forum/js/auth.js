@@ -38,6 +38,8 @@ $("loginBtn").onclick = async () => {
 		currentUser = data;
 		localStorage.setItem("loginUser", data.id);
 		if (data.token) localStorage.setItem("token", data.token);
+		if (data.avatar) localStorage.setItem("forumAvatar", data.avatar);
+		if (data.name) localStorage.setItem("forumName_" + data.id, data.name);
 		showLoggedFeatures();
 		$("nav").classList.remove("hidden");
 		show("main");
