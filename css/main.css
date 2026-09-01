@@ -136,3 +136,7 @@ a:active {
 #switch-theme-btn {
 	float: right;
 }
+
+.hidden {
+	display: none !important;
+}

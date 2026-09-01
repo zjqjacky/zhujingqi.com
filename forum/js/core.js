@@ -45,7 +45,7 @@ function enterGuestMode() {
 	syncUrlFromQuery();
 	loadPosts(1);
 }
-let currentPage = "welcomePage";
+let currentPage = "main";
 const defaultTags = ["学习", "日常", "搞笑", "提问"];
 const defaultTagKeys = {
 	"学习": "tag_study",
@@ -217,9 +217,8 @@ function show(p) {
 					300);
 			}
 		} else if (id === prev && slide) {
-			el.classList.remove("page-fade-out");
-			void el.offsetWidth;
-			el.classList.add("page-fade-out");
+			// 立即隐藏旧页面，避免灰色遮罩覆盖新页面
+			el.classList.add("hidden");
 		} else {
 			el.classList.add("hidden");
 		}

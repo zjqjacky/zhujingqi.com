@@ -3807,6 +3807,7 @@ body.dark .musicCard {
 .page-fade-out {
 	animation: fadeOut .28s ease-out both;
 	will-change: opacity;
+	pointer-events: none;
 }
 
 .post.postEnter {
