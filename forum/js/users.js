@@ -14,7 +14,7 @@ async function loadNewUsers(limit = 10) {
 		let div = document.createElement("div");
 		div.className = "newUserItem";
 		div.innerHTML =
-			`<span>${u.name}${getRoleBadge(u)}</span>`;
+			`<span>${escapeHtml(getDisplayName(u))}${getRoleBadge(u)}</span>`;
 		div.onclick = () => viewUser(u.id);
 		container.appendChild(div);
 	}
@@ -23,7 +23,8 @@ async function loadNewUsers(limit = 10) {
 const DEFAULT_AVATAR = "assets/img/head.svg";
 
 function getAvatar(user) {
-	return user?.avatar?.trim() || DEFAULT_AVATAR;
+	const a = user?.avatar ? String(user.avatar).trim() : "";
+	return a ? a.replace(/["'<>\u0060]/g, "") : DEFAULT_AVATAR;
 }
 
 function escapeAttr(s) {
@@ -102,7 +103,7 @@ function escapeAttr(s) {
 								<img class="avatar rankAvatar" src="${avatar}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
 								<div style="min-width:0;">
 									<div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
-										<span>${u.name}</span>
+										<span>${escapeHtml(getDisplayName(u))}</span>
 										<span class="userLevel">${getUserLevel(u.coins || 0)}${getRoleBadge(u)}</span>
 									</div>
 								</div>
@@ -112,7 +113,7 @@ function escapeAttr(s) {
 						div.onclick = () => viewUser(u.id);
 						items.push({
 							div,
-							name: u.name.toLowerCase()
+							name: ((u.nickname || "") + " " + u.name).toLowerCase()
 						});
 						box.appendChild(div);
 					});
@@ -124,7 +125,7 @@ function escapeAttr(s) {
 							box.querySelectorAll(".userItem.highlight").forEach(el => el.classList.remove(
 								"highlight"));
 							if (!q) return;
-							const found = items.find(it => it.name === q);
+							const found = items.find(it => it.name.includes(q));
 							if (!found) return;
 							setTimeout(() => {
 								found.div.classList.add("highlight");
@@ -136,6 +137,58 @@ function escapeAttr(s) {
 							}, 50);
 						};
 					}
+				}
+
+				function renderProfileName(user) {
+					if (!user || !$("pname")) return;
+					if (user.nickname) {
+						$("pname").innerHTML =
+							`<span class="pnickWrap"><span class="pNick">${escapeHtml(user.nickname)}</span>` +
+							`<span class="pAccount">@${escapeHtml(user.name)}</span></span>` +
+							`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+							getRoleBadge(user);
+					} else {
+						$("pname").innerHTML = escapeHtml(user.name) + `<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+							getRoleBadge(user);
+					}
+					if (currentUser && Number(user.id) === Number(currentUser.id)) {
+						const btn = document.createElement("button");
+						btn.className = "pnameEditBtn";
+						btn.textContent = t("settings_change_nickname");
+						btn.onclick = () => openNicknameEditor(user);
+						$("pname").appendChild(btn);
+					}
+				}
+
+				function openNicknameEditor(user) {
+					const box = document.querySelector(".modalBox");
+					box.style.width = "400px";
+					$("modalText").innerHTML = `
+						<h3>${t("settings_change_nickname")}</h3>
+						<input id="nickInput" maxlength="20" placeholder="${t("nickname_placeholder")}" value="${user.nickname ? escapeHtml(user.nickname) : ""}">
+						<div style="margin-top:14px;">
+							<button id="nickSaveBtn">${t("profile_save")}</button>
+						</div>
+					`;
+					if (typeof bindNicknameLimit === "function") bindNicknameLimit($("nickInput"));
+					$("modal").classList.remove("hidden");
+					$("nickSaveBtn").onclick = async () => {
+						const newNick = $("nickInput").value.trim();
+						if (nicknameWidth(newNick) > NICKNAME_MAX_WIDTH) return modal(t("nickname_too_long"));
+						try {
+							await apiPut("/api/users/" + currentUser.id, {
+								nickname: newNick || null
+							});
+						} catch (e) {
+							if (/taken/i.test(e.message)) return modal(t("nickname_taken"));
+							return modal(t("save_fail", e.message));
+						}
+						currentUser.nickname = newNick || null;
+						if (user) user.nickname = newNick || null;
+						renderProfileName(user);
+						$("modal").classList.add("hidden");
+						showCoinMsg(t("nickname_updated"));
+					};
 				}
 
 				function openProfileSettings(user) {
@@ -161,7 +214,10 @@ function escapeAttr(s) {
 								<button class="settingsLinkBtn" id="setAvatarBtn">${t("profile_edit_avatar")}</button>
 								<button class="settingsLinkBtn" id="setBioBtn">${t("profile_edit_desc")}</button>
 							</div>
-							<button class="settingsLinkBtn" id="setPassBtn" style="margin-top:6px;">${t("settings_change_pass")}</button>
+							<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+								<button class="settingsLinkBtn" id="setPassBtn">${t("settings_change_pass")}</button>
+								<button class="settingsLinkBtn" id="setNicknameBtn">${t("settings_change_nickname")}</button>
+							</div>
 							<div class="settingsCard" style="margin-top:6px;">
 								<div style="display:flex;align-items:center;justify-content:space-between;">
 									<span class="settingsLabel" style="margin:0;">${t("follow_public_label")}</span>
@@ -262,6 +318,10 @@ function escapeAttr(s) {
 							$("modal").classList.add("hidden");
 							showCoinMsg(t("pass_changed_ok"));
 						};
+					};
+					$("setNicknameBtn").onclick = () => {
+						$("modal").classList.add("hidden");
+						openNicknameEditor(user);
 					};
 					$("setCardBgBtn").onclick = () => {
 						$("modal").classList.add("hidden");
@@ -364,8 +424,7 @@ async function viewUser(uid) {
 						bgBtn.onclick = () => openCardBgEditor(user);
 						profileCardEl.appendChild(bgBtn);
 					}
-					$("pname").innerHTML = user.name + `<span class="userLevel">${getUserLevel(user.coins)}</span>` +
-						getRoleBadge(user);
+					renderProfileName(user);
 					$("profileMeta").innerHTML = `
 						<div class="metaRow">${t("profile_reg_time")}：${new Date(user.time).toLocaleString()}</div>
 						<div class="metaRow">${t("profile_coins")}：${user.coins || 0}</div>
@@ -414,8 +473,8 @@ async function viewUser(uid) {
 					actions.innerHTML = "";
 					const viewPostsBtn = document.createElement("button");
 					viewPostsBtn.className = "profileBtn";
-					viewPostsBtn.textContent = isSelf ? t("profile_view_my_posts") : t("profile_view_posts", user
-						.name);
+					viewPostsBtn.textContent = isSelf ? t("profile_view_my_posts") : t("profile_view_posts", getDisplayName(
+						user));
 					viewPostsBtn.onclick = () => {
 						show("main");
 						$("postSearch").value = "@" + user.name;
@@ -540,7 +599,7 @@ async function viewUser(uid) {
 							const u = x.users;
 							return `<div class="onlineUser voteUser" data-user="${u?.id}" style="display:flex;align-items:center;gap:8px;">
 								<img class="avatar onlineAvatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
-								<span>${u?.name || t("post_unknown")}</span>
+								<span>${escapeHtml(getDisplayName(u))}</span>
 								<span class="userLevel">${getUserLevel(u?.coins || 0)}</span>
 								${getRoleBadge(u)}
 							</div>`;

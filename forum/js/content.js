@@ -43,7 +43,7 @@ function showMentionBox(el, items, start, end) {
 						<div class="mentionItem ${idx === 0 ? "active" : ""}" data-index="${idx}" data-uid="${u.id}" data-uname="${u.name}">
 							<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
 							<div style="min-width:0;">
-								<div><b>${u.name}</b></div>
+								<div><b>${escapeHtml(getDisplayName(u))}</b>${u.nickname ? ` <span style="color:var(--sub);font-size:12px;">@${escapeHtml(u.name)}</span>` : ""}</div>
 								<div class="time">${t("mention_click_hint")}</div>
 							</div>
 						</div>
@@ -74,7 +74,7 @@ async function updateMentionBox(el) {
 	const users = await ensureAllUsersCache();
 	const q = ctx.query.toLowerCase();
 	const items = users
-		.filter(u => u.name && u.name.toLowerCase().includes(q))
+		.filter(u => ((u.name || "") + " " + (u.nickname || "")).toLowerCase().includes(q))
 		.slice(0, 6);
 	if (!items.length) {
 		hideMentionBox();

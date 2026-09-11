@@ -42,7 +42,7 @@ async function loadOnlineUsers() {
 											src="${getAvatar(u)}"
 											onerror="this.onerror=null;this.src='assets/img/head.svg'"
 										>
-										<span>${u.name}</span>
+										<span>${escapeHtml(getDisplayName(u))}</span>
 										<span class="userLevel">
 											${getUserLevel(u.coins || 0)}
 										</span>

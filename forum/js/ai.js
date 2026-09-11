@@ -435,7 +435,7 @@ async function openAILogs() {
 			list.innerHTML = '<div style="color:var(--sub);text-align:center;padding:20px;">' + t("ai_logs_empty") + '</div>';
 		} else {
 			list.innerHTML = logs.map(l => {
-				const name = l.users?.name || ("#" + l.user_id);
+				const name = getDisplayName(l.users) || ("#" + l.user_id);
 				const time = l.created_at ? new Date(l.created_at).toLocaleString() : "";
 				return `<div class="aiLogItem">
 									<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--sub);">

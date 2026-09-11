@@ -9,7 +9,7 @@
 		<link rel="icon" type="image/png" href="icon.svg">
 		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/icon.png">
 		<link rel="apple-touch-icon" sizes="120x120" href="assets/img/icon.png">
-		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="style.css?v=20260911">
 	</head>
 	<body>
 		<script>
@@ -61,8 +61,9 @@
 			<div class="big" id="regTitle">注册 Jacky 账号</div>
 			<div class="card">
 				<select id="langSelectReg" class="langSelect" style="width:100%;margin-bottom:8px;"></select>
-				<input id="regUser" placeholder="用户名">
-				<input id="regPass" type="password" placeholder="密码">
+        <input id="regUser" placeholder="账号名（登录用，仅限字母数字）">
+        <input id="regNickname" maxlength="20" placeholder="昵称（选填，可随时修改）">
+        <input id="regPass" type="password" placeholder="密码">
 				<input id="regPass2" type="password" placeholder="再次输入密码">
 				<div id="captchaRow" style="display:flex;align-items:center;gap:8px;margin:8px 0;">
 					<button id="captchaBtn" type="button" style="flex:1;">点击完成人机验证</button>
@@ -172,14 +173,6 @@
 						</label>
 					</div>
 					<input id="warnText" class="warnText" placeholder="自定义遮罩显示文字（可不填）" maxlength="40">
-				</div>
-				<div class="scopeRow">
-					<div class="scopeLabel" id="scopeTitleLabel">谁可以看</div>
-					<div class="scopeChips" id="scopeChips">
-						<span class="scopeChip active" data-scope="public">公开</span>
-						<span class="scopeChip" data-scope="followers">仅粉丝</span>
-						<span class="scopeChip" data-scope="private">仅自己</span>
-					</div>
 				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
@@ -322,27 +315,26 @@
 			<img id="viewerImg">
 		</div>
 		<script src="https://zhujingqi.com/js/egg.js"></script>
-		<script src="js/api.js"></script>
-		<script src="js/i18n.js"></script>
-		<script src="js/core.js"></script>
-		<script src="js/captcha.js"></script>
-		<script src="js/config.js"></script>
-		<script src="js/content.js"></script>
-		<script src="js/search.js"></script>
-		<script src="js/scope.js"></script>
-		<script src="js/editor.js"></script>
-		<script src="js/auth.js"></script>
-		<script src="js/posts.js"></script>
-		<script src="js/comments.js"></script>
-		<script src="js/users.js"></script>
-		<script src="js/notifications.js"></script>
-		<script src="js/presence.js"></script>
-		<script src="js/shop.js"></script>
-		<script src="js/lottery.js"></script>
-		<script src="js/ai.js"></script>
-		<script src="js/fortune.js"></script>
-		<script src="js/announcements.js"></script>
-		<script src="js/misc.js"></script>
-		<script src="js/app.js"></script>
+		<script src="js/api.js?v=20260911"></script>
+		<script src="js/i18n.js?v=20260911"></script>
+		<script src="js/core.js?v=20260911"></script>
+		<script src="js/captcha.js?v=20260911"></script>
+		<script src="js/config.js?v=20260911"></script>
+		<script src="js/content.js?v=20260911"></script>
+		<script src="js/search.js?v=20260911"></script>
+		<script src="js/editor.js?v=20260911"></script>
+		<script src="js/auth.js?v=20260911"></script>
+		<script src="js/posts.js?v=20260911"></script>
+		<script src="js/comments.js?v=20260911"></script>
+		<script src="js/users.js?v=20260911"></script>
+		<script src="js/notifications.js?v=20260911"></script>
+		<script src="js/presence.js?v=20260911"></script>
+		<script src="js/shop.js?v=20260911"></script>
+		<script src="js/lottery.js?v=20260911"></script>
+		<script src="js/ai.js?v=20260911"></script>
+		<script src="js/fortune.js?v=20260911"></script>
+		<script src="js/announcements.js?v=20260911"></script>
+		<script src="js/misc.js?v=20260911"></script>
+		<script src="js/app.js?v=20260911"></script>
 	</body>
 </html>

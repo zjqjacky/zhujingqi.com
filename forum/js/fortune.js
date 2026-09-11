@@ -5,7 +5,7 @@ function getLevelInfo(coins) {
 			color: "#888"
 		},
 		{
-			min: 0,
+			min: 1,
 			name: "LV1",
 			color: "#77bb00"
 		},

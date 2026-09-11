@@ -1,6 +1,40 @@
 const $ = id => document.getElementById(id);
 let currentUser = null;
 let guestMode = false;
+function getDisplayName(u) {
+	if (!u) return typeof t === "function" ? t("post_unknown") : "";
+	return u.nickname || u.name || (typeof t === "function" ? t("post_unknown") : "");
+}
+function getAccountName(u) {
+	return u && u.name ? u.name : "";
+}
+const NICKNAME_MAX_WIDTH = 20;
+const NICKNAME_WIDE_RE = /[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF60\uFFE0-\uFFE6]/;
+function nicknameWidth(s) {
+	let w = 0;
+	for (const ch of String(s || "")) w += NICKNAME_WIDE_RE.test(ch) ? 2 : 1;
+	return w;
+}
+function truncateNickname(s) {
+	let w = 0,
+		out = "";
+	for (const ch of String(s || "")) {
+		const cw = NICKNAME_WIDE_RE.test(ch) ? 2 : 1;
+		if (w + cw > NICKNAME_MAX_WIDTH) break;
+		w += cw;
+		out += ch;
+	}
+	return out;
+}
+function bindNicknameLimit(el) {
+	if (!el || el._nickBound) return;
+	el._nickBound = true;
+	el.addEventListener("input", e => {
+		if (e.isComposing) return;
+		const v = truncateNickname(el.value);
+		if (v !== el.value) el.value = v;
+	});
+}
 function hideLoggedFeatures() {
 	guestMode = true;
 	if ($("loginTopBtn")) $("loginTopBtn").style.display = "";
@@ -255,6 +289,7 @@ setT("welcomeTitle", t("login_title"));
 	setT("backLogin", t("go_login"));
 	setT("regTitle", t("reg_title"));
 	setPH("regUser", t("reg_username"));
+	setPH("regNickname", t("reg_nickname_ph"));
 	setPH("regPass", t("reg_password"));
 	setPH("regPass2", t("reg_password2"));
 	setT("registerBtn", t("reg_btn"));
@@ -326,15 +361,6 @@ renderLangSelect(document.getElementById("langSelectReg"));
 	setT("captchaCloseBtn", t("modal_close"));
 	setT("rankToggleCoins", t("profile_coins"));
 	setT("rankToggleFollowers", t("followers"));
-	const scopeTitle = $("scopeTitleLabel");
-	if (scopeTitle) scopeTitle.textContent = t("scope_title");
-	const scopeChipsEl = $("scopeChips");
-	if (scopeChipsEl) {
-		scopeChipsEl.querySelectorAll(".scopeChip").forEach(c => {
-			const key = "scope_" + c.dataset.scope;
-			c.textContent = t(key);
-		});
-	}
 	const nb = document.getElementById("notifBtn");
 	if (nb) {
 		const nl = nb.querySelector("#notifLabel");

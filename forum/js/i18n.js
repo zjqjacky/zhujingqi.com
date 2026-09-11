@@ -43,11 +43,11 @@ const TRANSLATIONS = {
 		"zh-TW": "Jacky 論壇"
 	},
 	login_username: {
-		zh: "用户名",
-		en: "Username",
-		es: "Usuario",
-		de: "Benutzername",
-		"zh-TW": "用戶名"
+		zh: "账号名",
+		en: "Account name",
+		es: "Nombre de cuenta",
+		de: "Kontoname",
+		"zh-TW": "帳號名"
 	},
 	login_password: {
 		zh: "密码",
@@ -92,11 +92,18 @@ const TRANSLATIONS = {
 		"zh-TW": "註冊 Jacky 帳號"
 	},
 	reg_username: {
-		zh: "用户名",
-		en: "Username",
-		es: "Usuario",
-		de: "Benutzername",
-		"zh-TW": "用戶名"
+		zh: "账号名（登录用，仅限字母数字）",
+		en: "Account name (for login, letters & numbers)",
+		es: "Nombre de cuenta (para iniciar sesión, letras y números)",
+		de: "Kontoname (zum Anmelden, Buchstaben & Zahlen)",
+		"zh-TW": "帳號名（登入用，僅限字母數字）"
+	},
+	reg_nickname_ph: {
+		zh: "昵称（选填，可随时修改）",
+		en: "Nickname (optional, changeable anytime)",
+		es: "Apodo (opcional, modificable en cualquier momento)",
+		de: "Spitzname (optional, jederzeit änderbar)",
+		"zh-TW": "暱稱（選填，可隨時修改）"
 	},
 	reg_password: {
 		zh: "密码",
@@ -120,11 +127,11 @@ const TRANSLATIONS = {
 		"zh-TW": "註冊"
 	},
 	reg_remember: {
-		zh: "请牢记用户名和密码。如无法注册，请联系管理员。",
-		en: "Please remember your username and password. Contact admin if you cannot register.",
-		es: "Recuerda tu usuario y contraseña. Contacta al admin si no puedes registrarte.",
-		de: "Bitte merke dir Benutzername und Passwort. Kontaktiere den Admin bei Problemen.",
-		"zh-TW": "請牢記用戶名和密碼。如無法註冊，請聯繫管理員。"
+		zh: "账号名用于登录，仅限字母和数字，注册后不可修改；昵称是对外显示的名字，可随时修改。请牢记账号名和密码。",
+		en: "The account name is used for login, letters and numbers only, and cannot be changed after registration. The nickname is shown publicly and can be changed anytime. Please remember your account name and password.",
+		es: "El nombre de cuenta se usa para iniciar sesión, solo letras y números, y no se puede cambiar tras el registro. El apodo se muestra públicamente y se puede cambiar en cualquier momento. Recuerda tu nombre de cuenta y contraseña.",
+		de: "Der Kontoname dient zum Anmelden, nur Buchstaben und Zahlen, und kann nach der Registrierung nicht geändert werden. Der Spitzname wird öffentlich angezeigt und ist jederzeit änderbar. Bitte merke dir Kontoname und Passwort.",
+		"zh-TW": "帳號名用於登入，僅限字母和數字，註冊後不可修改；暱稱是對外顯示的名字，可隨時修改。請牢記帳號名和密碼。"
 	},
 	terms_link: {
 		zh: "用户协议",
@@ -587,6 +594,13 @@ const TRANSLATIONS = {
 		es: "te añadió como amigo",
 		de: "hat dich als Freund hinzugefügt",
 		"zh-TW": "添加了你為好友"
+	},
+	notif_friend_request: {
+		zh: "请求添加为好友",
+		en: "requests to add you as a friend",
+		es: "solicitó añadirte como amigo",
+		de: " möchte dich als Freund hinzufügen",
+		"zh-TW": "請求添加為好友"
 	},
 	notif_reply: {
 		zh: "回复了你的评论",
@@ -1253,6 +1267,41 @@ const TRANSLATIONS = {
 		de: "Passwort ändern",
 		"zh-TW": "修改密碼"
 	},
+	settings_change_nickname: {
+		zh: "修改昵称",
+		en: "Change Nickname",
+		es: "Cambiar apodo",
+		de: "Spitznamen ändern",
+		"zh-TW": "修改暱稱"
+	},
+	nickname_placeholder: {
+		zh: "昵称（留空则使用账号名）",
+		en: "Nickname (leave empty to use account name)",
+		es: "Apodo (vacío para usar el nombre de cuenta)",
+		de: "Spitzname (leer lassen für Kontonamen)",
+		"zh-TW": "暱稱（留空則使用帳號名）"
+	},
+	nickname_taken: {
+		zh: "该昵称已被使用",
+		en: "This nickname is already taken",
+		es: "Este apodo ya está en uso",
+		de: "Dieser Spitzname ist bereits vergeben",
+		"zh-TW": "該暱稱已被使用"
+	},
+	nickname_updated: {
+		zh: "昵称已更新",
+		en: "Nickname updated",
+		es: "Apodo actualizado",
+		de: "Spitzname aktualisiert",
+		"zh-TW": "暱稱已更新"
+	},
+	nickname_too_long: {
+		zh: "昵称最长 10 个中文或 20 个西文字符",
+		en: "Nickname can be at most 10 Chinese or 20 Latin characters",
+		es: "El apodo puede tener como máximo 10 caracteres chinos o 20 latinos",
+		de: "Der Spitzname darf höchstens 10 chinesische oder 20 lateinische Zeichen haben",
+		"zh-TW": "暱稱最長 10 個中文或 20 個西文字元"
+	},
 	pass_old: {
 		zh: "旧密码",
 		en: "Old password",
@@ -1771,167 +1820,6 @@ const TRANSLATIONS = {
 		de: "Bitte zuerst die Verifizierung abschließen",
 		"zh-TW": "請先完成人機驗證"
 	},
-	scope_title: {
-		zh: "谁可以看",
-		en: "Who can see",
-		es: "Quién puede ver",
-		de: "Wer kann sehen",
-		"zh-TW": "誰可以看"
-	},
-	scope_public: {
-		zh: "公开",
-		en: "Public",
-		es: "Público",
-		de: "Öffentlich",
-		"zh-TW": "公開"
-	},
-	scope_followers: {
-		zh: "仅粉丝",
-		en: "Followers only",
-		es: "Solo seguidores",
-		de: "Nur Follower",
-		"zh-TW": "僅粉絲"
-	},
-	scope_private: {
-		zh: "仅自己",
-		en: "Only me",
-		es: "Solo yo",
-		de: "Nur ich",
-		"zh-TW": "僅自己"
-	},
-	scope_custom: {
-		zh: "自定义",
-		en: "Custom",
-		es: "Personalizado",
-		de: "Benutzerdefiniert",
-		"zh-TW": "自訂"
-	},
-	scope_custom_hint: {
-		zh: "选择特定用户或分组",
-		en: "Select specific users or groups",
-		es: "Seleccionar usuarios o grupos específicos",
-		de: "Bestimmte Benutzer oder Gruppen auswählen",
-		"zh-TW": "選擇特定用戶或分組"
-	},
-	scope_allow_title: {
-		zh: "允许查看",
-		en: "Allow to see",
-		es: "Permitir ver",
-		de: "Erlauben zu sehen",
-		"zh-TW": "允許查看"
-	},
-	scope_deny_title: {
-		zh: "禁止查看",
-		en: "Block from seeing",
-		es: "Bloquear",
-		de: "Blockieren",
-		"zh-TW": "禁止查看"
-	},
-	scope_select_groups: {
-		zh: "选择分组",
-		en: "Select groups",
-		es: "Seleccionar grupos",
-		de: "Gruppen auswählen",
-		"zh-TW": "選擇分組"
-	},
-	scope_select_users: {
-		zh: "可见用户",
-		en: "Visible users",
-		es: "Usuarios visibles",
-		de: "Sichtbare Benutzer",
-		"zh-TW": "可見用戶"
-	},
-	scope_badge_public: {
-		zh: "公开",
-		en: "Public",
-		es: "Público",
-		de: "Öffentlich",
-		"zh-TW": "公開"
-	},
-	scope_badge_followers: {
-		zh: "仅粉丝可见",
-		en: "Followers only",
-		es: "Solo seguidores",
-		de: "Nur Follower",
-		"zh-TW": "僅粉絲可見"
-	},
-	scope_badge_private: {
-		zh: "仅自己可见",
-		en: "Only me",
-		es: "Solo yo",
-		de: "Nur ich",
-		"zh-TW": "僅自己可見"
-	},
-	scope_badge_custom: {
-		zh: "自定义可见",
-		en: "Custom visibility",
-		es: "Visibilidad personalizada",
-		de: "Benutzerdefinierte Sichtbarkeit",
-		"zh-TW": "自訂可見"
-	},
-	profile_groups: {
-		zh: "分组管理",
-		en: "Groups",
-		es: "Grupos",
-		de: "Gruppen",
-		"zh-TW": "分組管理"
-	},
-	groups_new: {
-		zh: "新建分组",
-		en: "New group",
-		es: "Nuevo grupo",
-		de: "Neue Gruppe",
-		"zh-TW": "新建分組"
-	},
-	groups_name_ph: {
-		zh: "分组名称",
-		en: "Group name",
-		es: "Nombre del grupo",
-		de: "Gruppenname",
-		"zh-TW": "分組名稱"
-	},
-	groups_delete_confirm: {
-		zh: "确定删除此分组？",
-		en: "Delete this group?",
-		es: "¿Eliminar este grupo?",
-		de: "Diese Gruppe löschen?",
-		"zh-TW": "確定刪除此分組？"
-	},
-	groups_add_user: {
-		zh: "添加用户",
-		en: "Add user",
-		es: "Agregar usuario",
-	 de: "Benutzer hinzufügen",
-		"zh-TW": "添加用戶"
-	},
-	groups_search_users_ph: {
-		zh: "搜索用户名...",
-		en: "Search usernames...",
-		es: "Buscar usuarios...",
-		de: "Benutzernamen suchen...",
-		"zh-TW": "搜尋使用者名稱..."
-	},
-	groups_remove_user: {
-		zh: "移除",
-		en: "Remove",
-		es: "Eliminar",
-		de: "Entfernen",
-		"zh-TW": "移除"
-	},
-	groups_empty: {
-		zh: "暂无分组",
-		en: "No groups yet",
-		es: "Sin grupos",
-		de: "Noch keine Gruppen",
-		"zh-TW": "暫無分組"
-	},
-	groups_no_members: {
-		zh: "暂无成员",
-		en: "No members yet",
-		es: "Sin miembros",
-		de: "Noch keine Mitglieder",
-		"zh-TW": "暫無成員"
-	}
 };
 const PAGE_TITLE_TRANS = {
 	zh: "Jacky 论坛 - Zhujingqi",
@@ -2046,4 +1934,5 @@ const EMOJI_MAP = [
 		"jesus",
 		"14",
 		"saka",
+		"beng",
 	];

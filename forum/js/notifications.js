@@ -26,6 +26,7 @@ async function createNotification({
 
 function notifLabel(n) {
 	if (n.type === "chat_friend") return t("notif_friend");
+	if (n.type === "chat_friend_request") return t("notif_friend_request");
 	if (n.type === "follow") return t("notif_follow");
 	if (n.type === "reply") return t("notif_reply");
 	if (n.type === "comment") return t("notif_comment");
@@ -112,24 +113,11 @@ async function openSinglePost(postId) {
 		'<span class="userLink userLinkWithAvatar" data-user="' + post.author + '">' +
 		'<img class="avatar" src="' + avatar +
 		'" onerror="this.onerror=null;this.src=\'assets/img/head.svg\'">' +
-		(post.users?.name || t("post_unknown")) +
+		escapeHtml(getDisplayName(post.users)) +
 		'<span class="userLevel">' + getUserLevel(post.users?.coins || 0) + '</span>' +
 		'<span>' + getRoleBadge(post.users) + '</span>' +
 		'</span>' +
 		'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
-		(function() {
-			const isAuthor = currentUser && post.author === currentUser.id;
-			const isOwner = currentUser && currentUser.role?.includes?.('owner');
-			const vis = Array.isArray(post.visible_to) ? post.visible_to : null;
-			const isPublic = !vis || vis.includes('*');
-			// 作者始终看到按钮；owner 仅对非公开帖显示红色按钮
-			if (isAuthor) {
-				return '<button class="visBtn" onclick="showVisibleToModal(' + post.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>';
-			} else if (isOwner && !isPublic) {
-				return '<button class="visBtn visBtn-restricted" onclick="showVisibleToModal(' + post.id + ')" title="' + t("scope_select_users") + '"><img class="visBtnIcon" src="icon/user.svg" alt=""></button>';
-			}
-			return '';
-		})() +
 		(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post
 			.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id +
 			'">' + t("post_share") + '</button></div></div>') +
@@ -279,23 +267,24 @@ async function openNotifications() {
 			const actorFromId = a == null && n.actor_id != null ? n.actor_id : a;
 			let actorName, actorAvatar;
 			if (typeof actorFromId === 'object' && actorFromId) {
-				actorName = actorFromId.name || t("post_unknown");
+				actorName = escapeHtml(getDisplayName(actorFromId));
 				actorAvatar = getAvatar(actorFromId);
 			} else if (actorFromId != null) {
 				const uid = Number(actorFromId);
 				const found = allUsersCache.find(u => u.id === uid);
-				actorName = found ? found.name : t("post_unknown");
+				actorName = found ? escapeHtml(getDisplayName(found)) : t("post_unknown");
 				actorAvatar = found ? getAvatar(found) : DEFAULT_AVATAR;
 			} else {
 				actorName = t("post_unknown");
 				actorAvatar = DEFAULT_AVATAR;
 			}
-			const unreadClass = n.is_read ? "" : "font-weight:700;background:rgba(0,0,0,.03);";
+		const unreadClass = n.is_read ? "" : "font-weight:700;background:rgba(0,0,0,.03);";
 			return `
-								<div class="notifItem"
-									data-nid="${n.id}"
-									data-post="${n.post_id}"
-									style="padding:8px 10px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:14px;${unreadClass}">
+							<div class="notifItem"
+								data-nid="${n.id}"
+								data-post="${n.post_id}"
+								data-type="${n.type}"
+								style="padding:8px 10px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:14px;${unreadClass}">
 									<div style="display:flex;align-items:center;gap:8px;">
 										<img class="avatar notifAvatar" src="${actorAvatar}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
 										<div style="min-width:0;flex:1;">
@@ -340,18 +329,29 @@ async function openNotifications() {
 			el.onclick = () => window.open("https://zhujingqi.com/chat/", "_blank");
 			return;
 		}
-		el.onclick = async () => {
-			await markNotificationRead(Number(el.dataset.nid));
-			await refreshNotificationBadge();
-			const post = el.dataset.post;
-			const postId = Number(post);
-			if (!post || post === "null" || post === "undefined") return;
-			if (isNaN(postId)) {
-				const gift = SHOP_ITEMS.find(i => i.id === post);
-				modal(t("gift_received", gift ? gift.name : t("shop_item_generic")));
-			} else {
-				await openNotificationPost(postId);
+		el.onclick = () => {
+			const type = el.dataset.type;
+			if (type === "chat_friend_request" || type === "chat_friend") {
+				const url = type === "chat_friend_request" ?
+					"https://zhujingqi.com/chat/#pending" :
+					"https://zhujingqi.com/chat/";
+				window.open(url, "_blank");
+				markNotificationRead(Number(el.dataset.nid)).then(() => refreshNotificationBadge());
+				return;
 			}
+			(async () => {
+				await markNotificationRead(Number(el.dataset.nid));
+				await refreshNotificationBadge();
+				const post = el.dataset.post;
+				const postId = Number(post);
+				if (!post || post === "null" || post === "undefined") return;
+				if (isNaN(postId)) {
+					const gift = SHOP_ITEMS.find(i => i.id === post);
+					modal(t("gift_received", gift ? gift.name : t("shop_item_generic")));
+				} else {
+					await openNotificationPost(postId);
+				}
+			})();
 		};
 	});
 }

@@ -819,6 +819,59 @@
 				color: var(--sub);
 				font-size: 14px;
 			}
+			.pendingItem {
+				display: flex;
+				align-items: center;
+				padding: 10px 14px;
+				gap: 10px;
+				border-bottom: 1px solid var(--border);
+			}
+			.pendingItemInfo {
+				flex: 1;
+				min-width: 0;
+			}
+			.pendingItemName {
+				font-weight: 600;
+				font-size: 15px;
+			}
+			.pendingItemSub {
+				font-size: 12px;
+				color: var(--sub);
+				margin-top: 2px;
+			}
+			.pendingItemBtns {
+				display: flex;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+			.pendingAcceptBtn {
+				background: var(--green);
+				color: #fff;
+				border: none;
+				border-radius: 50%;
+				padding: 6px 14px;
+				font-size: 13px;
+				font-weight: 600;
+				cursor: pointer;
+			}
+			.pendingAcceptBtn:hover { opacity: .85; }
+			.pendingRejectBtn {
+				background: var(--border);
+				color: var(--text);
+				border: none;
+				border-radius: 50%;
+				padding: 6px 14px;
+				font-size: 13px;
+				cursor: pointer;
+			}
+			.pendingRejectBtn:hover { opacity: .7; }
+			.pendingSentTag {
+				font-size: 12px;
+				color: var(--sub);
+				padding: 4px 10px;
+				background: var(--border);
+				border-radius: 8px;
+			}
 
 			.modal {
 				position: fixed;
@@ -1027,6 +1080,13 @@
 				line-height: 1.3;
 			}
 
+			.drawerAccountName {
+				display: block;
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--sub, #888);
+			}
+
 			.drawerProfileBio {
 				font-size: 14px;
 				color: var(--sub, #888);
@@ -1167,11 +1227,16 @@
 				pointer-events: none;
 			}
 
-			.msgEmoji {
-				width: 22px;
-				height: 22px;
-				vertical-align: -4px;
-				margin: 0 2px;
+			.bubble img.msgEmoji {
+				display: inline;
+				width: 1.2em;
+				height: 1.2em;
+				max-width: none;
+				max-height: none;
+				vertical-align: -0.22em;
+				margin: 0 1px;
+				border-radius: 0;
+				cursor: text;
 			}
 
 			.searchWrap {
@@ -1193,6 +1258,7 @@
 				align-items: center;
 				justify-content: center;
 				cursor: pointer;
+				position: relative;
 			}
 
 			.addFriendBtn:hover {
@@ -1426,7 +1492,7 @@
 			</div>
 			<div class="card">
 				<div class="stack">
-					<input id="loginUser" placeholder="用户名" autofocus>
+					<input id="loginUser" placeholder="账号名" autofocus>
 					<input id="loginPass" type="password" placeholder="密码">
 					<button id="loginBtn">登录</button>
 					<button id="showRegisterBtn">注册</button>
@@ -1445,7 +1511,8 @@
 			<div class="big">注册 Jacky 账号 <button id="registerHelpBtn" class="helpBtn">?</button></div>
 			<div class="card">
 				<div class="stack">
-					<input id="regUser" placeholder="用户名" autofocus>
+					<input id="regUser" placeholder="账号名（登录用，仅限字母数字）" autofocus>
+					<input id="regNickname" maxlength="20" placeholder="昵称（选填，可随时修改）">
 					<input id="regPass" type="password" placeholder="密码">
 					<input id="regPass2" type="password" placeholder="再次输入密码">
 					<button id="registerBtn">注册</button>
@@ -1454,7 +1521,8 @@
 				<div class="muted" style="margin-top:12px;">
 					<p style="text-align:center;">
 						注册即代表您同意 <a id="termsBtn" style="cursor:pointer;">用户协议</a><br>
-						请牢记用户名和密码。如无法注册，请联系管理员。
+						账号名用于登录，仅限字母和数字，注册后不可修改；昵称是对外显示的名字，可随时修改。<br>
+						请牢记账号名和密码。如无法注册，请联系管理员。
 					</p>
 				</div>
 			</div>
@@ -1472,7 +1540,10 @@
 							<div class="panelHead">
 								<div class="searchWrap">
 									<input id="chatSearch" placeholder="搜索">
-									<button id="addFriendBtn" title="添加好友" class="addFriendBtn">+</button>
+									<button id="addFriendBtn" title="添加好友" class="addFriendBtn">
+										+
+										<span id="pendingBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ff3b30;color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;text-align:center;line-height:16px;padding:0 4px;font-weight:700;"></span>
+									</button>
 								</div>
 							</div>
 							<div id="chatContactList" class="list"></div>
@@ -1521,6 +1592,8 @@
 					<div class="section" style="overflow:hidden; display:flex; flex-direction:column; min-height:0;">
 						<div id="searchResultTitle" class="sectionTitle" style="display:none;">搜索结果</div>
 						<div id="searchResultBox" class="list" style="padding:0; min-height:0; display:none;"></div>
+						<div id="pendingTitle" class="sectionTitle" style="display:none;">好友请求</div>
+						<div id="pendingSection" class="list" style="padding:0; min-height:0;"></div>
 						<div class="sectionTitle">好友</div>
 						<div id="contactList" class="list" style="padding:0; min-height:0;"></div>
 					</div>
@@ -1630,6 +1703,7 @@
 					angry: "/forum/emojis/angry.svg",
 					ask: "/forum/emojis/ask.svg",
 					bad: "/forum/emojis/bad.svg",
+					beng: "/forum/emojis/beng.svg",
 					blank: "/forum/emojis/blank.svg",
 					bot: "/forum/emojis/bot.svg",
 					chill: "/forum/emojis/chill.svg",
@@ -1705,7 +1779,39 @@
 				const DEFAULT_AVATAR = "head.svg";
 
 				function getAvatar(user) {
-					return user?.avatar?.trim() || DEFAULT_AVATAR;
+					const a = user?.avatar ? String(user.avatar).trim() : "";
+					return a ? a.replace(/["'<>\u0060]/g, "") : DEFAULT_AVATAR;
+				}
+
+				function getDisplayName(u) {
+					return (u && (u.nickname || u.name)) || "未知用户";
+				}
+
+				const NICKNAME_MAX_WIDTH = 20;
+				const NICKNAME_WIDE_RE = /[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF60\uFFE0-\uFFE6]/;
+				function nicknameWidth(s) {
+					let w = 0;
+					for (const ch of String(s || "")) w += NICKNAME_WIDE_RE.test(ch) ? 2 : 1;
+					return w;
+				}
+				function truncateNickname(s) {
+					let w = 0, out = "";
+					for (const ch of String(s || "")) {
+						const cw = NICKNAME_WIDE_RE.test(ch) ? 2 : 1;
+						if (w + cw > NICKNAME_MAX_WIDTH) break;
+						w += cw;
+						out += ch;
+					}
+					return out;
+				}
+				function bindNicknameLimit(el) {
+					if (!el || el._nickBound) return;
+					el._nickBound = true;
+					el.addEventListener("input", e => {
+						if (e.isComposing) return;
+						const v = truncateNickname(el.value);
+						if (v !== el.value) el.value = v;
+					});
 				}
 
 				function isImageUrl(str) {
@@ -1716,7 +1822,7 @@
 					const me = Number(currentUser.id);
 					const other = Number(otherId);
 					const u = getUserById(otherId);
-					const name = u?.name || otherId;
+					const name = u ? getDisplayName(u) : otherId;
 					let data;
 					try {
 						data = await apiGet(`/api/chat/messages?other_id=${other}&all=1`);
@@ -1829,9 +1935,21 @@
 					return Array.isArray(contact?.pin) ? contact.pin.map(Number) : [];
 				}
 
-				function isContactPinnedByMe(contact) {
-					return getPinList(contact).includes(Number(currentUser.id));
+			function isContactPinnedByMe(contact) {
+				return getPinList(contact).includes(Number(currentUser.id));
+			}
+
+			function updatePendingBadge() {
+				const badge = $("pendingBadge");
+				if (!badge) return;
+				const count = contactCache.filter(c => c.pending && !c.pending_by_me).length;
+				if (count > 0) {
+					badge.style.display = "";
+					badge.textContent = count > 99 ? "99+" : count;
+				} else {
+					badge.style.display = "none";
 				}
+			}
 
 				function getContactRow(otherId) {
 					const key = pairKey(currentUser.id, otherId);
@@ -1947,7 +2065,10 @@
 				async function renderChatContactList() {
 					const box = $("chatContactList");
 					if (!box) return;
-					const ids = getContactUserIds();
+					const ids = getContactUserIds().filter(id => {
+						const c = getContactRow(id);
+						return c && !c.pending;
+					});
 					let list = ids.map(getUserById).filter(Boolean).sort((a, b) => {
 						const ca = getContactRow(a.id);
 						const cb = getContactRow(b.id);
@@ -1960,7 +2081,7 @@
 						return a.name.localeCompare(b.name, "zh-CN");
 					});
 					const q = $("chatSearch").value.trim().toLowerCase();
-					if (q) list = list.filter(u => u.name.toLowerCase().includes(q));
+					if (q) list = list.filter(u => ((u.nickname||"")+" "+u.name).toLowerCase().includes(q));
 					if (!list.length) {
 						box.innerHTML = '<div class="empty" style="padding:20px;">暂无可聊天的人。<br>去【联系】添加一个！</div>';
 						return;
@@ -1982,7 +2103,7 @@
 							<img class="avatar chatAvatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'" style="width:40px;height:40px;">
 							<div style="min-width:0;">
 								<div class="itemTitle">
-									${escapeHtml(u.name)} ${getVerifiedBadgeHTML(u)}
+									${escapeHtml(getDisplayName(u))} ${getVerifiedBadgeHTML(u)}
 									${unread > 0 ? `<span class="unreadDot" id="unread-${u.id}">${unread > 99 ? "99+" : unread}</span>` : ""}
 								</div>
 								<div class="itemSub">
@@ -2029,7 +2150,7 @@
 					const u = getUserById(contextUserId);
 					openModal(
 						"删除联系人",
-						`确定要删除 <b>${escapeHtml(u?.name || "这个联系人")}</b> 吗？<br>删除后聊天记录也会一起清掉。`, {
+						`确定要删除 <b>${escapeHtml(u ? getDisplayName(u) : "这个联系人")}</b> 吗？<br>删除后聊天记录也会一起清掉。`, {
 							confirm: true,
 							okText: "删除",
 							onOk: async () => {
@@ -2054,7 +2175,7 @@
 				const m = currentChatMessages.find(x => Number(x.id) === Number(msgId));
 				if (!m) return;
 				replyToId = m.id;
-				const name = getUserById(m.sender_id)?.name || "未知用户";
+				const name = getDisplayName(getUserById(m.sender_id));
 				const preview = (m.content || "").replace(/\[reply:\d+\]/g, "").slice(0, 40);
 				$("replyPreview").querySelector(".rpText").textContent =
 					"引用 " + name + ": " + preview + ((m.content || "").length > 40 ? "..." : "");
@@ -2077,7 +2198,7 @@
 						const card = document.createElement("div");
 						card.className = "replyCard";
 						if (orig) {
-							const name = getUserById(orig.sender_id)?.name || "未知用户";
+							const name = getDisplayName(getUserById(orig.sender_id));
 							const preview = (orig.content || "").replace(/\[reply:\d+\]/g, "").slice(0, 30);
 							card.textContent = "> " + name + ": " + preview + ((orig.content || "").length > 30 ? "..." : "");
 							card.onclick = (e) => {
@@ -2291,7 +2412,7 @@
 					$("sendMsgBtn").disabled = false;
 					const other = getUserById(currentChatUserId);
 					$("chatTitle").innerHTML =
-						`${escapeHtml(other?.name || "未知用户")} ${getVerifiedBadgeHTML(other)}`;
+						`${escapeHtml(other ? getDisplayName(other) : "未知用户")} ${getVerifiedBadgeHTML(other)}`;
 					const msgs = await loadMessages(currentChatUserId);
 					currentChatMessages = msgs;
 					body.innerHTML = "";
@@ -2306,13 +2427,17 @@
 					updateChatLayout();
 				}
 				async function openChat(userId) {
+					const contact = getContactRow(userId);
+					if (contact && contact.pending) {
+						return toast("请先接受好友请求");
+					}
 					currentChatUserId = Number(userId);
 					mobileChatMode = true;
 					showPage("pageChat");
 
 					updateChatLayout();
 					const other = getUserById(userId);
-					$("chatTitle").textContent = other?.name || "加载中...";
+					$("chatTitle").textContent = other ? getDisplayName(other) : "加载中...";
 					$("msgInput").disabled = false;
 					$("sendMsgBtn").disabled = false;
 					await markChatAsRead(userId);
@@ -2355,11 +2480,52 @@
 
 			function renderContactList() {
 				const box = $("contactList");
+				const pendingBox = $("pendingSection");
+				const pendingTitle = $("pendingTitle");
 				if (!box) return;
-				const ids = getContactUserIds();
+
+				const pendingIncoming = contactCache.filter(c => c.pending && !c.pending_by_me);
+				const friends = contactCache.filter(c => !c.pending);
+
+				if (pendingTitle && pendingBox) {
+					if (pendingIncoming.length) {
+						pendingTitle.style.display = "";
+						pendingTitle.textContent = "好友请求 (" + pendingIncoming.length + ")";
+						pendingBox.innerHTML = "";
+						for (const c of pendingIncoming) {
+							const u = c.user;
+							if (!u) continue;
+							const div = document.createElement("div");
+							div.className = "pendingItem";
+							div.innerHTML = `
+								<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'" style="width:36px;height:36px;border-radius:50%;">
+								<div class="pendingItemInfo">
+									<div class="pendingItemName">${escapeHtml(getDisplayName(u))}</div>
+									<div class="pendingItemSub">请求添加你为好友</div>
+								</div>
+								<div class="pendingItemBtns">
+									<button class="pendingAcceptBtn">接受</button>
+									<button class="pendingRejectBtn">拒绝</button>
+								</div>
+							`;
+							div.querySelector(".pendingAcceptBtn").onclick = () => acceptContact(u.id);
+							div.querySelector(".pendingRejectBtn").onclick = () => rejectContact(u.id);
+							pendingBox.appendChild(div);
+						}
+					} else {
+						pendingTitle.style.display = "none";
+						pendingBox.innerHTML = "";
+					}
+				}
+
+				const ids = friends.map(c => c.id1 === currentUser.id ? Number(c.id2) : Number(c.id1));
 				let list = ids.map(getUserById).filter(Boolean).sort((a, b) => a.name.localeCompare(b.name, "zh-CN"));
-				if (!list.length) {
+				if (!list.length && !pendingIncoming.length) {
 					box.innerHTML = '<div class="empty" style="padding:20px;">暂无好友。<br>点击上方搜索添加吧。</div>';
+					return;
+				}
+				if (!list.length) {
+					box.innerHTML = '<div class="empty" style="padding:20px;color:var(--sub);">暂无已确认好友</div>';
 					return;
 				}
 				box.innerHTML = "";
@@ -2369,7 +2535,7 @@
 					div.innerHTML = `
 						<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'">
 						<div style="flex:1;min-width:0;">
-							<div class="itemTitle">${escapeHtml(u.name)}</div>
+							<div class="itemTitle">${escapeHtml(getDisplayName(u))}</div>
 							<div class="itemSub">${escapeHtml(u.time || "")}</div>
 						</div>
 					`;
@@ -2391,8 +2557,7 @@
 				}
 				const list = userCache
 					.filter(u => Number(u.id) !== Number(currentUser.id))
-					.filter(u => u.name.toLowerCase().includes(q))
-					.filter(u => !isContactExists(currentUser.id, u.id))
+					.filter(u => ((u.nickname||"")+" "+u.name).toLowerCase().includes(q))
 					.slice(0, 10);
 				title.style.display = "";
 				box.style.display = "";
@@ -2405,19 +2570,43 @@
 					const div = document.createElement("div");
 					div.className = "searchResultItem";
 					const desc = (u.description || "").trim() || "暂无简介";
+					const contact = getContactRow(u.id);
+					let actionHtml = "";
+					if (contact) {
+						if (contact.pending) {
+							if (contact.pending_by_me) {
+								actionHtml = '<span class="pendingSentTag">已请求</span>';
+							} else {
+								actionHtml = '<button class="pendingAcceptBtn" style="padding:6px 12px;">接受</button>';
+							}
+						} else {
+							actionHtml = '<span class="pendingSentTag">已是好友</span>';
+						}
+					} else {
+						actionHtml = '<button class="addCircleBtn" title="添加好友">+</button>';
+					}
 					div.innerHTML = `
 						<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'">
 						<div class="searchResultInfo">
-							<div class="searchResultName">${escapeHtml(u.name)}</div>
+							<div class="searchResultName">${escapeHtml(getDisplayName(u))}</div>
 							<div class="searchResultDesc">${escapeHtml(desc)}</div>
 						</div>
-						<button class="addCircleBtn" title="添加好友">+</button>
+						${actionHtml}
 					`;
-					div.querySelector(".addCircleBtn").onclick = (e) => {
-						e.stopPropagation();
-						addContactById(u.id);
-					};
-					div.onclick = () => openContactDrawer(u.id);
+					if (!contact) {
+						div.querySelector(".addCircleBtn").onclick = (e) => {
+							e.stopPropagation();
+							addContactById(u.id);
+						};
+					} else if (contact.pending && !contact.pending_by_me) {
+						div.querySelector(".pendingAcceptBtn").onclick = (e) => {
+							e.stopPropagation();
+							acceptContact(u.id);
+						};
+					}
+					if (contact && !contact.pending) {
+						div.onclick = () => openContactDrawer(u.id);
+					}
 					box.appendChild(div);
 				}
 			}
@@ -2425,18 +2614,46 @@
 			async function addContactById(userId) {
 				const target = getUserById(userId);
 				if (!target) return;
-				if (isContactExists(currentUser.id, target.id)) {
-					toast("已经是好友了");
-					return;
-				}
 				try {
-					await apiPost("/api/chat/contacts", { user_id: Number(target.id) });
+					const res = await apiPost("/api/chat/contacts", { user_id: Number(target.id) });
+					if (res && res.auto_accepted) {
+						toast("已与 " + getDisplayName(target) + " 互相添加为好友");
+					} else {
+						toast("已发送好友请求给 " + getDisplayName(target));
+					}
 				} catch (e) {
 					return openModal("添加失败", e.message);
 				}
-				toast("已添加好友 " + target.name);
 				await refreshContactPage();
 				const q = $("contactSearch").value.trim();
+				if (q) renderSearchResults(q);
+			}
+
+			async function acceptContact(userId) {
+				const target = getUserById(userId);
+				if (!target) return;
+				try {
+					await apiPost("/api/chat/contacts/accept", { other_id: Number(userId) });
+				} catch (e) {
+					return openModal("接受失败", e.message);
+				}
+				toast("已接受 " + getDisplayName(target) + " 的好友请求");
+				await refreshContactPage();
+				const q = $("contactSearch")?.value?.trim();
+				if (q) renderSearchResults(q);
+			}
+
+			async function rejectContact(userId) {
+				const target = getUserById(userId);
+				if (!target) return;
+				try {
+					await apiPost("/api/chat/contacts/reject", { other_id: Number(userId) });
+				} catch (e) {
+					return openModal("拒绝失败", e.message);
+				}
+				toast("已拒绝 " + getDisplayName(target) + " 的好友请求");
+				await refreshContactPage();
+				const q = $("contactSearch")?.value?.trim();
 				if (q) renderSearchResults(q);
 			}
 				async function togglePinContact(otherId) {
@@ -2473,7 +2690,7 @@
 					const other = getUserById(currentChatUserId);
 					openModal(
 						"删除好友",
-						`确定要删除 <b>${escapeHtml(other?.name || "这个联系人")}</b> 吗？<br>同时清空聊天记录！`, {
+						`确定要删除 <b>${escapeHtml(other ? getDisplayName(other) : "这个联系人")}</b> 吗？<br>同时清空聊天记录！`, {
 							confirm: true,
 							okText: "删除",
 							onOk: async () => {
@@ -2543,6 +2760,7 @@
 				await loadUsersCache();
 				await loadContacts();
 				renderContactList();
+				updatePendingBadge();
 				const q = $("contactSearch")?.value?.trim();
 				if (q) renderSearchResults(q);
 			}
@@ -2555,6 +2773,7 @@
 				await renderChatContactList();
 				await renderChatMessages();
 				renderContactList();
+				updatePendingBadge();
 				if (drawerUserId !== null) openContactDrawer(drawerUserId, true);
 			}
 				async function doLogin() {
@@ -2583,31 +2802,36 @@
 				await renderChatContactList();
 				await renderChatMessages();
 				renderContactList();
-				toast("欢迎 " + data.name + " 来到 Jacky Chat！");
+				toast("欢迎 " + getDisplayName(data) + " 来到 Jacky Chat！");
 			}
 				async function doRegister() {
 					const u = $("regUser").value.trim();
+					const nick = $("regNickname") ? $("regNickname").value.trim() : "";
 					const p1 = $("regPass").value.trim();
 					const p2 = $("regPass2").value.trim();
-					if (!u || !p1 || !p2) return openModal("注册失败", "请输入用户名和密码");
+					if (!u || !p1 || !p2) return openModal("注册失败", "请输入账号名和密码");
 					if (p1 !== p2) return openModal("注册失败", "两次密码不一致");
 					if (!/^[A-Za-z0-9\-_áéíóúñÁÉÍÓÚÑäöüßÄÖÜ]+$/.test(u)) return openModal("注册失败",
-						"用户名只允许字母、数字、- 和 _");
+						"账号名只允许字母、数字、- 和 _");
 					if (/jacky|admin/i.test(u)) return openModal("注册失败", "请勿有冒充管理员的想法");
+					if (nicknameWidth(nick) > NICKNAME_MAX_WIDTH) return openModal("注册失败", "昵称最长 10 个中文或 20 个西文字符");
 					const passHash = await hash(p1);
 					try {
 						await apiPost("/api/auth/register", {
 							name: u,
+							nickname: nick || null,
 							pass: passHash,
 							time: new Date().toISOString()
 						});
 					} catch (e) {
 						const m = e.message;
 						if (/reserved/i.test(m)) return openModal("注册失败", "请勿有冒充管理员的想法");
-						if (/exists/i.test(m)) return openModal("注册失败", "用户名已被注册");
+						if (/nickname/i.test(m)) return openModal("注册失败", "该昵称已被使用");
+						if (/exists/i.test(m)) return openModal("注册失败", "账号名已被注册");
 						return openModal("注册失败", m);
 					}
 					$("regUser").value = "";
+					if ($("regNickname")) $("regNickname").value = "";
 					$("regPass").value = "";
 					$("regPass2").value = "";
 					openModal("注册成功", "可以返回登录了。");
@@ -2622,7 +2846,8 @@
 					$("drawerAvatar").onerror = function() { this.src = DEFAULT_AVATAR; };
 					$("drawerAvatar").onclick = () => openViewer(avatarUrl);
 					$("drawerProfileName").innerHTML =
-						`${escapeHtml(u.name)} ${getVerifiedBadgeHTML(u)}`;
+						`${escapeHtml(getDisplayName(u))} ${getVerifiedBadgeHTML(u)}` +
+						(u.nickname && u.name ? `<span class="drawerAccountName">@${escapeHtml(u.name)}</span>` : "");
 					$("drawerProfileBio").textContent = u.description || "暂无简介";
 					const card = $("drawerCard");
 					const bg = $("drawerCardBg");
@@ -2645,8 +2870,40 @@
 					$("drawerForumBtn").onclick = () => {
 						window.open("https://zhujingqi.com/forum/?uid=" + u.id, "_blank");
 					};
-					const contact = getContactRow(userId);
+				const contact = getContactRow(userId);
+				const isPending = contact && contact.pending;
+				const isPendingByMe = isPending && contact.pending_by_me;
+
+				if (isPending && !isPendingByMe) {
+					$("drawerChatBtn").style.display = "none";
+					$("drawerPinBtn").style.display = "none";
+					$("drawerDeleteBtn").textContent = "拒绝";
+					$("drawerDeleteBtn").className = "";
+					$("drawerDeleteBtn").onclick = async () => {
+						await rejectContact(userId);
+						closeDrawer();
+					};
+					const acceptBtn = document.createElement("button");
+					acceptBtn.id = "drawerAcceptBtn";
+					acceptBtn.textContent = "接受好友请求";
+					acceptBtn.style.cssText = "background:var(--green);color:#fff;border:none;border-radius:12px;padding:10px 20px;font-size:15px;font-weight:600;cursor:pointer;";
+					acceptBtn.onclick = async () => {
+						await acceptContact(userId);
+						closeDrawer();
+					};
+					const actions = $("drawerMask").querySelector(".drawerActions");
+					const existingAccept = $("drawerAcceptBtn");
+					if (existingAccept) existingAccept.remove();
+					actions.insertBefore(acceptBtn, $("drawerDeleteBtn"));
+				} else {
+					$("drawerChatBtn").style.display = "";
+					$("drawerPinBtn").style.display = "";
+					$("drawerDeleteBtn").textContent = "删除好友";
+					$("drawerDeleteBtn").className = "delBtn";
 					$("drawerPinBtn").textContent = isContactPinnedByMe(contact) ? "取消置顶" : "置顶";
+					const existingAccept = $("drawerAcceptBtn");
+					if (existingAccept) existingAccept.remove();
+				}
 				$("drawerMask").classList.remove("closed");
 			}
 
@@ -2725,7 +2982,7 @@
 				const u = getUserById(uid);
 				openModal(
 					"删除联系人",
-					`确定要删除 <b>${escapeHtml(u?.name || "这个联系人")}</b> 吗？<br>删除后聊天记录也会一起清掉。`, {
+					`确定要删除 <b>${escapeHtml(u ? getDisplayName(u) : "这个联系人")}</b> 吗？<br>删除后聊天记录也会一起清掉。`, {
 						confirm: true,
 						okText: "删除",
 						onOk: async () => {
@@ -2738,6 +2995,7 @@
 				$("backLoginBtn").onclick = () => show("welcomePage");
 				$("loginBtn").onclick = doLogin;
 				$("registerBtn").onclick = doRegister;
+				bindNicknameLimit($("regNickname"));
 				function askLogout() {
 					openModal(
 						"退出登录",
@@ -2828,7 +3086,7 @@
 					$("modalClose").classList.add("hidden");
 				};
 				$("registerHelpBtn").onclick = () => openModal("Jacky 账号",
-					`<b>Jacky 账号</b>为 <b>Jacky</b> 系列社交中心统一账号<br>（包括 <b>Jacky 论坛</b>、<b>Jacky Chat</b>）`);
+					`<b>Jacky 账号</b>为 <b>Jacky</b> 系列社交中心统一账号<br>（包括 <b>Jacky 论坛</b>、<b>Jacky Chat</b>）<br><br><b>账号名</b>：用于登录，仅限字母和数字，注册后不可修改。<br><b>昵称</b>：对外显示的名字，可随时修改，不得与他人相同。`);
 				$("loginUser").addEventListener("keydown", e => {
 					if (e.key === "Enter") doLogin();
 				});
@@ -2927,6 +3185,13 @@
 						mask.remove();
 						if (ok) {
 							show("app");
+							if (location.hash === "#pending") {
+								setTimeout(() => {
+									show("contactPage");
+									const section = $("pendingSection");
+									if (section) section.scrollIntoView({ behavior: "smooth", block: "center" });
+								}, 300);
+							}
 						} else {
 							show("welcomePage");
 						}

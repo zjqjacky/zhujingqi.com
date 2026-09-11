@@ -1,6 +1,7 @@
 $("registerBtn").onclick = async () => {
 	if (!captchaPassed) return modal(t("captcha_not_done"));
 	let u = $("regUser").value.trim();
+	let nick = $("regNickname") ? $("regNickname").value.trim() : "";
 	let p1 = $("regPass").value.trim();
 	let p2 = $("regPass2").value.trim();
 	if (!u || !p1 || !p2) return modal(t("enter_user_pass_reg"));
@@ -11,10 +12,12 @@ $("registerBtn").onclick = async () => {
 	if (/jacky|admin/i.test(u)) {
 		return modal(t("no_impersonate"));
 	}
+	if (nicknameWidth(nick) > NICKNAME_MAX_WIDTH) return modal(t("nickname_too_long"));
 	const passHash = await hash(p1);
 	try {
 		await apiPost("/api/auth/register", {
 			name: u,
+			nickname: nick || null,
 			pass: passHash,
 			time: new Date().toISOString()
 		});
@@ -25,6 +28,7 @@ $("registerBtn").onclick = async () => {
 	}
 };
 $("captchaBtn").onclick = openCaptchaModal;
+if ($("regNickname") && typeof bindNicknameLimit === "function") bindNicknameLimit($("regNickname"));
 $("loginBtn").onclick = async () => {
 	let u = $("loginUser").value.trim();
 	let p = $("loginPass").value.trim();
@@ -52,7 +56,7 @@ $("loginBtn").onclick = async () => {
 		startPresence();
 		refreshNotificationBadge();
 		loadAnnouncements();
-		modal(t("welcome_back", data.name));
+		modal(t("welcome_back", escapeHtml(getDisplayName(data))));
 	} catch (e) {
 		const msg = e.message;
 		if (msg.includes("Wrong password")) modal(t("wrong_password"));
@@ -109,7 +113,6 @@ $("sendBtn").onclick = async () => {
 		finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 	}
 	const postId = Date.now();
-	const scopeData = computeVisibleTo();
 	try {
 		await apiPost("/api/posts", {
 			id: postId,
@@ -117,17 +120,12 @@ $("sendBtn").onclick = async () => {
 			time: new Date().toISOString(),
 			author: currentUser.id,
 			tag: tag,
-			scope: scopeData.scope,
-			visible_to: scopeData.visible_to,
-			visible_not: scopeData.visible_not
 		});
 	} catch (e) {
 		if (e.message === "JWT_EXPIRED") return;
 		return modal(t("post_fail", e.message));
 	}
-	if (scopeData.scope === "public" || scopeData.scope === "followers") {
-		await notifyMentions(finalContent, postId, null);
-	}
+	await notifyMentions(finalContent, postId, null);
 	try {
 		for (const k of Object.keys(sessionStorage)) {
 			if (k.startsWith("tlDays_")) sessionStorage.removeItem(k);
@@ -141,7 +139,6 @@ $("sendBtn").onclick = async () => {
 	$("isSensitive").checked = false;
 	$("warnText").value = "";
 	$("warnText").classList.remove("show");
-	resetScopeState();
 	show("main");
 	loadStats();
 	loadPosts(1);

@@ -48,6 +48,9 @@ const escapeXml = (s) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
+// Public display name: nickname when set, otherwise the account name.
+const displayName = (u) => (u && (u.nickname || u.name)) || null;
+
 const toRfc2822 = (iso) => {
   const d = new Date(String(iso).replace(/\.\d+(Z|[+-]\d{2}:?\d{2})$/, "$1"));
   return isNaN(d) ? new Date().toUTCString() : d.toUTCString().replace("GMT", "+0000");
@@ -189,9 +192,9 @@ async function fetchComments(posts) {
 
 function commentsToHtml(comments, userByName = new Map()) {
   if (!comments || !comments.length) return "";
-  const nameById = new Map(comments.map((c) => [c.id, c.users?.name || null]));
+  const nameById = new Map(comments.map((c) => [c.id, displayName(c.users)]));
   const lines = comments.map((c) => {
-    const author = c.users?.name || "?";
+    const author = displayName(c.users) || "?";
     const { parentId, text } = parseReply(c.content);
     const parentName = parentId ? nameById.get(parentId) : null;
     const replyPrefix = parentName ? `回复 @${parentName} · ` : "";
@@ -209,12 +212,12 @@ const makeTitle = (post) => {
     .replace(/\s+/g, " ")
     .trim();
   if (text) return text.length > 60 ? `${text.slice(0, 60)}…` : text;
-  return post.users?.name || `Post ${post.id}`;
+  return displayName(post.users) || `Post ${post.id}`;
 };
 
 function buildItem(post, comments, userByName = new Map()) {
   const permalink = `${FORUM_URL}?pid=${post.id}`;
-  const author = post.users?.name || String(post.author);
+  const author = displayName(post.users) || String(post.author);
   const meta = [
     author ? `作者: ${author}` : "",
     post.tag ? `标签: ${post.tag}` : "",

@@ -23,7 +23,7 @@ function buildCommentTree(comments) {
 	}
 	for (const c of comments) {
 		if (c._parentId && map[c._parentId]) {
-			c._replyToName = map[c._parentId].users?.name || null;
+			c._replyToName = getDisplayName(map[c._parentId].users) || null;
 		}
 	}
 	const roots = [];
@@ -64,7 +64,7 @@ async function renderComments(postId, container, comments, postAuthorId) {
 			div.innerHTML =
 				`<span class="userLink userLinkWithAvatar" data-user="${c.author}">
 									<img class="avatar" src="${avatar}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
-									<b>${c.users?.name || t("post_unknown")}</b>
+									<b>${escapeHtml(getDisplayName(c.users))}</b>
 									<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>
 								${getRoleBadge(c.users)}
 								${c.author === postAuthorId ? '<span class="authorTag op">' + t("badge_op") + '</span>' : ""}
@@ -114,7 +114,7 @@ async function renderComments(postId, container, comments, postAuthorId) {
 				}
 				const w = document.createElement("div");
 				w.className = "replyInputWrap";
-				const placeholder = c.users?.name ? t("reply_ph", c.users.name) : t("reply");
+				const placeholder = c.users?.name ? t("reply_ph", escapeHtml(getDisplayName(c.users))) : t("reply");
 				w.innerHTML =
 					`<input data-input="reply-${c.id}" data-mention-input="1" placeholder="${placeholder}">
 									<button class="emojiBtn" data-emoji-target="reply-${c.id}" type="button" title="表情">
@@ -162,7 +162,7 @@ async function openVotePeople(postId, kind) {
 										? rows.map(x => `
 															<div class="onlineUser voteUser" data-user="${x.users?.id}">
 																<img class="avatar onlineAvatar" src="${getAvatar(x.users)}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
-																<span>${x.users?.name || t("post_unknown")}</span>
+																<span>${escapeHtml(getDisplayName(x.users))}</span>
 																<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
 																${getRoleBadge(x.users)}
 															</div>
