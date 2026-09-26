@@ -309,6 +309,7 @@ setT("welcomeTitle", t("login_title"));
 	setPH("text", t("editor_ph"));
 	setT("insertImgBtn", t("editor_insert_img"));
 	setT("insertMusicBtn", t("editor_insert_music"));
+	setT("insertPollBtn", t("editor_insert_poll"));
 	setPH("customTag", t("editor_custom_tag_ph"));
 	setT("sendBtn", t("editor_send"));
 	setT("randomPostBtn", t("random_post_btn"));
@@ -383,6 +384,10 @@ window.refreshUILanguage = refreshUILanguage;
 
 function modal(t) {
 	$("modalText").innerHTML = t;
+	$("modal").classList.remove("hidden");
+}
+function modalText(str) {
+	$("modalText").textContent = str == null ? "" : String(str);
 	$("modal").classList.remove("hidden");
 }
 $("closeModal").onclick = () => {

@@ -168,10 +168,10 @@ async function openSinglePost(postId) {
 						`;
 		bodyBox.querySelector(".warnMsg").textContent = meta.warnText || t("warn_default");
 		bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-			renderPostBody(bodyBox, post.content);
+			renderPostBody(bodyBox, post.content, post);
 		};
 	} else {
-		renderPostBody(bodyBox, post.content);
+		renderPostBody(bodyBox, post.content, post);
 	}
 	if (!guestMode) {
 		postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
@@ -239,7 +239,7 @@ async function openNotifications() {
 	try {
 		rows = await apiGet("/api/notifications?target_id=" + currentUser.id);
 	} catch (e) {
-		modal(t("notif_load_fail", e.message));
+		modalText(t("notif_load_fail", e.message));
 		return;
 	}
 	try {
@@ -318,7 +318,7 @@ async function openNotifications() {
 				target_id: currentUser.id
 			});
 		} catch (e) {
-			modal(t("delete_fail", e.message));
+			modalText(t("delete_fail", e.message));
 			return;
 		}
 		$("modal").classList.add("hidden");
@@ -372,6 +372,15 @@ async function cleanupNotifications() {
 			});
 		} catch {}
 	}
+}
+
+function decodeCssEscapes(value) {
+	return String(value || "")
+		.replace(/\\([0-9a-fA-F]{1,6})\s?/g, (_, hex) => {
+			const code = parseInt(hex, 16);
+			return Number.isFinite(code) && code > 0 ? String.fromCodePoint(code) : "";
+		})
+		.replace(/\\(.)/g, "$1");
 }
 
 function sanitizePostHtml(txt) {
@@ -448,8 +457,9 @@ function sanitizePostHtml(txt) {
 					}
 				}
 				if (attr === "style") {
+					const decoded = decodeCssEscapes(value);
 					if (
-						/expression|url\s*\(|javascript:|position\s*:\s*fixed/i.test(value)
+						/expression|url\s*\(|javascript:|position\s*:\s*fixed|@import|behavior\s*:/i.test(decoded)
 					) {
 						continue;
 					}
@@ -470,6 +480,9 @@ function sanitizePostHtml(txt) {
 					}
 				}
 				allowedAttrs += ` ${attr}="${value}"`;
+			}
+			if (tagName === "a") {
+				allowedAttrs += ' rel="noopener noreferrer"';
 			}
 			return `<${tagName}${allowedAttrs}>`;
 		});

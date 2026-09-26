@@ -101,7 +101,6 @@ async function renderComments(postId, container, comments, postAuthorId) {
 						}
 					}
 					renderComments(postId, container);
-					await changeCoins(currentUser.id, -3);
 				};
 			}
 			const replyBtn = div.querySelector(".replyBtn");
@@ -149,7 +148,7 @@ async function openVotePeople(postId, kind) {
 	try {
 		data = await apiGet("/api/likes/" + postId);
 	} catch (e) {
-		modal(t("read_fail", e.message));
+		modalText(t("read_fail", e.message));
 		return;
 	}
 	const rows = (data || []).filter(x => x.type === (kind === "like" ? 1 : -1));
@@ -210,13 +209,12 @@ async function addComment(postId, content, postAuthorId) {
 			const list = postDiv.querySelector(".commentList");
 			if (list) await renderComments(postId, list, undefined, postAuthorId);
 		}
-		await changeCoins(currentUser.id, 3);
 		await refreshNotificationBadge();
 		await loadStats();
 	} catch (e) {
 		if (e.message === "JWT_EXPIRED") return;
 		console.error(e);
-		modal(t("comment_fail", e.message));
+		modalText(t("comment_fail", e.message));
 	}
 }
 async function addReply(postId, parentId, content, postAuthorId, parentAuthorId) {
@@ -254,13 +252,12 @@ async function addReply(postId, parentId, content, postAuthorId, parentAuthorId)
 			const list = postDiv.querySelector(".commentList");
 			if (list) await renderComments(postId, list, undefined, postAuthorId);
 		}
-		await changeCoins(currentUser.id, 3);
 		await refreshNotificationBadge();
 		await loadStats();
 	} catch (e) {
 		if (e.message === "JWT_EXPIRED") return;
 		console.error(e);
-		modal(t("comment_fail", e.message));
+		modalText(t("comment_fail", e.message));
 	}
 }
 async function likePost(id, postDiv) {
@@ -295,8 +292,6 @@ async function likePost(id, postDiv) {
 			liker: currentUser.id,
 			type: hasLike ? 0 : 1
 		});
-		if (postDiv.dataset.authorId != currentUser.id) changeCoins(currentUser.id, hasLike ? -1 : (
-			hasDislike ? 2 : 1));
 	} catch (e) {
 		console.error(e);
 		likeNumEl.textContent = prevLikeCount;
@@ -338,8 +333,6 @@ async function dislikePost(id, postDiv) {
 			liker: currentUser.id,
 			type: hasDislike ? 0 : -1
 		});
-		if (postDiv.dataset.authorId != currentUser.id) changeCoins(currentUser.id, hasDislike ? 1 :
-			(hasLike ? -2 : -1));
 	} catch (e) {
 		console.error(e);
 		likeNumEl.textContent = prevLikeCount;

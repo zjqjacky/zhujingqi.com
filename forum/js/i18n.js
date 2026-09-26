@@ -357,6 +357,216 @@ const TRANSLATIONS = {
 		de: "Musik einfügen",
 		"zh-TW": "插入音樂"
 	},
+	editor_insert_poll: {
+		zh: "投票",
+		en: "Poll",
+		es: "Encuesta",
+		de: "Umfrage",
+		"zh-TW": "投票"
+	},
+	poll_modal_title: {
+		zh: "创建投票",
+		en: "Create Poll",
+		es: "Crear encuesta",
+		de: "Umfrage erstellen",
+		"zh-TW": "建立投票"
+	},
+	poll_option_ph: {
+		zh: "选项内容",
+		en: "Option text",
+		es: "Texto de opción",
+		de: "Optionstext",
+		"zh-TW": "選項內容"
+	},
+	poll_add_option: {
+		zh: "添加选项",
+		en: "Add option",
+		es: "Añadir opción",
+		de: "Option hinzufügen",
+		"zh-TW": "新增選項"
+	},
+	poll_remove_option: {
+		zh: "删除选项",
+		en: "Remove option",
+		es: "Eliminar opción",
+		de: "Option entfernen",
+		"zh-TW": "刪除選項"
+	},
+	poll_option_limit: {
+		zh: "最多 5 个选项",
+		en: "Max 5 options",
+		es: "Máx. 5 opciones",
+		de: "Max. 5 Optionen",
+		"zh-TW": "最多 5 個選項"
+	},
+	poll_anonymous: {
+		zh: "匿名投票",
+		en: "Anonymous",
+		es: "Anónimo",
+		de: "Anonym",
+		"zh-TW": "匿名投票"
+	},
+	poll_show_voters: {
+		zh: "投票者身份",
+		en: "Voter identities",
+		es: "Identidad de votantes",
+		de: "Wähler-Identität",
+		"zh-TW": "投票者身分"
+	},
+	poll_voters_author: {
+		zh: "仅作者可见",
+		en: "Author only",
+		es: "Solo autor",
+		de: "Nur Autor",
+		"zh-TW": "僅作者可見"
+	},
+	poll_voters_all: {
+		zh: "所有人可见",
+		en: "Everyone",
+		es: "Todos",
+		de: "Alle",
+		"zh-TW": "所有人可見"
+	},
+	poll_voters_none: {
+		zh: "不可见",
+		en: "Hidden",
+		es: "Oculto",
+		de: "Verborgen",
+		"zh-TW": "不可見"
+	},
+	poll_deadline: {
+		zh: "截止时间（可不填）",
+		en: "Deadline (optional)",
+		es: "Fecha límite (opcional)",
+		de: "Frist (optional)",
+		"zh-TW": "截止時間（可不填）"
+	},
+	poll_no_deadline: {
+		zh: "不设截止时间",
+		en: "No deadline",
+		es: "Sin fecha límite",
+		de: "Keine Frist",
+		"zh-TW": "不設截止時間"
+	},
+	poll_create: {
+		zh: "创建投票",
+		en: "Create Poll",
+		es: "Crear encuesta",
+		de: "Umfrage erstellen",
+		"zh-TW": "建立投票"
+	},
+	poll_need_two: {
+		zh: "至少需要 2 个选项",
+		en: "At least 2 options required",
+		es: "Se requieren al menos 2 opciones",
+		de: "Mindestens 2 Optionen erforderlich",
+		"zh-TW": "至少需要 2 個選項"
+	},
+	poll_option_empty: {
+		zh: "选项不能为空",
+		en: "Options cannot be empty",
+		es: "Las opciones no pueden estar vacías",
+		de: "Optionen dürfen nicht leer sein",
+		"zh-TW": "選項不能為空"
+	},
+	poll_vote: {
+		zh: "投票",
+		en: "Vote",
+		es: "Votar",
+		de: "Abstimmen",
+		"zh-TW": "投票"
+	},
+	poll_voted: {
+		zh: "已投票",
+		en: "Voted",
+		es: "Votado",
+		de: "Abgestimmt",
+		"zh-TW": "已投票"
+	},
+	poll_total: {
+		zh: "共 {0} 票",
+		en: "{0} votes",
+		es: "{0} votos",
+		de: "{0} Stimmen",
+		"zh-TW": "共 {0} 票"
+	},
+	poll_ended: {
+		zh: "投票已结束",
+		en: "Poll ended",
+		es: "Encuesta finalizada",
+		de: "Umfrage beendet",
+		"zh-TW": "投票已結束"
+	},
+	poll_end: {
+		zh: "结束投票",
+		en: "End poll",
+		es: "Finalizar encuesta",
+		de: "Umfrage beenden",
+		"zh-TW": "結束投票"
+	},
+	poll_settings: {
+		zh: "设置",
+		en: "Settings",
+		es: "Ajustes",
+		de: "Einstellungen",
+		"zh-TW": "設定"
+	},
+	poll_apply: {
+		zh: "保存",
+		en: "Save",
+		es: "Guardar",
+		de: "Speichern",
+		"zh-TW": "儲存"
+	},
+	poll_login: {
+		zh: "登录后可投票",
+		en: "Log in to vote",
+		es: "Inicia sesión para votar",
+		de: "Anmelden zum Abstimmen",
+		"zh-TW": "登入後可投票"
+	},
+	poll_vote_to_see: {
+		zh: "投票后查看结果",
+		en: "Vote to see results",
+		es: "Vota para ver los resultados",
+		de: "Abstimmen, um Ergebnisse zu sehen",
+		"zh-TW": "投票後查看結果"
+	},
+	poll_voters_title: {
+		zh: "投票者",
+		en: "Voters",
+		es: "Votantes",
+		de: "Wähler",
+		"zh-TW": "投票者"
+	},
+	poll_no_votes: {
+		zh: "暂无投票",
+		en: "No votes yet",
+		es: "Sin votos aún",
+		de: "Noch keine Stimmen",
+		"zh-TW": "暫無投票"
+	},
+	poll_expired: {
+		zh: "已截止",
+		en: "Ended",
+		es: "Finalizado",
+		de: "Beendet",
+		"zh-TW": "已截止"
+	},
+	poll_fail: {
+		zh: "投票失败",
+		en: "Vote failed",
+		es: "Voto fallido",
+		de: "Abstimmung fehlgeschlagen",
+		"zh-TW": "投票失敗"
+	},
+	poll_already: {
+		zh: "你已经投过票了",
+		en: "You have already voted",
+		es: "Ya has votado",
+		de: "Du hast bereits abgestimmt",
+		"zh-TW": "你已經投過票了"
+	},
 	rankings_title: {
 		zh: "排行榜",
 		en: "Leaderboard",

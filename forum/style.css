@@ -4485,6 +4485,7 @@ html.watch #logoRow {
 html.watch #editorPage #logoRow,
 html.watch #editorPage #insertImgBtn,
 html.watch #editorPage #insertMusicBtn,
+html.watch #editorPage #insertPollBtn,
 html.watch #editorPage #editorEmojiBtn,
 html.watch #editorPage #customTag,
 html.watch #editorPage .sensitiveWrap,
@@ -4495,4 +4496,288 @@ html.watch #editorPage .postBgRow {
 html.watch body {
 	overflow-y: auto;
 	padding-bottom: 0;
+}
+
+/* ===== 投票 ===== */
+.pollList {
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.pollCard {
+	border-radius: 20px;
+	background: rgba(0, 0, 0, 0.04);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	padding: 12px;
+	box-sizing: border-box;
+}
+
+body.dark .pollCard {
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pollOptions {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.pollOption {
+	position: relative;
+	overflow: hidden;
+	border-radius: 20px;
+	background: var(--card);
+	border: 1px solid var(--border);
+	padding: 10px 14px;
+	transition: border-color .15s, background .15s;
+	box-sizing: border-box;
+}
+
+.pollOption.canVote {
+	cursor: pointer;
+}
+
+.pollOption.canVote:hover {
+	border-color: var(--green);
+}
+
+.pollOption.selected {
+	border-color: var(--green);
+}
+
+.pollFill {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	background: rgba(10, 170, 0, 0.16);
+	transition: width .35s ease;
+}
+
+body.dark .pollFill {
+	background: rgba(61, 140, 64, 0.28);
+}
+
+.pollRow {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.pollOptionText {
+	flex: 1;
+	min-width: 0;
+	font-size: 15px;
+	color: var(--text);
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.pollPct {
+	flex-shrink: 0;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--sub);
+}
+
+.pollCheck {
+	flex-shrink: 0;
+	color: var(--green);
+	font-weight: 700;
+}
+
+.pollFoot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-top: 10px;
+	flex-wrap: wrap;
+}
+
+.pollMeta {
+	font-size: 13px;
+	color: var(--sub);
+}
+
+.pollActions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.pollVotersLink {
+	font-size: 13px;
+	color: var(--green);
+	cursor: pointer;
+}
+
+.pollEndBtn,
+.pollSettingsBtn {
+	font-size: 13px;
+	color: var(--sub);
+	cursor: pointer;
+}
+
+.pollVotersLink:hover,
+.pollEndBtn:hover,
+.pollSettingsBtn:hover {
+	text-decoration: underline;
+}
+
+/* 编辑器 / 设置弹窗 */
+.pollOptionEdit {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.pollOptionInput {
+	flex: 1;
+	min-width: 0;
+	height: 40px;
+	border-radius: 20px;
+	border: 1px solid var(--border);
+	background: var(--card);
+	color: var(--text);
+	padding: 0 14px;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+.pollOptionDel {
+	flex-shrink: 0;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: rgba(255, 77, 79, .12);
+	color: #e23a3a;
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+	user-select: none;
+}
+
+.pollAddBtn {
+	width: 100%;
+	height: 40px;
+	border-radius: 20px;
+	border: 1px dashed var(--border);
+	background: transparent;
+	color: var(--green);
+	font-size: 14px;
+	cursor: pointer;
+	margin-bottom: 10px;
+}
+
+.pollSetRow {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 10px;
+	font-size: 14px;
+	color: var(--text);
+}
+
+.pollSetRow input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	flex-shrink: 0;
+}
+
+.pollSetRow select,
+.pollSetRow input[type="datetime-local"] {
+	flex: 1;
+	min-width: 0;
+	height: 38px;
+	border-radius: 20px;
+	border: 1px solid var(--border);
+	background: var(--card);
+	color: var(--text);
+	padding: 0 12px;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+.pollVoterList {
+	max-height: 340px;
+	overflow-y: auto;
+	margin-top: 6px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.pollVoterGroup {
+	background: rgba(0, 0, 0, 0.04);
+	border-radius: 20px;
+	padding: 10px 14px;
+}
+
+body.dark .pollVoterGroup {
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.pollVoterOption {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text);
+	margin-bottom: 4px;
+}
+
+.pollVoterOptionText {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.pollVoterCount {
+	flex-shrink: 0;
+	color: var(--green);
+}
+
+.pollVoterNames {
+	font-size: 13px;
+	color: var(--sub);
+	line-height: 1.6;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.pollNoVotes {
+	text-align: center;
+	color: var(--sub);
+	padding: 12px;
+}
+
+@media (max-width: 480px) {
+	.pollCard {
+		padding: 10px;
+	}
+
+	.pollOption {
+		padding: 9px 12px;
+	}
+
+	.pollOptionText {
+		font-size: 14px;
+	}
+
+	.pollSetRow {
+		font-size: 13px;
+	}
 }

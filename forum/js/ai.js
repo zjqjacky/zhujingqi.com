@@ -1,3 +1,4 @@
+/* ===== Jacky AI 功能暂时下线：以下全部 AI 代码已注释，保留以便日后恢复 =====
 let aiHistory = [];
 let aiTurnSources = [];
 
@@ -454,3 +455,5 @@ async function openAILogs() {
 		if (e.target === wrap) wrap.remove();
 	};
 }
+
+===== Jacky AI 代码结束 ===== */

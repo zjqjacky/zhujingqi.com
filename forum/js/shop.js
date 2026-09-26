@@ -106,17 +106,19 @@ async function openShop() {
 				const itemId = btn.dataset.buy;
 				const item = SHOP_ITEMS.find(i => i.id === itemId);
 				if (!item || coins < item.price) return;
-				await changeCoins(currentUser.id, -item.price);
-				coins -= item.price;
-				roleArr = [...roleArr, itemId];
 				try {
-					await apiPut("/api/users/" + currentUser.id, {
-						role: roleArr
-					});
+					const res = await apiPost("/api/shop/buy", { itemId });
+					if (res && typeof res.coins === "number") coins = res.coins;
+					if (res && Array.isArray(res.role)) roleArr = res.role;
+					if (currentUser) {
+						currentUser.coins = coins;
+						currentUser.role = roleArr;
+					}
+					showCoinMsg(t("coin_sub", item.price));
 				} catch (e) {
-					console.error(e);
+					if (e.message === "JWT_EXPIRED") return;
+					showCoinMsg(t("coins_insufficient"));
 				}
-				if (currentUser) currentUser.role = roleArr;
 				renderShop();
 			};
 		});
@@ -298,7 +300,7 @@ function openAvatarEditor() {
 				avatar: url || null
 			});
 		} catch (e) {
-			return modal(t("save_fail", e.message));
+			return modalText(t("save_fail", e.message));
 		}
 		currentUser.avatar = url || null;
 		$("modal").classList.add("hidden");
@@ -344,27 +346,12 @@ function openCardBgEditor(user) {
 								card_bg: url || null
 							});
 						} catch (e) {
-							return modal(t("save_fail", e.message));
+							return modalText(t("save_fail", e.message));
 						}
 						currentUser.card_bg = url || null;
 						$("modal").classList.add("hidden");
 						viewUser(currentUser.id);
 					};
-				}
-				async function changeCoins(uid, amount) {
-					try {
-						const result = await apiPut("/api/users/" + uid + "/coins", {
-							amount
-						});
-						if (result && result.coins !== undefined) {
-							if (currentUser && currentUser.id === uid) {
-								currentUser.coins = result.coins;
-								showCoinMsg(amount > 0 ? t("coin_add", amount) : t("coin_sub", Math.abs(amount)));
-							}
-						}
-					} catch (e) {
-						showCoinMsg(t("coin_penalty"));
-					}
 				}
 
 				function showCoinMsg(text) {

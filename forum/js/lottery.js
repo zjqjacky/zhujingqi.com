@@ -236,37 +236,42 @@ async function openLottery() {
 
 	const lr = document.getElementById("lr");
 
+	function applyServerState(draw) {
+		if (!currentUser) return;
+		if (draw && typeof draw.coins === "number") currentUser.coins = draw.coins;
+		if (draw && Array.isArray(draw.role)) currentUser.role = draw.role;
+	}
+
 	document.getElementById("s1").onclick = async () => {
 		if (sp) return;
 		if ((currentUser?.coins || 0) < 10) {
 			showCoinMsg(t("lottery_no_coins"));
 			return;
 		}
-		await changeCoins(currentUser.id, -10);
-		const idx = pick();
-		spinTo(idx, async (ri, done) => {
-			try {
-				const p = prizes[ri];
-				if (typeof p.v === "number") {
-					await changeCoins(currentUser.id, p.v);
-					lr.innerHTML =
-						`<div class="singleResult">${p.label} ${t("profile_coins")}</div>`;
-				} else {
-					await addBadge(p.v);
-					lr.innerHTML =
-						`<div class="singleResult">${t("lottery_badge_won", p.label)}</div>`;
-				}
-				updCoins();
-			} finally {
-				done();
+		let draw;
+		try {
+			draw = await apiPost("/api/lottery/draw", { count: 1 });
+		} catch (e) {
+			showCoinMsg(e.message === "JWT_EXPIRED" ? t("coin_penalty") : t("lottery_no_coins"));
+			return;
+		}
+		const result = draw.results[0];
+		const ri = prizes.findIndex(p => p.id === result.id);
+		applyServerState(draw);
+		spinTo(ri >= 0 ? ri : 0, (landed, done) => {
+			if (result.isBadge) {
+				lr.innerHTML = `<div class="singleResult">${t("lottery_badge_won", result.label)}</div>`;
+			} else {
+				lr.innerHTML = `<div class="singleResult">${result.label} ${t("profile_coins")}</div>`;
 			}
+			updCoins();
+			done();
 		});
 		updCoins();
 	};
 
 	document.getElementById("s10").onclick = async () => {
 		if (sp) return;
-		sp = true;
 		const s10b = document.getElementById("s10"),
 			s1b = document.getElementById("s1");
 		s10b.disabled = true;
@@ -276,28 +281,13 @@ async function openLottery() {
 				showCoinMsg(t("lottery_no_coins"));
 				return;
 			}
-			await changeCoins(currentUser.id, -99);
-			const ids = Array.from({
-				length: 10
-			}, () => pick());
-			let tc = 0,
-				newBadges = [];
-			const items = ids.map(idx => {
-				const p = prizes[idx];
-				if (typeof p.v === "number") {
-					tc += p.v;
-					return {
-						...p,
-						isBadge: false
-					};
-				} else {
-					newBadges.push(p.v);
-					return {
-						...p,
-						isBadge: true
-					};
-				}
-			});
+			const draw = await apiPost("/api/lottery/draw", { count: 10 });
+			applyServerState(draw);
+			const items = draw.results.map(r => ({
+				label: r.label,
+				color: r.color || (prizes.find(p => p.id === r.id) || {}).color,
+				isBadge: r.isBadge
+			}));
 			lr.innerHTML =
 				'<div class="tenResult"><div class="tenTitle">' + t("lottery_10_result") +
 				'</div><div class="tenGrid"></div></div>';
@@ -319,10 +309,7 @@ async function openLottery() {
 				});
 				await new Promise(r => setTimeout(r, 120));
 			}
-			if (tc !== 0) {
-				await changeCoins(currentUser.id, tc);
-			}
-			for (const b of newBadges) await addBadge(b);
+			const tc = draw.results.reduce((a, r) => a + (typeof r.v === "number" ? r.v : 0), 0);
 			const totalEl = document.createElement("div");
 			totalEl.className = "tenTotal";
 			totalEl.textContent = `${tc>0?'+':''}${tc} ${t("profile_coins")}`;
@@ -331,6 +318,8 @@ async function openLottery() {
 			lr.querySelector(".tenResult").appendChild(totalEl);
 			requestAnimationFrame(() => totalEl.style.opacity = "1");
 			updCoins();
+		} catch (e) {
+			if (e.message !== "JWT_EXPIRED") showCoinMsg(t("lottery_no_coins"));
 		} finally {
 			sp = false;
 			s10b.disabled = false;

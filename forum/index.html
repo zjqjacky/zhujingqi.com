@@ -5,11 +5,15 @@
 		<meta name="viewport"
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 		<meta name="description" content="Jacky 论坛 - 社区交流平台，发帖、评论与互动">
+		<!-- 纵深防御：限制脚本来源并收紧 connect-src，切断 XSS 向站外外发令牌的通道。
+		     更严格的安全响应头建议在 Cloudflare/反向代理层配置（GitHub Pages 无法设置响应头）。 -->
+		<meta http-equiv="Content-Security-Policy"
+			content="default-src 'self'; script-src 'self' 'unsafe-inline' https://zhujingqi.com; style-src 'self' 'unsafe-inline'; img-src * data: blob:; media-src * data: blob:; font-src 'self' data:; connect-src 'self' https://jqtljtnchkhzcxykfnoo.supabase.co; frame-src *; object-src 'none'; base-uri 'self'; form-action 'self'">
 		<title>Jacky 论坛 - Zhujingqi</title>
 		<link rel="icon" type="image/png" href="icon.svg">
 		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/icon.png">
 		<link rel="apple-touch-icon" sizes="120x120" href="assets/img/icon.png">
-		<link rel="stylesheet" href="style.css?v=20260911">
+		<link rel="stylesheet" href="style.css?v=20260926">
 	</head>
 	<body>
 		<script>
@@ -154,6 +158,7 @@
 				<div style="display:flex;gap:6px;margin-top:8px;">
 					<button id="insertImgBtn" type="button">插图</button>
 					<button id="insertMusicBtn" type="button">插入音乐</button>
+					<button id="insertPollBtn" type="button">投票</button>
 					<button id="editorEmojiBtn" class="emojiBtn" type="button" title="表情"><img src="emojis/happy.svg"
 							style="width:22px;height:22px;display:block;pointer-events:none;"></button>
 				</div>
@@ -190,14 +195,14 @@
 				</div>
 				</div>
 				<div class="rankToggleWrap">
-					<button id="rankToggleCoins" class="rankToggleBtn active">金币</button>
-					<button id="rankToggleFollowers" class="rankToggleBtn">粉丝</button>
+					<button id="rankToggleCoins" class="rankToggleBtn">金币</button>
+					<button id="rankToggleFollowers" class="rankToggleBtn active">粉丝</button>
 				</div>
 				<input id="rankSearch" class="rankSearch" placeholder="搜索用户名..." autocomplete="off">
 				<div
 					style="display:flex;font-weight:bold;padding:8px 0;border-bottom:1px solid var(--border);width:100%;max-width:500px;">
 					<div style="flex:1;" id="rankColName">用户名</div>
-					<div style="width:150px;text-align:right;" id="rankColValue">金币数</div>
+					<div style="width:150px;text-align:right;" id="rankColValue">粉丝</div>
 				</div>
 				<div id="userItems"></div>
 			</div>
@@ -288,23 +293,15 @@
 			</div>
 		</div>
 		<div id="captchaModal" class="modal hidden">
-			<div class="modalBox" style="width:380px;text-align:center;">
-				<div id="captchaTitle" style="font-weight:bold;margin-bottom:10px;">人机验证 — 拖到闪烁虚线框中</div>
-				<div style="position:relative;display:inline-block;">
-					<canvas id="captchaCanvas" width="320" height="160"
-						style="border-radius:8px;display:block;"></canvas>
-					<div id="captchaTarget"
-						style="position:absolute;top:0;left:0;width:48px;height:160px;border:2px dashed rgba(255,255,255,.8);border-radius:4px;pointer-events:none;box-sizing:border-box;background:rgba(0,200,0,.12);">
-					</div>
-				</div>
-				<div id="captchaTrack"
-					style="position:relative;width:320px;height:36px;margin:10px auto 0;background:var(--bg);border-radius:18px;touch-action:none;user-select:none;">
-					<div id="captchaThumb"
-						style="position:absolute;top:2px;left:0;width:44px;height:32px;background:var(--green);border-radius:16px;cursor:grab;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;z-index:2;">
-						→</div>
-				</div>
-				<div id="captchaHint" style="margin-top:8px;font-size:12px;color:var(--sub);">← 拖动滑块完成拼图 →</div>
-				<div style="margin-top:10px"><button id="captchaCloseBtn">关闭</button></div>
+			<div class="modalBox" style="width:340px;text-align:center;">
+				<div id="captchaTitle" style="font-weight:bold;margin-bottom:10px;">人机验证</div>
+				<div id="captchaQuestion" style="font-size:24px;margin:16px 0;letter-spacing:2px;font-weight:bold;">…</div>
+				<input id="captchaAnswer" type="text" inputmode="numeric" autocomplete="off"
+					placeholder="请输入上方算式的结果" style="text-align:center;font-size:18px;">
+				<div id="captchaHint" style="margin-top:8px;font-size:12px;color:var(--sub);">请输入上方算式的结果</div>
+				<div style="margin-top:10px"><button id="captchaConfirmBtn">确认</button>
+					<button id="captchaCloseBtn">关闭</button></div>
+				<div id="captchaStatus" style="margin-top:8px;font-size:13px;min-height:18px;"></div>
 			</div>
 		</div>
 		<div id="coinMsg">
@@ -315,26 +312,26 @@
 			<img id="viewerImg">
 		</div>
 		<script src="https://zhujingqi.com/js/egg.js"></script>
-		<script src="js/api.js?v=20260911"></script>
-		<script src="js/i18n.js?v=20260911"></script>
-		<script src="js/core.js?v=20260911"></script>
-		<script src="js/captcha.js?v=20260911"></script>
-		<script src="js/config.js?v=20260911"></script>
-		<script src="js/content.js?v=20260911"></script>
-		<script src="js/search.js?v=20260911"></script>
-		<script src="js/editor.js?v=20260911"></script>
-		<script src="js/auth.js?v=20260911"></script>
-		<script src="js/posts.js?v=20260911"></script>
-		<script src="js/comments.js?v=20260911"></script>
-		<script src="js/users.js?v=20260911"></script>
-		<script src="js/notifications.js?v=20260911"></script>
-		<script src="js/presence.js?v=20260911"></script>
-		<script src="js/shop.js?v=20260911"></script>
-		<script src="js/lottery.js?v=20260911"></script>
-		<script src="js/ai.js?v=20260911"></script>
-		<script src="js/fortune.js?v=20260911"></script>
-		<script src="js/announcements.js?v=20260911"></script>
-		<script src="js/misc.js?v=20260911"></script>
-		<script src="js/app.js?v=20260911"></script>
+		<script src="js/api.js?v=20260926"></script>
+		<script src="js/i18n.js?v=20260926"></script>
+		<script src="js/core.js?v=20260926"></script>
+		<script src="js/captcha.js?v=20260926"></script>
+		<script src="js/config.js?v=20260926"></script>
+		<script src="js/content.js?v=20260926"></script>
+		<script src="js/search.js?v=20260926"></script>
+		<script src="js/editor.js?v=20260926"></script>
+		<script src="js/auth.js?v=20260926"></script>
+		<script src="js/posts.js?v=20260926"></script>
+		<script src="js/comments.js?v=20260926"></script>
+		<script src="js/users.js?v=20260926"></script>
+		<script src="js/notifications.js?v=20260926"></script>
+		<script src="js/presence.js?v=20260926"></script>
+		<script src="js/shop.js?v=20260926"></script>
+		<script src="js/lottery.js?v=20260926"></script>
+		<!-- AI 功能暂时下线：<script src="js/ai.js?v=20260926"></script> -->
+		<script src="js/fortune.js?v=20260926"></script>
+		<script src="js/announcements.js?v=20260926"></script>
+		<script src="js/misc.js?v=20260926"></script>
+		<script src="js/app.js?v=20260926"></script>
 	</body>
 </html>

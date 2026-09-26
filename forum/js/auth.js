@@ -13,18 +13,20 @@ $("registerBtn").onclick = async () => {
 		return modal(t("no_impersonate"));
 	}
 	if (nicknameWidth(nick) > NICKNAME_MAX_WIDTH) return modal(t("nickname_too_long"));
-	const passHash = await hash(p1);
+	if (p1.length < 6) return modal(t("pass_too_short"));
 	try {
 		await apiPost("/api/auth/register", {
 			name: u,
 			nickname: nick || null,
-			pass: passHash,
-			time: new Date().toISOString()
+			pass: p1,
+			captcha_token: captchaToken,
+			captcha_answer: captchaAnswer
 		});
+		resetCaptcha();
 		modal(t("register_ok"));
 		show("welcomePage");
 	} catch (e) {
-		modal(t("register_fail", e.message));
+		modalText(t("register_fail", e.message));
 	}
 };
 $("captchaBtn").onclick = openCaptchaModal;
@@ -33,11 +35,10 @@ $("loginBtn").onclick = async () => {
 	let u = $("loginUser").value.trim();
 	let p = $("loginPass").value.trim();
 	if (!u || !p) return modal(t("enter_user_pass"));
-	const passHash = await hash(p);
 	try {
 		const data = await apiPost("/api/auth/login", {
 			name: u,
-			pass: passHash
+			pass: p
 		});
 		currentUser = data;
 		localStorage.setItem("loginUser", data.id);
@@ -61,7 +62,7 @@ $("loginBtn").onclick = async () => {
 		const msg = e.message;
 		if (msg.includes("Wrong password")) modal(t("wrong_password"));
 		else if (msg.includes("not found")) modal(t("user_not_found"));
-		else modal(msg);
+		else modalText(msg);
 	}
 };
 $("guestBtn").onclick = () => {
@@ -112,19 +113,17 @@ $("sendBtn").onclick = async () => {
 	if (selectedPostBg) {
 		finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 	}
-	const postId = Date.now();
+	let created;
 	try {
-		await apiPost("/api/posts", {
-			id: postId,
+		created = await apiPost("/api/posts", {
 			content: finalContent,
-			time: new Date().toISOString(),
-			author: currentUser.id,
 			tag: tag,
 		});
 	} catch (e) {
 		if (e.message === "JWT_EXPIRED") return;
-		return modal(t("post_fail", e.message));
+		return modalText(t("post_fail", e.message));
 	}
+	const postId = (created && created.id) || Date.now();
 	await notifyMentions(finalContent, postId, null);
 	try {
 		for (const k of Object.keys(sessionStorage)) {

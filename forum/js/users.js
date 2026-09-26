@@ -34,12 +34,18 @@ function escapeAttr(s) {
 						.replace(/</g, "&lt;")
 						.replace(/>/g, "&gt;");
 				}
-				let rankMode = "coins";
+				let rankMode = "followers";
 
 				function setupRankToggle() {
 					const coinsBtn = $("rankToggleCoins");
 					const followersBtn = $("rankToggleFollowers");
-					if (!coinsBtn || coinsBtn._setup) return;
+					if (!coinsBtn || !followersBtn) return;
+					coinsBtn.classList.toggle("active", rankMode === "coins");
+					followersBtn.classList.toggle("active", rankMode === "followers");
+					const colValInit = $("rankColValue");
+					if (colValInit) colValInit.textContent = rankMode === "followers" ? t("followers") : t(
+						"rankings_col_coins");
+					if (coinsBtn._setup) return;
 					coinsBtn._setup = true;
 					coinsBtn.onclick = () => {
 						if (rankMode === "coins") return;
@@ -181,7 +187,7 @@ function escapeAttr(s) {
 							});
 						} catch (e) {
 							if (/taken/i.test(e.message)) return modal(t("nickname_taken"));
-							return modal(t("save_fail", e.message));
+							return modalText(t("save_fail", e.message));
 						}
 						currentUser.nickname = newNick || null;
 						if (user) user.nickname = newNick || null;
@@ -232,7 +238,7 @@ function escapeAttr(s) {
 								<button class="settingsLinkBtn" id="setAboutBtn">${t("profile_about")}</button>
 								<button class="settingsLinkBtn" id="setSponsorBtn">${t("profile_sponsor")}</button>
 							</div>
-							${isAdmin(user) ? `<button class="settingsLinkBtn" id="setAILogsBtn" style="margin-top:6px;">${t("ai_logs_admin")}</button>` : ""}
+							${"" /* AI 日志按钮已移除 */}
 							<a class="settingsLinkBtn" id="setRssBtn" href="rss.xml" target="_blank" rel="noopener" style="margin-top:6px;text-decoration:none;box-sizing:border-box;">${t("settings_rss")}</a>
 						</div>
 					`);
@@ -256,11 +262,11 @@ function escapeAttr(s) {
 					$("setBioBtn").onclick = () => {
 						$("modal").classList.add("hidden");
 						box.style.width = "400px";
-						$("modalText").innerHTML = `
-							<h3>${t("profile_edit_desc")}</h3>
-							<textarea id="descTextarea" maxlength="500" style="height:120px;">${user.description || ""}</textarea>
-							<div style="margin-top:10px;"><button id="saveDescBtn">${t("profile_save")}</button></div>
-						`;
+							$("modalText").innerHTML = `
+								<h3>${t("profile_edit_desc")}</h3>
+								<textarea id="descTextarea" maxlength="500" style="height:120px;">${escapeHtml(user.description || "")}</textarea>
+								<div style="margin-top:10px;"><button id="saveDescBtn">${t("profile_save")}</button></div>
+							`;
 						$("modal").classList.remove("hidden");
 						$("saveDescBtn").onclick = async () => {
 							const newDesc = $("descTextarea").value.trim();
@@ -269,12 +275,11 @@ function escapeAttr(s) {
 									description: newDesc
 								});
 							} catch (e) {
-								return modal(t("save_fail", e.message));
+								return modalText(t("save_fail", e.message));
 							}
 							currentUser.description = newDesc;
 							const bio = document.getElementById("profileBio");
-							if (bio) bio.innerHTML = (newDesc || t("profile_no_desc")) +
-								'<button class="bioEditBtn">' + t("profile_edit") + '</button>';
+							if (bio) bio.innerHTML = sanitizePostHtml(newDesc || t("profile_no_desc"));
 							$("modal").classList.add("hidden");
 						};
 					};
@@ -309,11 +314,11 @@ function escapeAttr(s) {
 							if (newP !== confirmP) return modal(t("pass_mismatch"));
 							try {
 								await apiPut("/api/auth/password", {
-									old_pass: await hash(oldP),
-									new_pass: await hash(newP)
+									old_pass: oldP,
+									new_pass: newP
 								});
 							} catch (e) {
-								return modal(t("save_fail", e.message));
+								return modalText(t("save_fail", e.message));
 							}
 							$("modal").classList.add("hidden");
 							showCoinMsg(t("pass_changed_ok"));
@@ -333,7 +338,7 @@ function escapeAttr(s) {
 								card_bg: null
 							});
 						} catch (e) {
-							return modal(t("save_fail", e.message));
+							return modalText(t("save_fail", e.message));
 						}
 						currentUser.card_bg = null;
 						if (user) user.card_bg = null;
@@ -351,13 +356,14 @@ function escapeAttr(s) {
 	$("setSponsorBtn").onclick = () => {
 		modal(`<h2>${t("sponsor_title")}</h2>${t("sponsor_content")}`);
 	};
-	const aiLogsBtn = box.querySelector("#setAILogsBtn");
-	if (aiLogsBtn) {
-		aiLogsBtn.onclick = () => {
-			$("modal").classList.add("hidden");
-			openAILogs();
-		};
-	}
+	// AI 日志入口已移除（AI 功能暂时下线）
+	// const aiLogsBtn = box.querySelector("#setAILogsBtn");
+	// if (aiLogsBtn) {
+	// 	aiLogsBtn.onclick = () => {
+	// 		$("modal").classList.add("hidden");
+	// 		openAILogs();
+	// 	};
+	// }
 }
 
 async function viewUser(uid) {
@@ -431,7 +437,7 @@ async function viewUser(uid) {
 					`;
 					renderLevelProgress(user.coins || 0);
 					const bio = document.getElementById("profileBio");
-					bio.innerHTML = (user.description || t("profile_no_desc"));
+					bio.innerHTML = sanitizePostHtml(user.description || t("profile_no_desc"));
 					if (isSelf) {
 						const editBio = document.createElement("button");
 						editBio.className = "bioEditBtn";
@@ -441,7 +447,7 @@ async function viewUser(uid) {
 							box.style.width = "400px";
 							$("modalText").innerHTML = `
 								<h3>${t("profile_edit_desc")}</h3>
-								<textarea id="descTextarea" maxlength="500" style="height:120px;">${user.description || ""}</textarea>
+							<textarea id="descTextarea" maxlength="500" style="height:120px;">${escapeHtml(user.description || "")}</textarea>
 								<div style="margin-top:10px;"><button id="saveDescBtn">${t("profile_save")}</button></div>
 							`;
 							$("modal").classList.remove("hidden");
@@ -452,12 +458,17 @@ async function viewUser(uid) {
 										description: newDesc
 									});
 								} catch (e) {
-									return modal(t("save_fail", e.message));
+									return modalText(t("save_fail", e.message));
 								}
 								currentUser.description = newDesc;
-								bio.innerHTML = (newDesc || t("profile_no_desc")) +
-									'<button class="bioEditBtn">' + t("profile_edit") + '</button>';
-								bio.querySelector(".bioEditBtn").onclick = editBio.onclick;
+								bio.innerHTML = sanitizePostHtml(newDesc || t("profile_no_desc"));
+								if (editBio) {
+									const eb = document.createElement("button");
+									eb.className = "bioEditBtn";
+									eb.textContent = t("profile_edit");
+									eb.onclick = editBio.onclick;
+									bio.appendChild(eb);
+								}
 								$("modal").classList.add("hidden");
 							};
 						};

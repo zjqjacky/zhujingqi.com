@@ -104,11 +104,12 @@ function renderPostFilters() {
 		};
 		tagBar.appendChild(chip);
 	}
-	const aiChip = document.createElement("span");
-	aiChip.className = "aiAskChip";
-	aiChip.innerHTML = '<img class="aiAskIcon" src="icon/jackyai.svg" alt="AI" onerror="this.style.display=\'none\'">' + t("ai_entry");
-	aiChip.onclick = openAIModal;
-	tagBar.appendChild(aiChip);
+	// AI 按钮已移除（AI 功能暂时下线）
+	// const aiChip = document.createElement("span");
+	// aiChip.className = "aiAskChip";
+	// aiChip.innerHTML = '<img class="aiAskIcon" src="icon/jackyai.svg" alt="AI" onerror="this.style.display=\'none\'">' + t("ai_entry");
+	// aiChip.onclick = openAIModal;
+	// tagBar.appendChild(aiChip);
 	$("searchBtn").onclick = () => {
 		applyQuery(search.value);
 		syncUrlFromQuery();
@@ -446,10 +447,10 @@ async function loadPosts(page = 1, container = $("posts")) {
 					'</div>';
 				bodyBox.querySelector(".warnMsg").textContent = meta.warnText || t("warn_default");
 				bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-					renderPostBody(bodyBox, p.content);
+					renderPostBody(bodyBox, p.content, p);
 				};
 			} else {
-				renderPostBody(bodyBox, p.content);
+				renderPostBody(bodyBox, p.content, p);
 			}
 			if (!guestMode) {
 				postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
@@ -516,7 +517,7 @@ async function loadPosts(page = 1, container = $("posts")) {
 		}
 	} catch (e) {
 		console.error(e);
-		modal(t("modal_load_fail") + "：" + e.message);
+		modalText(t("modal_load_fail") + "：" + e.message);
 	}
 }
 

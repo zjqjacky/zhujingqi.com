@@ -130,7 +130,7 @@ const autoLink = (text, userByName) => {
 //   [[music:ID]] / [[music:(netease|qq):ID]] -> plain link (readers strip iframes)
 // Plain text also passes through autoLink() (URLs + @mentions, as in the SPA).
 const contentToHtml = (raw, userByName = new Map()) => {
-  const reg = /:([a-zA-Z0-9_-]+):|\[img:(.*?)\]|\[\[music:(netease|qq):(\d+)\]\]|\[\[music:(\d+)\]\]/g;
+  const reg = /:([a-zA-Z0-9_-]+):|\[img:(.*?)\]|\[\[music:(netease|qq):(\d+)\]\]|\[\[music:(\d+)\]\]|\[poll:(\d+)\]/g;
   let out = "";
   let last = 0;
   let m;
@@ -145,6 +145,8 @@ const contentToHtml = (raw, userByName = new Map()) => {
       }
     } else if (m[2] !== undefined) {
       out += `<img src="${m[2]}" alt="image" />`;
+    } else if (m[6] !== undefined) {
+      // 投票标记由 renderPolls() 统一输出
     } else {
       const id = m[4] || m[5];
       const type = m[3] || "netease";
@@ -157,6 +159,23 @@ const contentToHtml = (raw, userByName = new Map()) => {
   }
   out += autoLink(raw.slice(last), userByName);
   return out.replace(/\n/g, "<br />");
+};
+
+// 投票摘要（RSS 只读，不可交互）
+const renderPolls = (polls) => {
+  if (!Array.isArray(polls) || !polls.length) return "";
+  return polls.map((poll) => {
+    const counts = Array.isArray(poll.counts) ? poll.counts : null;
+    const total = poll.total || 0;
+    const opts = (poll.options || []).map((o, i) => {
+      const pct = counts && total > 0 ? Math.round(((counts[i] || 0) / total) * 100) : null;
+      return pct === null ? `・${o}` : `・${o} (${pct}%)`;
+    }).join("<br />");
+    const foot = counts === null
+      ? "投票后可查看结果"
+      : `共 ${total} 票` + (poll.ended ? " · 已结束" : "");
+    return `<div>📊 <b>投票</b><br />${opts}<br /><small>${foot}</small></div>`;
+  }).join("<br />");
 };
 
 // Comments may be replies; the content starts with "[reply:<parentId>] ".
@@ -225,7 +244,7 @@ function buildItem(post, comments, userByName = new Map()) {
   ]
     .filter(Boolean)
     .join(" · ");
-  const descHtml = `${contentToHtml(post.content || "", userByName)}${meta ? `<br /><br /><small>${meta}</small>` : ""}${commentsToHtml(comments, userByName)}`;
+  const descHtml = `${contentToHtml(post.content || "", userByName)}${renderPolls(post.polls)}${meta ? `<br /><br /><small>${meta}</small>` : ""}${commentsToHtml(comments, userByName)}`;
   return `    <item>
       <title>${escapeXml(makeTitle(post))}</title>
       <link>${permalink}</link>
