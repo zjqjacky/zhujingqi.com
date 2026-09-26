@@ -5,8 +5,6 @@
 		<meta name="viewport"
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 		<meta name="description" content="Jacky 论坛 - 社区交流平台，发帖、评论与互动">
-		<!-- 纵深防御：限制脚本来源并收紧 connect-src，切断 XSS 向站外外发令牌的通道。
-		     更严格的安全响应头建议在 Cloudflare/反向代理层配置（GitHub Pages 无法设置响应头）。 -->
 		<meta http-equiv="Content-Security-Policy"
 			content="default-src 'self'; script-src 'self' 'unsafe-inline' https://zhujingqi.com; style-src 'self' 'unsafe-inline'; img-src * data: blob:; media-src * data: blob:; font-src 'self' data:; connect-src 'self' https://jqtljtnchkhzcxykfnoo.supabase.co; frame-src *; object-src 'none'; base-uri 'self'; form-action 'self'">
 		<title>Jacky 论坛 - Zhujingqi</title>
@@ -158,7 +156,6 @@
 				<div style="display:flex;gap:6px;margin-top:8px;">
 					<button id="insertImgBtn" type="button">插图</button>
 					<button id="insertMusicBtn" type="button">插入音乐</button>
-					<button id="insertPollBtn" type="button">投票</button>
 					<button id="editorEmojiBtn" class="emojiBtn" type="button" title="表情"><img src="emojis/happy.svg"
 							style="width:22px;height:22px;display:block;pointer-events:none;"></button>
 				</div>
