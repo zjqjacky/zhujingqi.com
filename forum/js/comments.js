@@ -95,7 +95,8 @@ async function renderComments(postId, container, comments, postAuthorId) {
 					collect(c);
 					for (const id of idsToDelete) {
 						try {
-							await apiDelete("/api/comments/" + id);
+							const del = await apiDelete("/api/comments/" + id);
+							applyCoinDelta(del && del.coinsDelta);
 						} catch (e) {
 							console.error(e);
 						}
@@ -182,6 +183,7 @@ async function openVotePeople(postId, kind) {
 async function addComment(postId, content, postAuthorId) {
 	const text = String(content || "").trim();
 	if (!text) return;
+	closeEmojiPicker();
 	try {
 		const result = await apiPost("/api/comments", {
 			postid: postId,
@@ -190,6 +192,7 @@ async function addComment(postId, content, postAuthorId) {
 			time: new Date().toISOString()
 		});
 		const commentId = result?.id || null;
+		applyCoinDelta(result && result.coinsDelta);
 		await notifyMentions(text, postId, commentId);
 		await createNotification({
 			targetId: postAuthorId,
@@ -220,6 +223,7 @@ async function addComment(postId, content, postAuthorId) {
 async function addReply(postId, parentId, content, postAuthorId, parentAuthorId) {
 	const text = String(content || "").trim();
 	if (!text) return;
+	closeEmojiPicker();
 	const replyContent = `[reply:${parentId}] ${sanitizePostHtml(text)}`;
 	try {
 		const result = await apiPost("/api/comments", {
@@ -229,6 +233,7 @@ async function addReply(postId, parentId, content, postAuthorId, parentAuthorId)
 			time: new Date().toISOString()
 		});
 		const commentId = result?.id || null;
+		applyCoinDelta(result && result.coinsDelta);
 		await notifyMentions(text, postId, commentId);
 		await createNotification({
 			targetId: postAuthorId,
@@ -287,11 +292,12 @@ async function likePost(id, postDiv) {
 	likeNumEl.textContent = likeCount;
 	dislikeNumEl.textContent = dislikeCount;
 	try {
-		await apiPost("/api/likes/toggle", {
+		const res = await apiPost("/api/likes/toggle", {
 			postid: id,
 			liker: currentUser.id,
 			type: hasLike ? 0 : 1
 		});
+		applyCoinDelta(res && res.coinsDelta);
 	} catch (e) {
 		console.error(e);
 		likeNumEl.textContent = prevLikeCount;
@@ -328,11 +334,12 @@ async function dislikePost(id, postDiv) {
 	likeNumEl.textContent = likeCount;
 	dislikeNumEl.textContent = dislikeCount;
 	try {
-		await apiPost("/api/likes/toggle", {
+		const res = await apiPost("/api/likes/toggle", {
 			postid: id,
 			liker: currentUser.id,
 			type: hasDislike ? 0 : -1
 		});
+		applyCoinDelta(res && res.coinsDelta);
 	} catch (e) {
 		console.error(e);
 		likeNumEl.textContent = prevLikeCount;
@@ -346,6 +353,7 @@ async function deletePost(id) {
 	modal(`
 						<strong>${t("modal_confirm_delete")}</strong><br>
 						<span style="font-size:14px;color:var(--sub);">${t("modal_irreversible")}</span>
+						${currentUser && !isAdmin(currentUser) ? `<br><span style="font-size:13px;color:#e0403f;">${t("modal_delete_coin_warn")}</span>` : ""}
 						<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;">
 							<button id="confirmDeleteBtn" style="background:#f66;color:#fff;">${t("modal_confirm_btn")}</button>
 						</div>
@@ -353,10 +361,11 @@ async function deletePost(id) {
 	$("confirmDeleteBtn").onclick = async () => {
 		$("closeModal").click();
 		try {
-			await apiDelete("/api/posts/" + id, {
+			const res = await apiDelete("/api/posts/" + id, {
 				userId: currentUser.id,
 				isAdmin: isAdmin(currentUser)
 			});
+			applyCoinDelta(res && res.coinsDelta);
 		} catch (e) {
 			console.error(e);
 		}

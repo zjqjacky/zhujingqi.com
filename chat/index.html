@@ -93,6 +93,9 @@
 			html,
 			body {
 				height: 100%;
+				/* 全站禁止横向滚动 */
+				overflow-x: hidden;
+				max-width: 100%;
 			}
 
 			body {
@@ -294,6 +297,7 @@
 				flex: 1;
 				min-height: 0;
 				overflow-y: auto;
+				overflow-x: hidden;
 				padding: 8px;
 			}
 
@@ -433,6 +437,7 @@
 				flex: 1;
 				min-height: 0;
 				overflow-y: auto;
+				overflow-x: hidden;
 				padding: 16px;
 				display: flex;
 				flex-direction: column;
@@ -495,6 +500,9 @@
 				display: flex;
 				width: 100%;
 				max-width: 100%;
+				/* 操作按钮放不下时换行显示，避免挤压气泡或横向溢出 */
+				flex-wrap: wrap;
+				align-items: flex-start;
 			}
 
 			.msg.mine {
@@ -509,7 +517,7 @@
 				display: block;
 				width: auto;
 				min-width: 0;
-				max-width: 560px;
+				max-width: min(560px, 100%);
 				padding: 12px 14px;
 				border-radius: 20px;
 				white-space: pre-wrap;
@@ -530,31 +538,96 @@
 				border-radius: 2px 20px 20px 20px;
 			}
 
-			.revokeBtn {
-				position: static;
-				background: rgba(255, 77, 79, .14);
-				color: #e23a3a;
-				border: 1px solid rgba(255, 77, 79, .25);
+			.bubble a.msgLink {
+				color: #2a7ae2;
+				text-decoration: underline;
+				overflow-wrap: anywhere;
+				word-break: break-all;
+			}
+
+			body.dark .bubble a.msgLink {
+				color: #6db3ff;
+			}
+
+			/* 消息操作按钮：圆形图标按钮（引用 / 分享 / 撤回） */
+			.revokeBtn,
+			.quoteBtn,
+			.shareBtn {
+				position: relative;
+				width: 30px;
+				height: 30px;
+				padding: 0;
+				border: none;
 				border-radius: 50%;
-				font-size: 12px;
-				padding: 3px 10px;
+				background-color: rgba(0, 0, 0, .06);
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
 				cursor: pointer;
 				opacity: 0;
 				pointer-events: none;
-				transition: 0.2s;
-				white-space: nowrap;
 				flex-shrink: 0;
-				margin-right: 4px;
-				backdrop-filter: blur(4px);
-				-webkit-backdrop-filter: blur(4px);
+				margin: 0 2px;
+				transition: opacity .2s, transform .15s, background-color .2s;
+				-webkit-tap-highlight-color: transparent;
 			}
 
-			.msg.mine:hover .revokeBtn {
-				opacity: 1;
-				pointer-events: auto;
+			.revokeBtn::after,
+			.quoteBtn::after,
+			.shareBtn::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				margin: auto;
+				width: 58%;
+				height: 58%;
+				background-color: currentColor;
+				-webkit-mask: var(--icon) center / contain no-repeat;
+				mask: var(--icon) center / contain no-repeat;
+				pointer-events: none;
+			}
+
+			.quoteBtn {
+				--icon: url("/chat/quote.svg");
+				color: rgba(0, 0, 0, .62);
+			}
+
+			.shareBtn {
+				--icon: url("/chat/share.svg");
+				color: rgba(0, 0, 0, .62);
+			}
+
+			.revokeBtn {
+				--icon: url("/chat/revoke.svg");
+				color: #e0403f;
+				background-color: rgba(224, 64, 63, .12);
+			}
+
+			.revokeBtn:hover,
+			.quoteBtn:hover,
+			.shareBtn:hover {
+				transform: scale(1.1);
+			}
+
+			.revokeBtn:active,
+			.quoteBtn:active,
+			.shareBtn:active {
+				transform: scale(.92);
+			}
+
+			body.dark .quoteBtn,
+			body.dark .shareBtn {
+				color: rgba(255, 255, 255, .78);
+				background-color: rgba(255, 255, 255, .1);
+			}
+
+			body.dark .revokeBtn {
+				color: #ff8a8a;
+				background-color: rgba(255, 120, 120, .16);
 			}
 
 			.replyCard {
+				display: flex;
+				align-items: center;
+				gap: 6px;
 				background: rgba(0, 0, 0, .04);
 				border-left: 3px solid rgba(0, 0, 0, .15);
 				border-radius: 4px;
@@ -563,16 +636,215 @@
 				font-size: 12px;
 				color: #888;
 				cursor: pointer;
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
 				max-width: 100%;
 				box-sizing: border-box;
 				transition: background .15s;
 			}
 
+			.replyCardAvatar {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex-shrink: 0;
+			}
+
+			.replyCardLabel {
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+			}
+
 			.replyCard:hover {
 				background: rgba(0, 0, 0, .08);
+			}
+
+			/* ===== 转发快照卡片（左头像 + 右气泡，仿聊天） ===== */
+			.shareCard {
+				display: flex;
+				align-items: flex-start;
+				gap: 8px;
+				max-width: 100%;
+				box-sizing: border-box;
+			}
+
+			.shareCardAvatar {
+				width: 34px;
+				height: 34px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex-shrink: 0;
+				cursor: pointer;
+				background: rgba(0, 0, 0, .06);
+			}
+
+			.shareCardBubble {
+				background: var(--other);
+				border: 1px solid var(--line);
+				border-radius: 2px 16px 16px 16px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+				padding: 9px 12px;
+				max-width: 100%;
+				min-width: 0;
+				box-sizing: border-box;
+				cursor: pointer;
+				transition: filter .15s;
+			}
+
+			.shareCardBubble:hover {
+				filter: brightness(.97);
+			}
+
+			.shareCardHead {
+				display: flex;
+				align-items: baseline;
+				gap: 6px;
+				margin-bottom: 3px;
+			}
+
+			.shareCardName {
+				font-size: 12px;
+				font-weight: 600;
+				color: var(--text);
+				opacity: .85;
+			}
+
+			.shareCardTag {
+				font-size: 10px;
+				color: #999;
+				border: 1px solid rgba(0, 0, 0, .12);
+				border-radius: 4px;
+				padding: 0 4px;
+				line-height: 15px;
+				flex-shrink: 0;
+			}
+
+			.shareCardText {
+				font-size: 14px;
+				color: var(--text);
+				white-space: pre-wrap;
+				overflow-wrap: anywhere;
+				word-break: break-word;
+				max-height: 4.9em;
+				overflow: hidden;
+			}
+
+			/* 转发内容里的图片（.msgEmoji 是行内表情，单独排除） */
+			.shareCardText img:not(.msgEmoji),
+			.shareFullBubble img:not(.msgEmoji) {
+				max-width: 100%;
+				max-height: 300px;
+				border-radius: 8px;
+				display: block;
+				margin: 4px 0;
+				cursor: zoom-in;
+			}
+
+			.sharePickRow {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 8px 6px;
+				border-radius: 8px;
+				cursor: pointer;
+			}
+
+			.sharePickRow:hover {
+				background: rgba(0, 0, 0, .05);
+			}
+
+			.sharePickRow img {
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex-shrink: 0;
+			}
+
+			.sharePickName {
+				font-size: 14px;
+				color: var(--text);
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+			}
+
+			.sharePickEmpty {
+				font-size: 13px;
+				color: #999;
+				padding: 10px 6px;
+			}
+
+			.shareDetailText {
+				white-space: pre-wrap;
+				word-break: break-word;
+				font-size: 14px;
+				color: var(--text);
+				background: rgba(0, 0, 0, .04);
+				border-radius: 8px;
+				padding: 10px;
+				margin-top: 10px;
+				max-height: 50vh;
+				overflow: auto;
+			}
+
+			/* ===== 转发详情：微信式聊天视图 ===== */
+			.shareDetailWrap {
+				display: block;
+			}
+
+			.shareTimeLine {
+				text-align: center;
+				font-size: 12px;
+				color: #999;
+				margin: 2px 0 14px;
+			}
+
+			.shareTimePill {
+				display: inline-block;
+				background: rgba(0, 0, 0, .06);
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-size: 11px;
+				color: #999;
+			}
+
+			.shareFullRow {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+			}
+
+			.shareFullRow + .shareFullRow {
+				margin-top: 14px;
+			}
+
+			.shareFullBody {
+				min-width: 0;
+				max-width: 100%;
+			}
+
+			.shareFullName {
+				font-size: 12px;
+				color: var(--sub, #999);
+				margin-bottom: 4px;
+			}
+
+			.shareFullBubble {
+				display: block;
+				background: var(--other);
+				border: 1px solid var(--line);
+				border-radius: 2px 16px 16px 16px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+				padding: 10px 13px;
+				font-size: 14px;
+				color: var(--text);
+				white-space: pre-wrap;
+				overflow-wrap: anywhere;
+				word-break: break-word;
+				box-sizing: border-box;
 			}
 
 			.replyPreview {
@@ -614,27 +886,12 @@
 				color: #333;
 			}
 
-			.quoteBtn {
-				position: static;
-				background: rgba(0, 0, 0, .06);
-				color: var(--text);
-				border: 1px solid rgba(0, 0, 0, .1);
-				border-radius: 50%;
-				font-size: 12px;
-				padding: 3px 10px;
-				cursor: pointer;
-				opacity: 0;
-				pointer-events: none;
-				transition: 0.2s;
-				white-space: nowrap;
-				flex-shrink: 0;
-				margin-left: 4px;
-				backdrop-filter: blur(4px);
-				-webkit-backdrop-filter: blur(4px);
-			}
-
 			.msg:hover .quoteBtn,
-			.msg:hover .revokeBtn {
+			.msg:hover .revokeBtn,
+			.msg:hover .shareBtn,
+			.msg.showActions .quoteBtn,
+			.msg.showActions .revokeBtn,
+			.msg.showActions .shareBtn {
 				opacity: 1;
 				pointer-events: auto;
 			}
@@ -736,6 +993,7 @@
 				gap: 14px;
 				height: 100%;
 				overflow-y: auto;
+				overflow-x: hidden;
 			}
 
 			.section {
@@ -1515,6 +1773,12 @@
 					<input id="regNickname" maxlength="20" placeholder="昵称（选填，可随时修改）">
 					<input id="regPass" type="password" placeholder="密码">
 					<input id="regPass2" type="password" placeholder="再次输入密码">
+					<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+						<span class="muted">验证：</span>
+						<b id="regCaptchaQuestion">…</b>
+						<input id="regCaptchaAnswer" style="width:90px;" placeholder="结果" inputmode="numeric">
+						<button id="regCaptchaRefresh" type="button" style="width:auto;">换一题</button>
+					</div>
 					<button id="registerBtn">注册</button>
 					<button id="backLoginBtn">返回登录</button>
 				</div>
@@ -1922,9 +2186,18 @@
 					else mq.addListener(onChange);
 				}
 
-				async function hash(text) {
-					const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-					return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+				let regCaptchaToken = "";
+				async function loadRegisterCaptcha() {
+					regCaptchaToken = "";
+					const q = $("regCaptchaQuestion");
+					if (q) q.textContent = "…";
+					try {
+						const data = await apiGet("/api/auth/captcha");
+						regCaptchaToken = data && data.token ? data.token : "";
+						if (q) q.textContent = data && data.question ? data.question : "加载失败";
+					} catch {
+						if (q) q.textContent = "加载失败";
+					}
 				}
 
 				function pairKey(a, b) {
@@ -2182,26 +2455,397 @@
 				$("replyPreview").classList.add("show");
 				$("msgInput").focus();
 			}
+
+			/* ===== 转发快照（类似微信转发聊天记录：只转述内容，不依赖原对话） ===== */
+			const SHARE_MAX_BYTES = 2200;
+			const SHARE_RE = /^\[share:([A-Za-z0-9_-]+)\]/;
+
+			// 按 UTF-8 字节截断（emoji 占 4 字节），并按码点遍历避免切碎代理对
+			function truncateByBytes(text, maxBytes) {
+				const enc = new TextEncoder();
+				if (enc.encode(text).length <= maxBytes) return text;
+				let out = "";
+				let bytes = 0;
+				for (const ch of text) {
+					const b = enc.encode(ch).length;
+					if (bytes + b > maxBytes - 3) break;
+					out += ch;
+					bytes += b;
+				}
+				return out + "…";
+			}
+
+			// 去掉引用标记与嵌套快照，避免转出去后显示为“已删除”或套娃
+			function stripForForward(text) {
+				return (text || "")
+					.replace(/\[reply:\d+\]/g, "")
+					.replace(/\[share:[A-Za-z0-9_-]+\]/g, "[转发消息]")
+					.trim();
+			}
+
+			function encodeShareSnapshot(obj) {
+				const bytes = new TextEncoder().encode(JSON.stringify(obj));
+				let bin = "";
+				for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+				return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+			}
+
+			function decodeShareSnapshot(b64) {
+				try {
+					const bin = atob(b64.replace(/-/g, "+").replace(/_/g, "/"));
+					const bytes = new Uint8Array(bin.length);
+					for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+					const o = JSON.parse(new TextDecoder().decode(bytes));
+					return (o && typeof o === "object") ? o : null;
+				} catch {
+					return null;
+				}
+			}
+
+			function findUserIdByName(name) {
+				const t = String(name || "").trim().toLowerCase();
+				if (!t) return null;
+				const hit = (userCache || []).find(u => u && (
+					String(u.nickname || "").trim().toLowerCase() === t ||
+					String(u.name || "").trim().toLowerCase() === t
+				));
+				return hit ? Number(hit.id) : null;
+			}
+
+			// 旧版快照没有 sid，按昵称反查兜底
+			function shareSenderId(snap) {
+				const sid = Number(snap && snap.sid);
+				if (Number.isInteger(sid) && sid > 0) return sid;
+				return findUserIdByName(snap && snap.n);
+			}
+
+			function buildShareCard(snap) {
+				const card = document.createElement("div");
+				card.className = "shareCard";
+
+				const av = document.createElement("img");
+				av.className = "shareCardAvatar";
+				av.alt = "";
+				av.loading = "lazy";
+				av.title = snap.n || "";
+				if (snap.a) av.src = snap.a;
+				av.onerror = function() { this.style.visibility = "hidden"; };
+				// 头像可点击：打开该用户资料（与聊天窗口里点头像一致）
+				av.onclick = (e) => {
+					e.stopPropagation();
+					const sid = shareSenderId(snap);
+					if (sid) openContactDrawer(sid);
+					else toast("无法定位该用户（可能已注销或改名）");
+				};
+				card.appendChild(av);
+
+				const bubble = document.createElement("div");
+				bubble.className = "shareCardBubble";
+
+				const head = document.createElement("div");
+				head.className = "shareCardHead";
+				const nm = document.createElement("span");
+				nm.className = "shareCardName";
+				nm.textContent = snap.n || "未知用户";
+				head.appendChild(nm);
+				const tag = document.createElement("span");
+				tag.className = "shareCardTag";
+				tag.textContent = "转发";
+				head.appendChild(tag);
+				bubble.appendChild(head);
+
+				const tx = document.createElement("div");
+				tx.className = "shareCardText";
+				// 走富文本解析：:emoji: 与 [img:] 正常显示，不做链接化
+				tx.appendChild(buildRichText(snap.t || ""));
+				bubble.appendChild(tx);
+
+				bubble.onclick = (e) => {
+					e.stopPropagation();
+					openShareDetail(snap);
+				};
+				card.appendChild(bubble);
+				return card;
+			}
+
+			// 详情：微信式——一条真实聊天记录（左侧头像、右侧气泡）
+			function openShareDetail(snap) {
+				openModal("转发的消息", "");
+				const box = $("modalText");
+				box.innerHTML = "";
+				const wrap = document.createElement("div");
+				wrap.className = "shareDetailWrap";
+
+				if (snap.ts) {
+					const d = new Date(snap.ts);
+					if (!isNaN(d.getTime())) {
+						const line = document.createElement("div");
+						line.className = "shareTimeLine";
+						const pill = document.createElement("span");
+						pill.className = "shareTimePill";
+						pill.textContent = d.toLocaleString("zh-CN", {
+							month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
+						});
+						line.appendChild(pill);
+						wrap.appendChild(line);
+					}
+				}
+
+				const row = document.createElement("div");
+				row.className = "shareFullRow";
+
+				const av = document.createElement("img");
+				av.className = "shareCardAvatar";
+				av.alt = "";
+				if (snap.a) av.src = snap.a;
+				av.onerror = function() { this.style.visibility = "hidden"; };
+				const sid = shareSenderId(snap);
+				if (sid) {
+					av.style.cursor = "pointer";
+					av.onclick = () => {
+						closeModal();
+						openContactDrawer(sid);
+					};
+				}
+				row.appendChild(av);
+
+				const body = document.createElement("div");
+				body.className = "shareFullBody";
+
+				const nm = document.createElement("div");
+				nm.className = "shareFullName";
+				nm.textContent = snap.n || "未知用户";
+				body.appendChild(nm);
+
+				const bubble = document.createElement("div");
+				bubble.className = "shareFullBubble";
+				bubble.appendChild(buildRichText(snap.t || ""));
+				body.appendChild(bubble);
+
+				row.appendChild(body);
+				wrap.appendChild(row);
+				box.appendChild(wrap);
+			}
+
+			// 可转发对象：已通过好友申请的人（后端要求双方为好友）
+			function shareTargets() {
+				return getContactUserIds()
+					.map(id => ({ id: id, user: getUserById(id), row: getContactRow(id) }))
+					.filter(x => x.user && x.row && !x.row.pending);
+			}
+
+			function forwardMessageTo(targetId, msg) {
+				const sender = getUserById(msg.sender_id);
+				let text = stripForForward(msg.content);
+				if (!text) return toast("这条消息没有可转发的内容");
+				text = truncateByBytes(text, SHARE_MAX_BYTES);
+				const isOwn = Number(msg.sender_id) === Number(currentUser.id);
+				const snap = {
+					n: getDisplayName(sender),
+					a: getAvatar(sender),
+					sid: Number(msg.sender_id) || null,
+					t: text,
+					f: isOwn ? null : getDisplayName(getUserById(currentChatUserId)),
+					ts: msg.time || null
+				};
+				const content = "[share:" + encodeShareSnapshot(snap) + "]";
+				if (content.length > 3900) return toast("消息过长，无法转发");
+				return apiPost("/api/chat/messages", { receiver_id: targetId, content })
+					.then(() => {
+						const sameChat = Number(targetId) === Number(currentChatUserId);
+						toast(sameChat ? "已转发到当前会话" : "已转发");
+						closeModal();
+						if (sameChat) renderChatMessages();
+						else refreshUnreadCache();
+					})
+					.catch(err => {
+						if (err && err.message === "JWT_EXPIRED") return;
+						toast("转发失败：" + (err && err.message ? err.message : "未知错误"));
+					});
+			}
+
+			function openSharePicker(msg) {
+				if (!currentUser) return;
+				const targets = shareTargets();
+				const selfName = getDisplayName(currentUser);
+				const sameChat = Number(currentChatUserId) === Number(msg.sender_id);
+
+				let html = '<input id="shareSearch" placeholder="搜索好友" ' +
+					'style="width:100%;box-sizing:border-box;padding:8px 10px;margin-bottom:8px;' +
+					'border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)">';
+				html += '<div id="shareList" style="max-height:46vh;overflow:auto;"></div>';
+				openModal("分享消息", html);
+
+				const list = $("shareList");
+				const paint = (kw) => {
+					const k = (kw || "").trim().toLowerCase();
+					const rows = targets.filter(x => {
+						if (!k) return true;
+						const u = x.user;
+						return [u && u.name, u && u.nickname, u && getDisplayName(u)]
+							.filter(Boolean).join(" ").toLowerCase().includes(k);
+					});
+					list.innerHTML = "";
+					if (!rows.length) {
+						const e0 = document.createElement("div");
+						e0.className = "sharePickEmpty";
+						e0.textContent = targets.length ? "没有匹配的好友" : "你还没有可以转发的好友";
+						list.appendChild(e0);
+						return;
+					}
+					rows.forEach(x => {
+						const u = x.user;
+						const rowEl = document.createElement("div");
+						rowEl.className = "sharePickRow";
+						const av = document.createElement("img");
+						av.alt = "";
+						av.src = getAvatar(u);
+						av.onerror = function() { this.src = DEFAULT_AVATAR; };
+						const nm = document.createElement("div");
+						nm.className = "sharePickName";
+						const note = document.createElement("span");
+						note.style.color = "#999";
+						note.style.fontSize = "12px";
+						note.textContent = Number(x.id) === Number(currentChatUserId)
+							? "（当前会话）" : "";
+						nm.textContent = getDisplayName(u);
+						nm.appendChild(note);
+						rowEl.appendChild(av);
+						rowEl.appendChild(nm);
+						rowEl.onclick = () => forwardMessageTo(x.id, msg);
+						list.appendChild(rowEl);
+					});
+				};
+				paint("");
+				$("shareSearch").oninput = (e) => paint(e.target.value);
+			}
 			document.addEventListener("click", () => {
 				closeUserMenu();
 				$("meMenu").classList.add("closed");
 			});
 
-				function buildMessageFragment(text) {
-					const frag = document.createDocumentFragment();
-					let mainText = text;
-					const replyMatch = text.match(/^\[reply:(\d+)\]/);
+				function linkifyChatUrls(root) {
+					if (!root) return;
+					const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+					const nodes = [];
+					while (walker.nextNode()) nodes.push(walker.currentNode);
+					for (const node of nodes) {
+						if (!node.parentElement) continue;
+						if (node.parentElement.closest("a,.replyCard,script,style")) continue;
+						const text = node.nodeValue;
+						if (!text) continue;
+						const reg = /(^|[\s(])((?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?(?:\/[^\s<>"']*)?)/gi;
+						let m;
+						let hit = false;
+						while ((m = reg.exec(text))) { hit = true; }
+						if (!hit) continue;
+						reg.lastIndex = 0;
+						const frag = document.createDocumentFragment();
+						let last = 0;
+						while ((m = reg.exec(text))) {
+							const prefix = m[1] || "";
+							const url = m[2];
+							const before = text.slice(last, m.index);
+							if (before) frag.appendChild(document.createTextNode(before));
+							if (prefix) frag.appendChild(document.createTextNode(prefix));
+							const href = /^https?:\/\//i.test(url) ? url : "https://" + url;
+							const a = document.createElement("a");
+							a.href = href;
+							a.target = "_blank";
+							a.rel = "noopener noreferrer";
+							a.className = "msgLink";
+							a.textContent = url;
+							frag.appendChild(a);
+							last = m.index + m[0].length;
+						}
+						const tail = text.slice(last);
+						if (tail) frag.appendChild(document.createTextNode(tail));
+						node.parentNode.replaceChild(frag, node);
+					}
+				}
+
+			// 富文本解析：把 :emoji: 转成图片、[img:url] 转成图片，其余按纯文本
+			// target 传入时追加到已有 fragment（保留前面已加入的转发/引用卡片）
+			function buildRichText(text, target) {
+				const frag = target || document.createDocumentFragment();
+				const src0 = String(text || "");
+				const re = /(:([a-zA-Z0-9_-]+):|\[img:([^\]]+)\])/g;
+				let last = 0;
+				let match;
+				while ((match = re.exec(src0)) !== null) {
+					if (match.index > last) {
+						frag.appendChild(document.createTextNode(src0.slice(last, match.index)));
+					}
+					if (match[2]) {
+						const code = match[2].toLowerCase();
+						const src = EMOJIS[code];
+						if (src) {
+							const img = document.createElement("img");
+							img.className = "msgEmoji";
+							img.src = src;
+							img.alt = code;
+							img.draggable = false;
+							frag.appendChild(img);
+						} else {
+							frag.appendChild(document.createTextNode(match[0]));
+						}
+					} else if (match[3]) {
+						const url = match[3].trim();
+						const img = document.createElement("img");
+						img.className = "chatImage";
+						img.src = url;
+						img.alt = "";
+						img.loading = "lazy";
+						img.onclick = (e) => { e.stopPropagation(); openViewer(url); };
+						frag.appendChild(img);
+					}
+					last = re.lastIndex;
+				}
+				if (last < src0.length) {
+					frag.appendChild(document.createTextNode(src0.slice(last)));
+				}
+				return frag;
+			}
+
+			function buildMessageFragment(text) {
+				const frag = document.createDocumentFragment();
+				let mainText = text;
+				const shareMatch = text.match(SHARE_RE);
+				if (shareMatch) {
+					mainText = text.slice(shareMatch[0].length);
+					const snap = decodeShareSnapshot(shareMatch[1]);
+					if (snap) {
+						frag.appendChild(buildShareCard(snap));
+					} else {
+						const bad = document.createElement("div");
+						bad.className = "shareCardBubble";
+						bad.style.opacity = ".7";
+						bad.textContent = "[转发的消息已失效]";
+						frag.appendChild(bad);
+					}
+				}
+				const replyMatch = mainText.match(/^\[reply:(\d+)\]/);
 					if (replyMatch) {
 						const rid = Number(replyMatch[1]);
-						mainText = text.slice(replyMatch[0].length);
+						mainText = mainText.slice(replyMatch[0].length);
 						const orig = currentChatMessages.find(m => Number(m.id) === rid);
 						const card = document.createElement("div");
 						card.className = "replyCard";
-						if (orig) {
-							const name = getDisplayName(getUserById(orig.sender_id));
-							const preview = (orig.content || "").replace(/\[reply:\d+\]/g, "").slice(0, 30);
-							card.textContent = "> " + name + ": " + preview + ((orig.content || "").length > 30 ? "..." : "");
-							card.onclick = (e) => {
+					if (orig) {
+						const name = getDisplayName(getUserById(orig.sender_id));
+						const preview = (orig.content || "").replace(/\[reply:\d+\]/g, "").slice(0, 30);
+						const av = document.createElement("img");
+						av.className = "replyCardAvatar";
+						av.alt = "";
+						av.loading = "lazy";
+						av.src = getAvatar(getUserById(orig.sender_id));
+						av.onerror = function() { this.style.display = "none"; };
+						card.appendChild(av);
+						const label = document.createElement("span");
+						label.className = "replyCardLabel";
+						label.textContent = "> " + name + ": " + preview + ((orig.content || "").length > 30 ? "..." : "");
+						card.appendChild(label);
+						card.onclick = (e) => {
 								e.stopPropagation();
 								const target = document.querySelector(`.msg[data-id="${rid}"]`);
 								if (target) {
@@ -2215,43 +2859,8 @@
 						}
 						frag.appendChild(card);
 					}
-					const re = /(:([a-zA-Z0-9_-]+):|\[img:([^\]]+)\])/g;
-					let last = 0;
-					let match;
-					while ((match = re.exec(mainText)) !== null) {
-						if (match.index > last) {
-							frag.appendChild(document.createTextNode(mainText.slice(last, match.index)));
-						}
-						if (match[2]) {
-							const code = match[2].toLowerCase();
-							const src = EMOJIS[code];
-							if (src) {
-								const img = document.createElement("img");
-								img.className = "msgEmoji";
-								img.src = src;
-								img.alt = code;
-								img.draggable = false;
-								frag.appendChild(img);
-							} else {
-								frag.appendChild(document.createTextNode(match[0]));
-							}
-						} else if (match[3]) {
-							const url = match[3].trim();
-							const img = document.createElement("img");
-							img.className = "chatImage";
-							img.src = url;
-							img.alt = "";
-							img.loading = "lazy";
-							img.onclick = (e) => { e.stopPropagation(); openViewer(url); };
-							frag.appendChild(img);
-						}
-						last = re.lastIndex;
-					}
-					if (last < mainText.length) {
-						frag.appendChild(document.createTextNode(mainText.slice(last)));
-					}
-					return frag;
-				}
+					return buildRichText(mainText, frag);
+			}
 
 				function renderMessage(m) {
 					const mine = Number(m.sender_id) === Number(currentUser.id);
@@ -2264,30 +2873,57 @@
 					bubble.className = "bubble";
 					const frag = buildMessageFragment(m.content || "");
 					bubble.appendChild(frag);
-					const quoteBtn = document.createElement("button");
-					quoteBtn.className = "quoteBtn";
-					quoteBtn.textContent = "引用";
-					quoteBtn.onclick = (e) => {
+					linkifyChatUrls(bubble);
+				const quoteBtn = document.createElement("button");
+				quoteBtn.className = "quoteBtn";
+				quoteBtn.type = "button";
+				quoteBtn.title = "引用";
+				quoteBtn.setAttribute("aria-label", "引用");
+				quoteBtn.onclick = (e) => {
+					e.stopPropagation();
+					setReply(m.id);
+				};
+				const shareBtn = document.createElement("button");
+				shareBtn.className = "shareBtn";
+				shareBtn.type = "button";
+				shareBtn.title = "分享";
+				shareBtn.setAttribute("aria-label", "分享");
+				shareBtn.onclick = (e) => {
+					e.stopPropagation();
+					openSharePicker(m);
+				};
+				if (mine) {
+					const btn = document.createElement("button");
+					btn.className = "revokeBtn";
+					btn.type = "button";
+					btn.title = "撤回";
+					btn.setAttribute("aria-label", "撤回");
+					btn.onclick = (e) => {
 						e.stopPropagation();
-						setReply(m.id);
+						// 防误触：先确认再撤回
+						openModal("撤回消息",
+							'<div style="font-size:14px;line-height:1.8;">撤回后对方将无法再看到这条消息。<br>确定要撤回吗？</div>',
+							{
+								confirm: true,
+								okText: "撤回",
+								onOk: async () => {
+									try {
+										await apiDelete("/api/chat/messages/" + m.id);
+									} catch (err) {
+										if (err && err.message === "JWT_EXPIRED") return;
+										toast("撤回失败：" + (err && err.message ? err.message : "未知错误"));
+										return;
+									}
+									msg.remove();
+									avatar.remove();
+									toast("已撤回");
+								}
+							});
 					};
-					if (mine) {
-						const btn = document.createElement("button");
-						btn.className = "revokeBtn";
-						btn.textContent = "撤回";
-						btn.onclick = async (e) => {
-							e.stopPropagation();
-							try {
-								await apiDelete("/api/chat/messages/" + m.id);
-							} catch (err) {
-								return toast("撤回失败：" + err.message);
-							}
-							msg.remove();
-							avatar.remove();
-						};
-						msg.appendChild(btn);
-						msg.appendChild(quoteBtn);
-						msg.appendChild(bubble);
+					msg.appendChild(btn);
+					msg.appendChild(quoteBtn);
+					msg.appendChild(shareBtn);
+					msg.appendChild(bubble);
 						row.appendChild(msg);
 						const avatar = document.createElement("img");
 						avatar.className = "msgAvatar";
@@ -2305,8 +2941,16 @@
 						row.appendChild(avatar);
 						msg.appendChild(bubble);
 						msg.appendChild(quoteBtn);
+						msg.appendChild(shareBtn);
 						row.appendChild(msg);
 					}
+					// 触屏没有 hover：点一下消息唤出「引用/分享/撤回」
+					msg.addEventListener("click", (e) => {
+						if (e.target.closest("button")) return;
+						const opened = msg.classList.contains("showActions");
+						document.querySelectorAll(".msg.showActions").forEach(x => x.classList.remove("showActions"));
+						if (!opened) msg.classList.add("showActions");
+					});
 					return row;
 				}
 
@@ -2324,7 +2968,6 @@
 					item.onclick = (e) => {
 						e.stopPropagation();
 						insertEmoji(`:${code}:`);
-						panel.classList.add("closed");
 					};
 					panel.appendChild(item);
 				}
@@ -2347,6 +2990,7 @@
 				if (!panel) return;
 				panel.classList.toggle("closed");
 			}
+			// 点击面板外区域收起；插入表情时不关闭（便于连续输入）。
 			$("emojiBtn").onclick = (e) => {
 				e.stopPropagation();
 				toggleEmojiPanel();
@@ -2434,6 +3078,7 @@
 					currentChatUserId = Number(userId);
 					mobileChatMode = true;
 					showPage("pageChat");
+					cancelReply();
 
 					updateChatLayout();
 					const other = getUserById(userId);
@@ -2718,6 +3363,8 @@
 					if (!currentChatUserId) return;
 					const txt = $("msgInput").value.trim();
 					if (!txt) return;
+					const emojiPanelEl = $("emojiPanel");
+					if (emojiPanelEl) emojiPanelEl.classList.add("closed");
 					const other = Number(currentChatUserId);
 					const total = chatTotals[other] || 0;
 					if (total >= 500) {
@@ -2735,7 +3382,10 @@
 						return;
 					}
 					const now = new Date().toISOString();
-					const content = replyToId ? `[reply:${replyToId}]${txt}` : txt;
+					// 引用兜底：被引用的消息若已不在当前会话中（如撤回/删除），则丢弃引用，避免发出后显示为“已删除”
+					const quoteStillValid = replyToId &&
+						currentChatMessages.some(m => Number(m.id) === Number(replyToId));
+					const content = quoteStillValid ? `[reply:${replyToId}]${txt}` : txt;
 					try {
 						await apiPost("/api/chat/messages", { receiver_id: other, content });
 					} catch (e) {
@@ -2780,10 +3430,9 @@
 					const u = $("loginUser").value.trim();
 					const p = $("loginPass").value.trim();
 					if (!u || !p) return openModal("提示", "请输入账号密码");
-					const passHash = await hash(p);
 					let data;
 					try {
-						data = await apiPost("/api/auth/login", { name: u, pass: passHash });
+						data = await apiPost("/api/auth/login", { name: u, pass: p });
 					} catch (e) {
 						const m = e.message;
 						if (/not found/i.test(m)) return openModal("登录失败", "用户不存在");
@@ -2815,16 +3464,21 @@
 						"账号名只允许字母、数字、- 和 _");
 					if (/jacky|admin/i.test(u)) return openModal("注册失败", "请勿有冒充管理员的想法");
 					if (nicknameWidth(nick) > NICKNAME_MAX_WIDTH) return openModal("注册失败", "昵称最长 10 个中文或 20 个西文字符");
-					const passHash = await hash(p1);
+					const captchaAnswer = ($("regCaptchaAnswer").value || "").trim();
+					if (!regCaptchaToken) return openModal("注册失败", "验证未就绪，请点击「换一题」重试");
+					if (!/^\d{1,6}$/.test(captchaAnswer)) return openModal("注册失败", "请输入验证题的数字结果");
 					try {
 						await apiPost("/api/auth/register", {
 							name: u,
 							nickname: nick || null,
-							pass: passHash,
-							time: new Date().toISOString()
+							pass: p1,
+							captcha_token: regCaptchaToken,
+							captcha_answer: captchaAnswer
 						});
 					} catch (e) {
 						const m = e.message;
+						loadRegisterCaptcha();
+						if (/captcha/i.test(m)) return openModal("注册失败", "验证码错误，请重新作答");
 						if (/reserved/i.test(m)) return openModal("注册失败", "请勿有冒充管理员的想法");
 						if (/nickname/i.test(m)) return openModal("注册失败", "该昵称已被使用");
 						if (/exists/i.test(m)) return openModal("注册失败", "账号名已被注册");
@@ -2834,6 +3488,7 @@
 					if ($("regNickname")) $("regNickname").value = "";
 					$("regPass").value = "";
 					$("regPass2").value = "";
+					$("regCaptchaAnswer").value = "";
 					openModal("注册成功", "可以返回登录了。");
 				}
 
@@ -2991,7 +3646,8 @@
 					}
 				);
 			};
-				$("showRegisterBtn").onclick = () => show("registerPage");
+				$("showRegisterBtn").onclick = () => { show("registerPage"); loadRegisterCaptcha(); };
+				$("regCaptchaRefresh").onclick = loadRegisterCaptcha;
 				$("backLoginBtn").onclick = () => show("welcomePage");
 				$("loginBtn").onclick = doLogin;
 				$("registerBtn").onclick = doRegister;

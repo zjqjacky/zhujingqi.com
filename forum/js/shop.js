@@ -364,3 +364,16 @@ function openCardBgEditor(user) {
 					}, 3000);
 				}
 
+				// 金币变动统一入口：delta 由服务端返回，前端只负责更新本地余额并弹窗
+				function applyCoinDelta(delta) {
+					if (!currentUser || typeof delta !== "number" || delta === 0) return;
+					currentUser.coins = (currentUser.coins || 0) + delta;
+					showCoinDelta(delta);
+				}
+
+				// 只弹窗、不改余额：用于服务端已返回新余额（抽奖 / 买背景）的场景
+				function showCoinDelta(delta) {
+					if (typeof delta !== "number" || delta === 0) return;
+					showCoinMsg(delta > 0 ? t("coin_add", delta) : t("coin_sub", Math.abs(delta)));
+				}
+

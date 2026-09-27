@@ -43,6 +43,10 @@ emojiPicker.innerHTML = EMOJI_MAP.map(name =>
 ).join("");
 let emojiTargetInput = null;
 
+function closeEmojiPicker() {
+	if (emojiPicker) emojiPicker.classList.remove("show");
+}
+
 function positionEmojiPicker(btn) {
 	const rect = btn.getBoundingClientRect();
 	let top = rect.bottom + 4;
@@ -96,5 +100,5 @@ emojiPicker.addEventListener("click", e => {
 	input.dispatchEvent(new Event("input", {
 		bubbles: true
 	}));
-	emojiPicker.classList.remove("show");
+	// 选中表情后不再自动关闭，便于连续插入。
 });

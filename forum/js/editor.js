@@ -75,8 +75,8 @@ function openImagePicker() {
 					`);
 	$("imgApplyBtn").onclick = () => {
 		const url = $("imgUrlInput").value.trim();
-		if (!url) return modal(t("img_enter_url"));
-		if (!/^https?:\/\//i.test(url)) return modal(t("img_invalid_url"));
+		if (!url) return modalError(t("img_enter_url"));
+		if (!/^https?:\/\//i.test(url)) return modalError(t("img_invalid_url"));
 		const textArea = $("text");
 		textArea.value += (textArea.value ? "\n" : "") + `[img:${url}]` + "\n";
 		$("modal").classList.add("hidden");
@@ -98,19 +98,19 @@ function openMusicPicker() {
 					`);
 	$("musicApplyBtn").onclick = () => {
 		const url = $("musicUrlInput").value.trim();
-		if (!url) return modal(t("music_enter_url"));
+		if (!url) return modalError(t("music_enter_url"));
 		const textArea = $("text");
 		let marker;
 		if (/music\.163\.com/i.test(url)) {
 			const idMatch = url.match(/id=(\d+)/);
-			if (!idMatch) return modal(t("music_no_id"));
+			if (!idMatch) return modalError(t("music_no_id"));
 			marker = `[[music:netease:${idMatch[1]}]]`;
 		} else if (/y\.qq\.com/i.test(url)) {
 			const idMatch = url.match(/songid=(\d+)/);
-			if (!idMatch) return modal(t("music_no_id"));
+			if (!idMatch) return modalError(t("music_no_id"));
 			marker = `[[music:qq:${idMatch[1]}]]`;
 		} else {
-			return modal(t("music_invalid"));
+			return modalError(t("music_invalid"));
 		}
 		textArea.value += (textArea.value ? "\n" : "") + marker + "\n";
 		$("modal").classList.add("hidden");
@@ -267,16 +267,21 @@ function openPostBgPicker() {
 	$("bgApplyBtn").onclick = async () => {
 		if (!picked) return;
 		if ((currentUser.coins || 0) < POST_BG_COST) {
-			return modal(t("coins_insufficient"));
+			return modalError(t("coins_insufficient"));
 		}
+		const bgBefore = currentUser.coins || 0;
 		try {
 			const res = await apiPost("/api/shop/background", {
 				color: picked
 			});
-			if (res && typeof res.coins === "number" && currentUser) currentUser.coins = res.coins;
+			if (res && typeof res.coins === "number" && currentUser) {
+				currentUser.coins = res.coins;
+				// 购买背景扣金币的提示（服务端已返回新余额，这里只弹窗）
+				showCoinDelta(res.coins - bgBefore);
+			}
 		} catch (e) {
 			if (e.message === "JWT_EXPIRED") return;
-			return modal(t("coins_insufficient"));
+			return modalError(t("coins_insufficient"));
 		}
 		selectedPostBg = picked;
 		$("bgBuyBtn").textContent = t("editor_bg_used");
@@ -296,9 +301,8 @@ function openPollPicker() {
 		'<button id="pollAddOption" class="pollAddBtn" type="button">+ ' + t("poll_add_option") + "</button>" +
 		'<label class="pollSetRow"><input type="checkbox" id="pollAnon"> ' + t("poll_anonymous") + "</label>" +
 		'<div class="pollSetRow" id="pollVotersRow"><span>' + t("poll_show_voters") + '</span><select id="pollVoters">' +
-		'<option value="author">' + t("poll_voters_author") + "</option>" +
 		'<option value="all">' + t("poll_voters_all") + "</option>" +
-		'<option value="none">' + t("poll_voters_none") + "</option>" +
+		'<option value="author">' + t("poll_voters_author") + "</option>" +
 		"</select></div>" +
 		'<div class="pollSetRow"><span>' + t("poll_deadline") + '</span><input type="datetime-local" id="pollDeadline"></div>' +
 		'<div style="margin-top:14px;text-align:center;"><button id="pollCreateBtn">' + t("poll_create") + "</button></div>"
@@ -321,11 +325,24 @@ function openPollPicker() {
 	};
 	$("pollAnon").onchange = syncVotersRow;
 	syncVotersRow();
+	// 用户开始修改时清掉错误提示
+	const clearPollError = () => {
+		const e = $("modalText").querySelector(".modalError");
+		if (e) e.remove();
+	};
+	box.addEventListener("input", clearPollError);
+	["pollAnon", "pollVoters", "pollDeadline"].forEach(id => {
+		const el = $(id);
+		if (el) el.addEventListener("change", clearPollError);
+	});
+	$("pollAddOption").addEventListener("click", clearPollError);
 	$("pollCreateBtn").onclick = () => {
 		const options = [...box.querySelectorAll(".pollOptionInput")]
 			.map(i => i.value.trim().replace(/[<>]/g, ""))
 			.filter(Boolean);
-		if (options.length < 2) return modal(t("poll_need_two"));
+		// 校验失败只提示，不关闭弹窗，保留已填写的选项
+		if (options.length < 2) return modalError(t("poll_need_two"));
+		if (new Set(options).size !== options.length) return modalError(t("poll_dup_option"));
 		const settings = {
 			anonymous: $("pollAnon").checked,
 			show_voters: $("pollVoters").value,
@@ -375,9 +392,8 @@ function renderPollCard(poll, postId, pollIndex, authorId) {
 	if (showResults && Array.isArray(poll.voters) && poll.voters.some(a => a && a.length)) {
 		actions += '<span class="pollVotersLink">' + t("poll_voters_title") + "</span>";
 	}
-	if (isAuthor) {
-		if (!ended) actions += '<span class="pollEndBtn">' + t("poll_end") + "</span>";
-		actions += '<span class="pollSettingsBtn">' + t("poll_settings") + "</span>";
+	if (isAuthor && !ended) {
+		actions += '<span class="pollEndBtn">' + t("poll_end") + "</span>";
 	}
 
 	const card = document.createElement("div");
@@ -402,9 +418,11 @@ function renderPollCard(poll, postId, pollIndex, authorId) {
 	const votersLink = card.querySelector(".pollVotersLink");
 	if (votersLink) votersLink.onclick = () => showPollVoters(poll);
 	const endBtn = card.querySelector(".pollEndBtn");
-	if (endBtn) endBtn.onclick = () => setPollSettings(card, postId, pollIndex, { ended: true }, authorId);
-	const setBtn = card.querySelector(".pollSettingsBtn");
-	if (setBtn) setBtn.onclick = () => openPollSettings(card, postId, pollIndex, poll, authorId);
+	if (endBtn) endBtn.onclick = () => {
+		// 结束投票不可撤销，先确认
+		modalConfirm(t("poll_end_confirm"), () =>
+			setPollSettings(card, postId, pollIndex, { ended: true }, authorId), t("poll_end"));
+	};
 	return card;
 }
 
@@ -412,6 +430,7 @@ async function votePoll(card, postId, pollIndex, optionIndex, authorId) {
 	try {
 		const updated = await apiPost("/api/polls/vote", { postId, pollIndex, optionIndex });
 		if (updated && !updated.error) {
+			applyCoinDelta(updated.coinsDelta);
 			card.replaceWith(renderPollCard(updated, postId, pollIndex, authorId));
 		} else {
 			showCoinMsg((updated && updated.error) || t("poll_fail"));
@@ -434,37 +453,6 @@ async function setPollSettings(card, postId, pollIndex, payload, authorId) {
 		if (e && e.message === "JWT_EXPIRED") return;
 		showCoinMsg(t("poll_fail"));
 	}
-}
-
-function openPollSettings(card, postId, pollIndex, poll, authorId) {
-	document.querySelector(".modalBox").style.width = "420px";
-	const s = poll.settings || {};
-	const deadlineVal = s.deadline ? new Date(s.deadline).toISOString().slice(0, 16) : "";
-	modal(
-		'<h3>' + t("poll_settings") + "</h3>" +
-		'<label class="pollSetRow"><input type="checkbox" id="pollSetAnon"' + (s.anonymous ? " checked" : "") + "> " + t("poll_anonymous") + "</label>" +
-		'<div class="pollSetRow" id="pollSetVotersRow"><span>' + t("poll_show_voters") + '</span><select id="pollSetVoters">' +
-		'<option value="author"' + (s.show_voters === "author" ? " selected" : "") + ">" + t("poll_voters_author") + "</option>" +
-		'<option value="all"' + (s.show_voters === "all" ? " selected" : "") + ">" + t("poll_voters_all") + "</option>" +
-		'<option value="none"' + (s.show_voters === "none" ? " selected" : "") + ">" + t("poll_voters_none") + "</option>" +
-		"</select></div>" +
-		'<div class="pollSetRow"><span>' + t("poll_deadline") + '</span><input type="datetime-local" id="pollSetDeadline" value="' + deadlineVal + '"></div>' +
-		'<div style="margin-top:14px;text-align:center;"><button id="pollSetSave">' + t("poll_apply") + "</button></div>"
-	);
-	$("pollSetSave").onclick = () => {
-		const settings = {
-			anonymous: $("pollSetAnon").checked,
-			show_voters: $("pollSetVoters").value,
-			deadline: $("pollSetDeadline").value ? new Date($("pollSetDeadline").value).toISOString() : null,
-		};
-		$("modal").classList.add("hidden");
-		setPollSettings(card, postId, pollIndex, { settings }, authorId);
-	};
-	const syncSetVotersRow = () => {
-		$("pollSetVotersRow").style.display = $("pollSetAnon").checked ? "none" : "";
-	};
-	$("pollSetAnon").onchange = syncSetVotersRow;
-	syncSetVotersRow();
 }
 
 function showPollVoters(poll) {

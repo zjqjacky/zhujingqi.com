@@ -13,9 +13,32 @@
 		<link rel="icon" type="image/png" href="icon.svg">
 		<link rel="apple-touch-icon" sizes="180x180" href="assets/img/icon.png">
 		<link rel="apple-touch-icon" sizes="120x120" href="assets/img/icon.png">
-		<link rel="stylesheet" href="style.css?v=20260926">
+		<link rel="stylesheet" href="style.css?v=20260927">
 	</head>
 	<body>
+		<!-- 首屏遮罩：静态输出，从第一帧就盖住页面，避免先闪出登录页再切加载动画 -->
+		<div class="loadingMask" id="bootMask">
+			<div class="loadingBox">
+				<div class="loadingLogo">
+					<img src="icon.svg" alt="">
+					<span id="bootTitle">Jacky 论坛</span>
+				</div>
+				<div class="loadingText">Loading<span class="dot dot1">.</span><span class="dot dot2">.</span><span class="dot dot3">.</span></div>
+			</div>
+		</div>
+		<script>
+			// 兜底：若 20 秒后仍未完成初始化，强制移除遮罩，避免白屏卡死
+			(function () {
+				window.__bootMask = document.getElementById("bootMask");
+				setTimeout(function () {
+					var m = window.__bootMask;
+					if (m && m.parentNode && !m.dataset.done) {
+						m.classList.add("fadeOut");
+						setTimeout(function () { if (m.parentNode) m.remove(); }, 300);
+					}
+				}, 20000);
+			})();
+		</script>
 		<script>
 			(function () {
 				try {
@@ -312,26 +335,26 @@
 			<img id="viewerImg">
 		</div>
 		<script src="https://zhujingqi.com/js/egg.js"></script>
-		<script src="js/api.js?v=20260926"></script>
-		<script src="js/i18n.js?v=20260926"></script>
-		<script src="js/core.js?v=20260926"></script>
-		<script src="js/captcha.js?v=20260926"></script>
-		<script src="js/config.js?v=20260926"></script>
-		<script src="js/content.js?v=20260926"></script>
-		<script src="js/search.js?v=20260926"></script>
-		<script src="js/editor.js?v=20260926"></script>
-		<script src="js/auth.js?v=20260926"></script>
-		<script src="js/posts.js?v=20260926"></script>
-		<script src="js/comments.js?v=20260926"></script>
-		<script src="js/users.js?v=20260926"></script>
-		<script src="js/notifications.js?v=20260926"></script>
-		<script src="js/presence.js?v=20260926"></script>
-		<script src="js/shop.js?v=20260926"></script>
-		<script src="js/lottery.js?v=20260926"></script>
-		<!-- AI 功能暂时下线：<script src="js/ai.js?v=20260926"></script> -->
-		<script src="js/fortune.js?v=20260926"></script>
-		<script src="js/announcements.js?v=20260926"></script>
-		<script src="js/misc.js?v=20260926"></script>
-		<script src="js/app.js?v=20260926"></script>
+		<script src="js/api.js?v=20260927"></script>
+		<script src="js/i18n.js?v=20260927"></script>
+		<script src="js/core.js?v=20260927"></script>
+		<script src="js/captcha.js?v=20260927"></script>
+		<script src="js/config.js?v=20260927"></script>
+		<script src="js/content.js?v=20260927"></script>
+		<script src="js/search.js?v=20260927"></script>
+		<script src="js/editor.js?v=20260927"></script>
+		<script src="js/auth.js?v=20260927"></script>
+		<script src="js/posts.js?v=20260927"></script>
+		<script src="js/comments.js?v=20260927"></script>
+		<script src="js/users.js?v=20260927"></script>
+		<script src="js/notifications.js?v=20260927"></script>
+		<script src="js/presence.js?v=20260927"></script>
+		<script src="js/shop.js?v=20260927"></script>
+		<script src="js/lottery.js?v=20260927"></script>
+		<!-- AI 功能暂时下线：<script src="js/ai.js?v=20260927"></script> -->
+		<script src="js/fortune.js?v=20260927"></script>
+		<script src="js/announcements.js?v=20260927"></script>
+		<script src="js/misc.js?v=20260927"></script>
+		<script src="js/app.js?v=20260927"></script>
 	</body>
 </html>

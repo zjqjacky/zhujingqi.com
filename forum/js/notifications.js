@@ -38,12 +38,11 @@ function notifLabel(n) {
 async function refreshNotificationBadge() {
 	if (!currentUser) return;
 	try {
-		const notifRes = await apiGet("/api/notifications/count?target_id=" + currentUser.id);
-		let chatCount = 0;
-		try {
-			const chatRes = await apiGet("/api/chat/unread?user_id=" + currentUser.id);
-			chatCount = chatRes.count || 0;
-		} catch {}
+		const [notifRes, chatRes] = await Promise.all([
+			apiGet("/api/notifications/count?target_id=" + currentUser.id),
+			apiGet("/api/chat/unread?user_id=" + currentUser.id).catch(() => null),
+		]);
+		const chatCount = (chatRes && chatRes.count) || 0;
 		const badge = $("notifBadge");
 		if (!badge) return;
 		const unread = (notifRes.count || 0) + chatCount;

@@ -3,9 +3,12 @@
 refreshUILanguage(true);
 
 (async () => {
-	const mask = document.createElement("div");
-	mask.className = "loadingMask";
-	mask.innerHTML = `
+	// 复用 index.html 里静态输出的首屏遮罩，避免登录页先闪一下
+	let mask = window.__bootMask;
+	if (!mask) {
+		mask = document.createElement("div");
+		mask.className = "loadingMask";
+		mask.innerHTML = `
 						<div class="loadingBox">
 							<div class="loadingLogo">
 								<img src="icon.svg" alt="">
@@ -14,7 +17,10 @@ refreshUILanguage(true);
 							<div class="loadingText">Loading<span class="dot dot1">.</span><span class="dot dot2">.</span><span class="dot dot3">.</span></div>
 						</div>
 					`;
-	document.body.appendChild(mask);
+		document.body.appendChild(mask);
+	}
+	const bootTitle = $("bootTitle");
+	if (bootTitle) bootTitle.textContent = t("login_title");
 	try {
 		if (autoId && localStorage.getItem("token")) {
 			let data;
@@ -95,6 +101,7 @@ refreshUILanguage(true);
 			if (!isNaN(userId)) viewUser(userId);
 		}
 	} finally {
+		mask.dataset.done = "1";
 		mask.classList.add("fadeOut");
 		setTimeout(() => mask.remove(), 300);
 	}

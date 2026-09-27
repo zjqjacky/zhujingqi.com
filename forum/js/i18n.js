@@ -462,6 +462,13 @@ const TRANSLATIONS = {
 		de: "Mindestens 2 Optionen erforderlich",
 		"zh-TW": "至少需要 2 個選項"
 	},
+	poll_dup_option: {
+		zh: "选项内容不能重复",
+		en: "Options must be unique",
+		es: "Las opciones no pueden repetirse",
+		de: "Optionen dürfen nicht doppelt sein",
+		"zh-TW": "選項內容不能重複"
+	},
 	poll_option_empty: {
 		zh: "选项不能为空",
 		en: "Options cannot be empty",
@@ -714,6 +721,27 @@ const TRANSLATIONS = {
 		de: "Schließen",
 		"zh-TW": "關閉"
 	},
+	confirm_ok: {
+		zh: "确定",
+		en: "Confirm",
+		es: "Confirmar",
+		de: "Bestätigen",
+		"zh-TW": "確定"
+	},
+	confirm_cancel: {
+		zh: "取消",
+		en: "Cancel",
+		es: "Cancelar",
+		de: "Abbrechen",
+		"zh-TW": "取消"
+	},
+	poll_end_confirm: {
+		zh: "结束后将无法再投票，且此操作无法撤销。确定要结束这个投票吗？",
+		en: "After ending, voting is closed and this cannot be undone. End this poll?",
+		es: "Al finalizar se cierra la votación y no se puede deshacer. ¿Finalizar esta encuesta?",
+		de: "Nach dem Beenden ist die Abstimmung geschlossen und nicht rückgängig zu machen. Abstimmung beenden?",
+		"zh-TW": "結束後將無法再投票，且此操作無法撤銷。確定要結束這個投票嗎？"
+	},
 	modal_loading: {
 		zh: "加载中...",
 		en: "Loading...",
@@ -734,6 +762,13 @@ const TRANSLATIONS = {
 		es: "¿Confirmar eliminar esta publicación?",
 		de: "Diesen Beitrag wirklich löschen?",
 		"zh-TW": "確認刪除這條帖子嗎？"
+	},
+	modal_delete_coin_warn: {
+		zh: "删除会扣除金币：帖子 5 金币，加上你在本帖的每条评论（3 金币）和每个点赞（1 金币）",
+		en: "Deleting deducts coins: 5 for the post, plus 3 per comment and 1 per like you made here",
+		es: "Al eliminar se restan monedas: 5 por la publicación, más 3 por comentario y 1 por me gusta",
+		de: "Beim Löschen werden Münzen abgezogen: 5 für den Beitrag, plus 3 pro Kommentar und 1 pro Like",
+		"zh-TW": "刪除會扣除金幣：帖子 5 金幣，加上你在本帖的每條評論（3 金幣）和每個按讚（1 金幣）"
 	},
 	modal_irreversible: {
 		zh: "此操作不可撤销",
@@ -1302,6 +1337,13 @@ const TRANSLATIONS = {
 		de: "Ankündigungen",
 		"zh-TW": "公告"
 	},
+	post_announce_forbidden: {
+		zh: "只有站长或管理员可以发布公告",
+		en: "Only the owner or admins can post announcements",
+		es: "Solo el propietario o los administradores pueden publicar anuncios",
+		de: "Nur der Eigentümer oder Administratoren können Ankündigungen veröffentlichen",
+		"zh-TW": "只有站長或管理員可以發布公告"
+	},
 	filter_other: {
 		zh: "其它",
 		en: "Other",
@@ -1709,11 +1751,11 @@ const TRANSLATIONS = {
 		"zh-TW": "1. 等級分為 LV0 - LV12 共 13 個等級<br>2. 不同等級會有不同顏色區分<br>3. 金幣到達某數量後，自動升級<br>4. 獲取金幣並提升等級吧！"
 	},
 	coin_rules_content: {
-		zh: "1. 发布 +5 金币<br>2. 评论 +3 金币<br>3. 点赞 +1 金币<br>4. 踩 +(-1) 金币<br>5. 删除帖子、内容或取消点赞，减少对应数量金币<br>金币用途：提升等级；购买彩色帖子背景；商店中购买徽章、礼物；金币抽奖",
-		en: "1. Post +5 coins<br>2. Comment +3 coins<br>3. Like +1 coin<br>4. Dislike -1 coin<br>5. Deleting posts/content or unliking reduces coins accordingly<br>Uses: Level up; Buy colorful post backgrounds; Buy badges & gifts in shop; Coin lottery",
-		es: "1. Publicar +5 monedas<br>2. Comentar +3 monedas<br>3. Me gusta +1 moneda<br>4. No me gusta -1 moneda<br>5. Eliminar publicaciones/contenido o quitar me gusta reduce monedas<br>Usos: Subir de nivel; Comprar fondos de publicación coloridos; Comprar insignias y regalos en la tienda; Lotería de monedas",
-		de: "1. Posten +5 Münzen<br>2. Kommentieren +3 Münzen<br>3. Like +1 Münze<br>4. Dislike -1 Münze<br>5. Löschen von Posts/Inhalten oder Entfernen von Likes reduziert Münzen<br>Verwendung: Level aufsteigen; Bunte Post-Hintergründe kaufen; Abzeichen & Geschenke im Shop kaufen; Münz-Lotterie",
-		"zh-TW": "1. 發佈 +5 金幣<br>2. 評論 +3 金幣<br>3. 按讚 +1 金幣<br>4. 踩 -1 金幣<br>5. 刪除帖子、內容或取消按讚，減少對應數量金幣<br>金幣用途：提升等級；購買彩色帖子背景；商店中購買徽章、禮物；金幣抽獎"
+		zh: "1. 发布 +5 金币<br>2. 评论 +3 金币<br>3. 点赞 +1 金币<br>4. 踩帖不扣金币（取消踩也不加）<br>5. 删除帖子、内容或取消点赞，减少对应数量金币<br>金币用途：提升等级；购买彩色帖子背景；商店中购买徽章、礼物；金币抽奖",
+		en: "1. Post +5 coins<br>2. Comment +3 coins<br>3. Like +1 coin<br>4. Dislikes cost no coins (removing a dislike adds none either)<br>5. Deleting posts/content or unliking reduces coins accordingly<br>Uses: Level up; Buy colorful post backgrounds; Buy badges & gifts in shop; Coin lottery",
+		es: "1. Publicar +5 monedas<br>2. Comentar +3 monedas<br>3. Me gusta +1 moneda<br>4. No me gusta no cuesta monedas (quitarlo tampoco suma)<br>5. Eliminar publicaciones/contenido o quitar me gusta reduce monedas<br>Usos: Subir de nivel; Comprar fondos de publicación coloridos; Comprar insignias y regalos en la tienda; Lotería de monedas",
+		de: "1. Posten +5 Münzen<br>2. Kommentieren +3 Münzen<br>3. Like +1 Münze<br>4. Dislike kostet keine Münzen (Entfernen bringt auch keine)<br>5. Löschen von Posts/Inhalten oder Entfernen von Likes reduziert Münzen<br>Verwendung: Level aufsteigen; Bunte Post-Hintergründe kaufen; Abzeichen & Geschenke im Shop kaufen; Münz-Lotterie",
+		"zh-TW": "1. 發佈 +5 金幣<br>2. 評論 +3 金幣<br>3. 按讚 +1 金幣<br>4. 踩帖不扣金幣（取消踩也不加）<br>5. 刪除帖子、內容或取消按讚，減少對應數量金幣<br>金幣用途：提升等級；購買彩色帖子背景；商店中購買徽章、禮物；金幣抽獎"
 	},
 	about_title: {
 		zh: "关于",
@@ -2015,13 +2057,6 @@ const TRANSLATIONS = {
 		es: "Verificación — arrastra hasta la caja punteada",
 		de: "Verifizierung — in das gestrichelte Feld ziehen",
 		"zh-TW": "人機驗證 — 拖到閃爍虛線框中"
-	},
-	captcha_slider_hint: {
-		zh: "← 拖动滑块完成拼图 →",
-		en: "← Drag the slider to complete the puzzle →",
-		es: "← Arrastra el control para completar el rompecabezas →",
-		de: "← Schieberegler ziehen, um das Puzzle zu lösen →",
-		"zh-TW": "← 拖動滑塊完成拼圖 →"
 	},
 	captcha_not_done: {
 		zh: "请先完成人机验证",

@@ -249,6 +249,7 @@ async function openLottery() {
 			return;
 		}
 		let draw;
+		const before1 = currentUser?.coins || 0;
 		try {
 			draw = await apiPost("/api/lottery/draw", { count: 1 });
 		} catch (e) {
@@ -258,6 +259,8 @@ async function openLottery() {
 		const result = draw.results[0];
 		const ri = prizes.findIndex(p => p.id === result.id);
 		applyServerState(draw);
+		// 抽奖扣费/返奖的净变化（服务端已返回新余额，这里只弹窗）
+		showCoinDelta((draw.coins || 0) - before1);
 		spinTo(ri >= 0 ? ri : 0, (landed, done) => {
 			if (result.isBadge) {
 				lr.innerHTML = `<div class="singleResult">${t("lottery_badge_won", result.label)}</div>`;
@@ -276,6 +279,7 @@ async function openLottery() {
 			s1b = document.getElementById("s1");
 		s10b.disabled = true;
 		s1b.disabled = true;
+		const before10 = currentUser?.coins || 0;
 		try {
 			if ((currentUser?.coins || 0) < 99) {
 				showCoinMsg(t("lottery_no_coins"));
@@ -283,6 +287,7 @@ async function openLottery() {
 			}
 			const draw = await apiPost("/api/lottery/draw", { count: 10 });
 			applyServerState(draw);
+			showCoinDelta((draw.coins || 0) - before10);
 			const items = draw.results.map(r => ({
 				label: r.label,
 				color: r.color || (prizes.find(p => p.id === r.id) || {}).color,

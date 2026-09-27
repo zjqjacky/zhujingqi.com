@@ -160,18 +160,20 @@ function renderTagBar() {
 	const bar = $("tagBar");
 	bar.innerHTML = "";
 	selectedTags = [];
-	for (let tag of defaultTags) {
-		const display = t(defaultTagKeys[tag] || tag);
-		let span = document.createElement("span");
+	function makeTagChip(value, display) {
+		const span = document.createElement("span");
 		span.className = "tag";
 		span.innerText = display;
 		span.onclick = () => {
-			selectedTags = [tag];
+			selectedTags = [value];
 			bar.querySelectorAll(".tag").forEach(tagEl => {
-				tagEl.classList.toggle("active", tagEl.textContent === display);
+				tagEl.classList.toggle("active", tagEl === span);
 			});
 		};
 		bar.appendChild(span);
+	}
+	for (let tag of defaultTags) {
+		makeTagChip(tag, t(defaultTagKeys[tag] || tag));
 	}
 }
 
@@ -358,7 +360,6 @@ renderLangSelect(document.getElementById("langSelectReg"));
 	setT("closeModal", t("modal_close"));
 	setT("captchaBtn", t("captcha_btn"));
 	setT("captchaTitle", t("captcha_modal_title"));
-	setT("captchaHint", t("captcha_slider_hint"));
 	setT("captchaCloseBtn", t("modal_close"));
 	setT("rankToggleCoins", t("profile_coins"));
 	setT("rankToggleFollowers", t("followers"));
@@ -390,9 +391,73 @@ function modalText(str) {
 	$("modalText").textContent = str == null ? "" : String(str);
 	$("modal").classList.remove("hidden");
 }
-$("closeModal").onclick = () => {
+// 弹窗内联错误提示：只追加提示，不覆盖弹窗已有内容，
+// 避免用户填了一半的表单（投票选项、图片/音乐链接等）被冲掉
+function modalError(msg) {
+	const box = $("modalText");
+	if (!box) return;
+	let el = box.querySelector(".modalError");
+	if (!el) {
+		el = document.createElement("div");
+		el.className = "modalError";
+		el.style.cssText = "margin-top:12px;padding:9px 11px;border-radius:8px;" +
+			"background:rgba(224,64,63,.1);color:#e0403f;font-size:13px;line-height:1.6;text-align:left;";
+		box.appendChild(el);
+	}
+	el.textContent = msg == null ? "" : String(msg);
+	clearTimeout(el._hideT);
+	el._hideT = setTimeout(() => { if (el && el.parentNode) el.remove(); }, 4000);
+	try { el.scrollIntoView({ block: "nearest" }); } catch {}
+}
+function closeModalDialog() {
 	$("modal").classList.add("hidden");
 	document.querySelector(".modalBox").style.width = "300px";
+}
+$("closeModal").onclick = closeModalDialog;
+
+// 确认弹窗：需要用户点「确定」才执行 onOk，点「取消」或关闭按钮都不执行
+function modalConfirm(msg, onOk, okText) {
+	const box = $("modalText");
+	if (!box) return;
+	modalText("");
+	const text = document.createElement("div");
+	text.style.cssText = "font-size:14px;line-height:1.8;";
+	text.textContent = msg == null ? "" : String(msg);
+	box.appendChild(text);
+
+	const row = document.createElement("div");
+	row.style.cssText = "margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;";
+	const cancel = document.createElement("button");
+	cancel.type = "button";
+	cancel.textContent = t("confirm_cancel");
+	const ok = document.createElement("button");
+	ok.type = "button";
+	ok.textContent = okText || t("confirm_ok");
+	ok.style.background = "#e0403f";
+	ok.style.color = "#fff";
+	ok.style.borderColor = "#e0403f";
+	row.appendChild(cancel);
+	row.appendChild(ok);
+	box.appendChild(row);
+
+	let done = false;
+	const finish = () => {
+		if (done) return;
+		done = true;
+		closeModalDialog();
+	};
+	cancel.onclick = finish;
+	ok.onclick = async () => {
+		if (done) return;
+		ok.disabled = true;
+		cancel.disabled = true;
+		try {
+			if (typeof onOk === "function") await onOk();
+		} catch (e) {
+			console.error(e);
+		}
+		finish();
+	};
 }
 function escapeHtml(str) {
 	return String(str ?? "").replace(/[&<>"']/g, c => ({

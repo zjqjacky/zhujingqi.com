@@ -102,8 +102,12 @@ document.addEventListener("click", e => {
 $("sendBtn").onclick = async () => {
 	let txt = $("text").value.trim();
 	if (!txt) return;
+	closeEmojiPicker();
 	let custom = $("customTag").value.trim();
 	let tag = custom || selectedTags[0] || null;
+	if (tag === "公告" && !isAdmin(currentUser)) {
+		return modalText(t("post_announce_forbidden"));
+	}
 	txt = sanitizePostHtml(txt);
 	let finalContent = txt;
 	if ($("isSensitive").checked) {
@@ -124,6 +128,7 @@ $("sendBtn").onclick = async () => {
 		return modalText(t("post_fail", e.message));
 	}
 	const postId = (created && created.id) || Date.now();
+	applyCoinDelta(created && created.coinsDelta);
 	await notifyMentions(finalContent, postId, null);
 	try {
 		for (const k of Object.keys(sessionStorage)) {
