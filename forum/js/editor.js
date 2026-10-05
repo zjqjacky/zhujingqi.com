@@ -215,7 +215,7 @@ async function renderPostBody(box, fullContent, post) {
 		toggleBtn.onclick = () => {
 			e = !e;
 			const l = box.querySelector(".longPostText");
-			if (l) l.innerHTML = e ? meta.content : foldedText;
+			if (l) l.innerHTML = e ? safeContent : foldedText;
 			linkifyMentions(box);
 			renderEmojis(box);
 			linkifyUrls(box);

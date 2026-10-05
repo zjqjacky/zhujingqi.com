@@ -2180,4 +2180,8 @@ const EMOJI_MAP = [
 		"14",
 		"saka",
 		"beng",
+		
+		"please",
+		"67",
+		"nfls",
 	];

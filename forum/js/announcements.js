@@ -43,13 +43,35 @@ async function loadAnnouncements() {
 	}
 }
 
+function renderFortuneItem(el, text) {
+	const parts = FORTUNE_LINKS[text];
+	el.textContent = "";
+	if (!parts) {
+		el.textContent = text;
+		return;
+	}
+	let rest = text;
+	for (const [label, href] of parts) {
+		const i = rest.indexOf(label);
+		if (i === -1) continue;
+		if (i > 0) el.appendChild(document.createTextNode(rest.slice(0, i)));
+		const a = document.createElement("a");
+		a.href = href;
+		a.textContent = label;
+		a.className = "fortuneLink";
+		el.appendChild(a);
+		rest = rest.slice(i + label.length);
+	}
+	if (rest) el.appendChild(document.createTextNode(rest));
+}
+
 document.getElementById("fortuneBtn").onclick = function() {
 	if (!currentUser) return;
 	const username = currentUser.name;
 	const f = getDailyFortune(username);
 	document.getElementById("fortuneLevel").innerText = f.level;
-	document.getElementById("fortuneGood").innerText = f.good;
-	document.getElementById("fortuneBad").innerText = f.bad;
+	renderFortuneItem(document.getElementById("fortuneGood"), f.good);
+	renderFortuneItem(document.getElementById("fortuneBad"), f.bad);
 	document.getElementById("fortuneResult").style.display = "block";
 	const colors = {
 		"大吉": "gold",

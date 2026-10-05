@@ -1922,6 +1922,25 @@ body.dark .roleBadge.blue_diamond {
 	font-size: 14px;
 }
 
+.fortuneVer {
+	color: var(--green);
+	font-size: 13px;
+	font-weight: 800;
+	margin-left: 5px;
+	vertical-align: super;
+}
+
+.fortuneLink {
+	color: var(--green);
+	font-weight: bold;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.fortuneLink:hover {
+	opacity: .75;
+}
+
 #fortuneLevel {
 	font-size: 25px;
 	font-weight: bold;
@@ -4023,20 +4042,56 @@ body.dark .musicCard {
 	padding: 10px;
 	box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
 	display: none;
+	--emoji-cell: 32px;
+	--emoji-gap: 4px;
 	grid-template-columns: repeat(6, 1fr);
-	gap: 4px;
+	gap: var(--emoji-gap);
 	max-width: 280px;
-	max-height: 220px;
+	/* 恰好 5 行，超出滚动 */
+	max-height: calc(5 * var(--emoji-cell) + 4 * var(--emoji-gap));
 	overflow-y: auto;
+	overflow-x: hidden;
+	/* 预留滚动条空间，出现时不抖动 */
+	scrollbar-gutter: stable;
+	/* Firefox 细滚动条 + 深色适配 */
+	scrollbar-width: thin;
+	scrollbar-color: var(--border) transparent;
 }
 
 .emojiPickerPopup.show {
 	display: grid;
 }
 
+/* WebKit 细滚动条（浅色/深色跟随主题变量） */
+.emojiPickerPopup::-webkit-scrollbar {
+	width: 6px;
+}
+
+.emojiPickerPopup::-webkit-scrollbar-track {
+	background: transparent;
+	margin: 10px 0;
+}
+
+.emojiPickerPopup::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 999px;
+}
+
+.emojiPickerPopup::-webkit-scrollbar-thumb:hover {
+	background: var(--sub);
+}
+
+body.dark .emojiPickerPopup::-webkit-scrollbar-thumb {
+	background: #4a4a4a;
+}
+
+body.dark .emojiPickerPopup::-webkit-scrollbar-thumb:hover {
+	background: #6a6a6a;
+}
+
 .emojiPickerPopup img {
-	width: 32px;
-	height: 32px;
+	width: var(--emoji-cell);
+	height: var(--emoji-cell);
 	cursor: pointer;
 	border-radius: 6px;
 	padding: 4px;
@@ -4393,14 +4448,9 @@ html.watch .rankSearch {
 }
 
 html.watch .emojiPickerPopup {
+	--emoji-cell: 24px;
 	grid-template-columns: repeat(8, 1fr);
 	max-width: calc(100vw - 16px);
-	max-height: 180px;
-}
-
-html.watch .emojiPickerPopup img {
-	width: 24px;
-	height: 24px;
 }
 
 html.watch .musicIframe {
