@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Circuit Pro - Zhujingqi</title>
+		<meta name="description" content="初中物理电学电路仿真器：摆放元件，实时计算电流电压" />
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/mobile.css" />
+		<link rel="stylesheet" href="/css/dark.css" />
+		<link rel="icon" type="image/svg+xml" href="icon.svg" />
+		<style>
+			:root {
+				--bd-bg: #ffffff;
+				--bd-line: #d9d9d9;
+				--bd-ink: #111111;
+				--bd-sel: #0a84ff;
+				--bd-hot: #ffcc33;
+				--bd-axis: #b0b0b0;
+				--panel-bg: #f3f3f3;
+			}
+
+			body.dark-mode {
+				--bd-bg: #161616;
+				--bd-line: #303030;
+				--bd-ink: #eaeaea;
+				--bd-sel: #4c9dff;
+				--panel-bg: #262626;
+				--bd-axis: #666666;
+			}
+
+			html,
+			body {
+				height: 100%;
+			}
+
+			body {
+				margin: 0;
+				font-family: Arial, "Microsoft YaHei", sans-serif;
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+				height: 100dvh;
+				overflow: hidden;
+			}
+
+			.bar {
+				display: flex;
+				align-items: stretch;
+				flex: 0 0 auto;
+				min-width: 0;
+				overflow: hidden;
+			}
+
+.bar a {
+					float: none;
+					white-space: nowrap;
+					flex: 0 0 auto;
+				}
+
+			#switch-theme-btn {
+				float: none;
+				position: static !important;
+				margin-left: 0;
+				display: flex;
+				align-items: center;
+				flex: 0 0 auto;
+				padding: 5px 4px !important;
+				right: auto !important;
+			}
+
+			#switch-theme-btn img {
+				display: block;
+			}
+
+			.bar-tools {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				margin-left: auto;
+				padding: 4px 4px;
+				flex-wrap: nowrap;
+				min-width: 0;
+				flex: 0 1 auto;
+			}
+
+			#switch-theme-btn img {
+				width: 34px;
+				height: auto;
+			}
+
+			.bar-tools button {
+				min-height: 34px;
+				padding: 4px 10px;
+				border: 2px solid #6de6b3;
+				border-radius: 8px;
+				background: #ffffff;
+				color: #000000;
+				cursor: pointer;
+				font-size: 14px;
+				line-height: 1.1;
+			}
+
+			.bar-tools button:hover {
+				border-color: #000000;
+			}
+
+			body.dark-mode .bar-tools button {
+				border-color: #2a7a4a;
+				background: #1e1e1e;
+				color: #e0e0e0;
+			}
+
+			.bar-tools button:disabled {
+				opacity: .45;
+				cursor: default;
+			}
+
+			.wrap {
+				display: flex;
+				align-items: stretch;
+				gap: 10px;
+				padding: 10px;
+				box-sizing: border-box;
+				flex: 1 1 auto;
+				min-height: 0;
+			}
+
+			.side {
+				width: 250px;
+				flex: 0 0 250px;
+				background: var(--panel-bg);
+				border-radius: 14px;
+				padding: 12px;
+				box-sizing: border-box;
+				overflow-y: auto;
+				overflow-x: hidden;
+				min-height: 0;
+			}
+
+			.side h3 {
+				margin: 2px 0 10px;
+				font-size: 18px;
+			}
+
+			.side.results {
+				width: 340px;
+				flex: 0 0 340px;
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
+			}
+
+			.results-body {
+				flex: 1 1 auto;
+				min-height: 0;
+				overflow-y: auto;
+				overflow-x: hidden;
+			}
+
+			.side.results .more {
+				flex: 0 0 auto;
+				margin-top: 10px;
+				border-top: 1px solid var(--bd-line);
+			}
+
+			.logo-wrap {
+				text-align: center;
+				margin: 2px 0 clamp(4px, 1.4vh, 12px);
+			}
+
+			.logo-mark {
+				display: block;
+				margin: 0 auto 2px;
+				width: clamp(110px, min(84%, 22vh), 205px);
+				height: auto;
+			}
+
+			body.dark-mode .logo-mark {
+				filter: invert(1);
+			}
+
+			.logo-word {
+				font-family: Arial, "Microsoft YaHei", sans-serif;
+				font-size: clamp(17px, 3.6vh, 30px);
+				font-weight: 800;
+				letter-spacing: -0.5px;
+				color: var(--bd-ink);
+			}
+
+			.logo-word .logo-pro {
+				color: var(--bd-sel);
+			}
+
+			.modal {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .5);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				padding: 16px;
+				box-sizing: border-box;
+			}
+
+			.modal.open {
+				display: flex;
+			}
+
+			.confirm-card {
+				max-width: 400px;
+			}
+
+			.confirm-title {
+				font-size: 18px;
+				font-weight: 800;
+				margin-bottom: 8px;
+			}
+
+			.confirm-msg {
+				font-size: 15px;
+				line-height: 1.7;
+				margin: 0 0 18px;
+				color: #444;
+			}
+
+			body.dark-mode .confirm-msg {
+				color: #cfcfcf;
+			}
+
+			.confirm-actions {
+				display: flex;
+				gap: 10px;
+				justify-content: flex-end;
+			}
+
+			.confirm-actions button {
+				min-height: 40px;
+				padding: 8px 18px;
+				border-radius: 10px;
+				cursor: pointer;
+				font-size: 15px;
+				border: 2px solid #999;
+				background: var(--bd-bg);
+				color: var(--bd-ink);
+			}
+
+			.confirm-actions .cf-ok {
+				border-color: #e05252;
+				background: #e05252;
+				color: #fff;
+			}
+
+			.confirm-actions .cf-ok:hover {
+				background: #c94040;
+			}
+
+			.modal-card {
+				background: var(--panel-bg);
+				color: var(--bd-ink);
+				border-radius: 16px;
+				width: 100%;
+				max-width: 520px;
+				max-height: 86vh;
+				overflow: auto;
+				padding: 18px 20px 22px;
+				box-shadow: 0 12px 48px rgba(0, 0, 0, .45);
+				box-sizing: border-box;
+			}
+
+			/* the picker must never scroll: fit the card to the viewport */
+			.modal-card.picker {
+				max-height: 92vh;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.modal-card.picker .modal-body {
+				overflow-y: auto;
+				flex: 1 1 auto;
+				min-height: 0;
+			}
+
+			.modal-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+			}
+
+			.modal-logo {
+				font-size: 26px;
+				font-weight: 800;
+			}
+
+			.modal-logo b {
+				color: var(--bd-sel);
+			}
+
+			.modal-x {
+				border: none;
+				background: none;
+				color: var(--bd-ink);
+				font-size: 30px;
+				line-height: 1;
+				cursor: pointer;
+				padding: 0 6px;
+			}
+
+			.modal-body {
+				font-size: 15px;
+				line-height: 1.7;
+			}
+
+			.modal-body .about {
+				margin: 12px 0;
+				color: #555;
+			}
+
+			body.dark-mode .modal-body .about {
+				color: #b5b5b5;
+			}
+
+			.modal-body h4 {
+				margin: 14px 0 6px;
+				font-size: 17px;
+			}
+
+			.modal-body ul {
+				margin: 0;
+				padding-left: 20px;
+			}
+
+			.modal-body li {
+				margin: 6px 0;
+			}
+
+			.modal-body .foot {
+				margin: 16px 0 0;
+				color: #888;
+				font-size: 13px;
+			}
+
+			/* compact so all 13 fit on a phone without scrolling */
+			.demo-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+				gap: 7px;
+			}
+
+			.demo-item {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				padding: 8px 10px;
+				border: 1px solid #d9dee6;
+				border-radius: 8px;
+				background: #fff;
+				cursor: pointer;
+				text-align: left;
+				font: inherit;
+				font-size: 13px;
+				color: inherit;
+				transition: border-color .15s, box-shadow .15s, transform .1s;
+			}
+
+			.demo-item:hover,
+			.demo-item:focus-visible {
+				border-color: var(--bd-sel);
+				box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+				outline: none;
+			}
+
+			.demo-item:active {
+				transform: scale(.98);
+			}
+
+			body.dark-mode .demo-item {
+				background: #1b1f27;
+				border-color: #333a45;
+			}
+
+			.demo-name {
+				font-weight: 600;
+				font-size: 13px;
+				line-height: 1.35;
+			}
+
+			.demo-tag {
+				font-size: 11px;
+				line-height: 1.3;
+				color: #888;
+			}
+
+			.palette {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 8px;
+				max-width: 100%;
+			}
+
+			.palette button {
+				min-width: 0;
+				overflow: hidden;
+			}
+
+			.palette button {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 3px;
+				min-height: clamp(42px, 8.6vh, 76px);
+				padding: 4px 2px;
+				border: 2px solid #bbb;
+				border-radius: 10px;
+				background: var(--bd-bg);
+				color: var(--bd-ink);
+				cursor: pointer;
+				font-size: 12px;
+				line-height: 1.15;
+			}
+
+			.palette button:hover {
+				border-color: var(--bd-sel);
+			}
+
+			.palette button.on {
+				border-color: var(--bd-sel);
+				box-shadow: 0 0 0 3px var(--bd-sel);
+				background: rgba(10, 132, 255, .12);
+			}
+
+			.palette svg {
+				width: clamp(22px, 5.6vh, 44px);
+				height: clamp(22px, 5.6vh, 44px);
+				color: var(--bd-ink);
+			}
+
+			.modebar {
+				margin: 12px 0 0;
+				font-size: 14px;
+				line-height: 1.45;
+				min-height: 22px;
+			}
+
+			.row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-top: 10px;
+			}
+
+			.row button,
+			.btn {
+				flex: 1 1 auto;
+				min-height: 46px;
+				padding: 8px 10px;
+				border: 2px solid #999;
+				border-radius: 10px;
+				background: var(--bd-bg);
+				color: var(--bd-ink);
+				cursor: pointer;
+				font-size: 15px;
+			}
+
+			.row button:hover {
+				border-color: var(--bd-sel);
+			}
+
+			.row button:disabled {
+				opacity: .4;
+				cursor: default;
+			}
+
+			details.more {
+				margin-top: 12px;
+				font-size: 14px;
+			}
+
+			details.more summary {
+				cursor: pointer;
+				padding: 8px 0;
+				font-size: 15px;
+			}
+
+			details.more .field {
+				margin: 8px 0;
+			}
+
+			select {
+				padding: 6px 8px;
+				border-radius: 8px;
+				border: 2px solid #999;
+				background: var(--bd-bg);
+				color: var(--bd-ink);
+				font-size: 14px;
+			}
+
+			.stage {
+				flex: 1 1 auto;
+				min-width: 0;
+				min-height: 0;
+				overflow: hidden;
+				background: var(--bd-bg);
+				border: 1px solid var(--bd-line);
+				border-radius: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#board {
+				display: block;
+				width: 100%;
+				height: 100%;
+				color: var(--bd-ink);
+				touch-action: none;
+				user-select: none;
+				-webkit-user-select: none;
+				-webkit-touch-callout: none;
+			}
+
+			#board text {
+				fill: var(--bd-ink);
+			}
+
+			.ln {
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 4;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+
+			.bx {
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 3.5;
+			}
+
+			.dot {
+				fill: currentColor;
+			}
+
+			.bulbx {
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 3.5;
+			}
+
+			.sym {
+				font-size: 20px;
+				font-weight: bold;
+				text-anchor: middle;
+				font-family: Arial, sans-serif;
+			}
+
+			.sym2 {
+				font-size: 18px;
+				font-weight: bold;
+				text-anchor: middle;
+				font-family: Arial, sans-serif;
+			}
+
+			.pm {
+				font-size: 15px;
+				font-weight: bold;
+				font-family: Arial, sans-serif;
+				text-anchor: middle;
+			}
+
+			.gridline {
+				stroke: var(--bd-line);
+				stroke-width: 1;
+				fill: none;
+			}
+
+			.axis {
+				font-size: 11px;
+				font-family: Arial, sans-serif;
+				fill: var(--bd-axis);
+				text-anchor: middle;
+			}
+
+			.axis.y {
+				text-anchor: end;
+			}
+
+			.selbox {
+				fill: none;
+				stroke: var(--bd-sel);
+				stroke-width: 2;
+				stroke-dasharray: 5 3;
+			}
+
+			.hotbox {
+				fill: var(--bd-sel);
+				fill-opacity: .18;
+			}
+
+			.ro {
+				font-size: 13px;
+				font-family: Arial, sans-serif;
+				text-anchor: middle;
+				paint-order: stroke;
+				stroke: var(--bd-bg);
+				stroke-width: 3px;
+				fill: var(--bd-ink);
+			}
+
+			.ro.bad {
+				fill: #e33;
+			}
+
+			.legend {
+				font-size: 11px;
+				color: #777;
+				margin-top: 8px;
+				line-height: 1.5;
+			}
+
+			body.dark-mode .legend {
+				color: #aaa;
+			}
+
+			.reslist {
+				font-size: 15px;
+				overflow: visible;
+				margin-top: 8px;
+			}
+
+			.ritem {
+				padding: 10px 0;
+				border-bottom: 1px solid var(--bd-line);
+			}
+
+			.rname {
+				font-weight: bold;
+				margin-bottom: 3px;
+			}
+
+			.rval {
+				color: #444;
+				line-height: 1.7;
+			}
+
+			body.dark-mode .rval {
+				color: #bdbdbd;
+			}
+
+			.warn {
+				color: #d33;
+				font-size: 14px;
+				margin-top: 8px;
+				line-height: 1.6;
+			}
+
+			body.dark-mode .warn {
+				color: #ff8080;
+			}
+
+			.field {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin: 6px 0;
+				font-size: 13px;
+			}
+
+			.field-col {
+				display: grid;
+				grid-template-columns: auto 1fr auto;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.field-col input[type=range] {
+				width: 100%;
+				min-width: 0;
+				accent-color: var(--bd-sel);
+				height: 28px;
+			}
+
+			.pval {
+				font-variant-numeric: tabular-nums;
+				min-width: 42px;
+				text-align: right;
+				color: var(--bd-sel);
+				font-weight: bold;
+			}
+
+			.rheoInfo {
+				margin: 8px 0 4px;
+				padding: 8px 10px;
+				border-radius: 8px;
+				background: rgba(10, 132, 255, .1);
+				font-size: 13px;
+				line-height: 1.6;
+			}
+
+			.rheoInfo.warn2 {
+				background: rgba(255, 149, 0, .14);
+			}
+
+			.field input[type=number] {
+				width: 84px;
+				padding: 3px 5px;
+				border: 1px solid #999;
+				border-radius: 6px;
+				background: var(--bd-bg);
+				color: var(--bd-ink);
+			}
+
+			@media (max-width: 780px) {
+				.bar > a {
+					padding-left: 10px;
+					padding-right: 10px;
+					font-size: 14px;
+				}
+
+				.bar > a.zjq b {
+					font-size: 14px;
+				}
+
+				.bar {
+					flex-wrap: wrap;
+					overflow: visible;
+				}
+
+				.bar-tools {
+					width: 100%;
+					order: 9;
+					justify-content: center;
+					margin-left: 0;
+					padding: 2px 4px 4px;
+					gap: 5px;
+					flex-wrap: wrap;
+				}
+
+				#switch-theme-btn {
+					order: 5;
+					margin-left: auto;
+				}
+
+				.bar-tools button {
+					min-height: 32px;
+					padding: 3px 9px;
+					font-size: 12px;
+				}
+
+				.wrap {
+					flex-direction: column;
+					align-items: stretch;
+					gap: 8px;
+					padding: 8px;
+					overflow-y: auto;
+				}
+
+				.side {
+					width: 100%;
+					flex: 0 0 auto;
+					overflow: visible;
+				}
+
+				.side.results {
+					width: 100%;
+					flex: 0 0 auto;
+					order: 3;
+				}
+
+				.stage {
+					width: 100%;
+					max-width: 100%;
+					order: 2;
+					flex: 0 0 auto;
+					height: 52vh;
+					min-height: 300px;
+				}
+
+				.logo-wrap {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					gap: 10px;
+					margin: 0 0 8px;
+					text-align: left;
+				}
+
+				.logo-mark {
+					width: 58px;
+					margin: 0;
+					flex: 0 0 auto;
+				}
+
+				.logo-word {
+					font-size: 22px;
+				}
+
+				.bar-tools {
+					width: 100%;
+					order: 9;
+					justify-content: center;
+					margin-left: 0;
+					padding: 2px 4px 4px;
+					gap: 5px;
+					flex-wrap: wrap;
+				}
+
+				.bar-tools button {
+					min-height: 32px;
+					padding: 3px 9px;
+					font-size: 12px;
+				}
+
+				.palette {
+					grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+					gap: 5px;
+				}
+
+				.palette button {
+					min-height: clamp(38px, 7.4vh, 54px);
+					font-size: 11px;
+					padding: 4px 2px;
+				}
+
+				/* keep the whole picker on one screen: 3 columns, tighter rows */
+				.modal-card {
+					padding: 12px 12px 14px;
+					max-height: 92vh;
+				}
+
+				.modal-card.picker .modal-body .about {
+					margin: 6px 0 8px;
+					font-size: 13px;
+					line-height: 1.5;
+				}
+
+				.demo-grid {
+					grid-template-columns: repeat(3, 1fr);
+					gap: 5px;
+				}
+
+				.demo-item {
+					padding: 6px 7px;
+					font-size: 12px;
+					border-radius: 7px;
+				}
+
+				.demo-name {
+					font-size: 12px;
+				}
+
+				.demo-tag {
+					font-size: 10px;
+				}
+
+				.palette svg {
+					width: clamp(20px, 4.6vh, 32px);
+					height: clamp(20px, 4.6vh, 32px);
+				}
+
+				.legend {
+					display: none;
+				}
+
+				.palette button {
+					min-width: 0;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="/me/">介绍</a>
+			<a href="/game/">游戏</a>
+			<a href="/tool/" class="active">工具</a>
+			<div class="bar-tools">
+				<button id="btnUndo" title="撤销 (Ctrl+Z)">撤销</button>
+				<button id="btnRedo" title="重做 (Ctrl+Shift+Z)">重做</button>
+				<button id="btnDemo" title="载入示例电路">示例</button>
+				<button id="btnClear" title="清空画布">清空</button>
+				<button id="btnHelp" title="操作说明 / About">?</button>
+			</div>
+			<a id="switch-theme-btn" style="padding: 5px; cursor: pointer;"><img src="/img/switch-theme.svg"
+					height="34px" width="auto" /></a>
+		</div>
+
+		<div class="wrap">
+			<div class="side">
+				<div class="logo-wrap">
+					<img class="logo-mark" src="icon.svg" alt="Circuit Pro" />
+					<div class="logo-word">Circuit <span class="logo-pro">Pro</span></div>
+				</div>
+				<div class="palette" id="palette"></div>
+				<div class="modebar" id="modeBar"></div>
+				<div class="legend">
+					拖动元件可移动；点开关可开合；<br />
+					右键或长按旋转；双击删除。
+				</div>
+			</div>
+
+			<div class="stage">
+				<svg id="board" xmlns="http://www.w3.org/2000/svg"></svg>
+			</div>
+
+			<div class="side results">
+				<h3>Circuit Pro 分析结果</h3>
+				<div class="results-body">
+					<div id="selPanel"></div>
+					<div id="warnBox" class="warn"></div>
+					<div class="reslist" id="resList"></div>
+				</div>
+				<details class="more">
+					<summary>更多设置</summary>
+					<label class="field"><input type="checkbox" id="chkRead" checked /> 在图上显示读数</label>
+					<div class="row">
+						<select id="selGrid">
+							<option value="6,8">网格 6 × 8</option>
+							<option value="8,12" selected>网格 8 × 12</option>
+							<option value="10,16">网格 10 × 16</option>
+						</select>
+						<select id="selCell">
+							<option value="40">格子 小</option>
+							<option value="52">格子 中</option>
+							<option value="64" selected>格子 大</option>
+						</select>
+					</div>
+					<div class="row">
+						<button id="btnExport">导出 JSON</button>
+						<button id="btnImport">导入 JSON</button>
+						<input type="file" id="fileImport" accept=".json,application/json" style="display:none" />
+					</div>
+				</details>
+			</div>
+		</div>
+
+		<div class="modal" id="modal" aria-hidden="true">
+			<div class="modal-card" role="dialog" aria-modal="true" aria-label="操作说明">
+				<div class="modal-head">
+					<span class="modal-logo">Circuit <b>Pro</b></span>
+					<button class="modal-x" id="modalClose" aria-label="关闭">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="about">初中电学电路仿真：摆好元件，实时算出电流、电压、电功率。</p>
+					<h4>操作说明</h4>
+					<ul>
+						<li><b>单击</b> 元件：选中并查看/修改参数；单击 <b>开关</b>：开合。</li>
+						<li><b>双击</b> 元件：删除它。</li>
+						<li><b>右键</b>（电脑）或 <b>长按</b>（手机）：旋转 90°。</li>
+						<li><b>拖动</b> 元件：移到别的格子。</li>
+						<li><b>放置</b>：先点左侧元件，再点<u>空格子</u>。有东西的格子不会被覆盖，只会被选中。</li>
+						<li><b>滑动变阻器</b>有 3 个接线柱：<b>上</b>是滑片，<b>左、右</b>是电阻两端。接入电路要「上面那个 + 左边或右边一个」；选中它后拖动「滑片位置」滑块即可改变接入阻值。</li>
+						<li>顶栏有 <b>撤销 / 重做</b>、<b>示例</b>（弹窗里有 10 个电路可载入）、<b>清空</b>。</li>
+						<li>右下角「更多设置」里可改网格、格子大小、显示读数、导出 / 导入。</li>
+					</ul>
+					<p class="foot">by Jacky Zhu &middot; zhujingqi.com</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="demoModal" aria-hidden="true">
+			<div class="modal-card picker" role="dialog" aria-modal="true" aria-label="示例电路">
+				<div class="modal-head">
+					<span class="modal-logo">示例<b>电路</b></span>
+					<button class="modal-x" id="demoModalClose" aria-label="关闭">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="about">挑一个电路载入画布。载入后照常可以拖动、旋转、删改，<b>撤销</b>也能退回原来的图。</p>
+					<div class="demo-grid" id="demoGrid"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="confirm" aria-hidden="true">
+			<div class="modal-card confirm-card" role="dialog" aria-modal="true" aria-label="确认">
+				<div class="confirm-title" id="confirmTitle">确认</div>
+				<p class="confirm-msg" id="confirmMsg"></p>
+				<div class="confirm-actions">
+					<button class="cf-cancel" id="confirmCancel">取消</button>
+					<button class="cf-ok" id="confirmOk">确定</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="bottom" style="display:none"></div>
+
+		<script src="/js/theme.js"></script>
+		<script>
+		(function () {
+			"use strict";
+
+			var TYPES = {
+				wire: { name: "导线", ports: [1, 3], conduct: "always", kind: "none" },
+				corner: { name: "折线", ports: [0, 1], conduct: "always", kind: "none" },
+				tee: { name: "三通", ports: [3, 0, 1], conduct: "always", kind: "none" },
+				cross: { name: "十字", ports: [0, 1, 2, 3], conduct: "always", kind: "none" },
+				battery: { name: "电池", ports: [0, 2], conduct: "never", kind: "vsource", params: { v: { label: "电源电压", unit: "V", def: 5, min: 0.1, step: 0.5 } } },
+				sw: { name: "开关", ports: [1, 3], conduct: "switch", kind: "none", params: { closed: { label: "闭合", def: false, bool: true } } },
+				spdt: { name: "单刀双掷", ports: [3, 0, 2], conduct: "spdt", kind: "none", params: { up: { label: "接上端", def: true, bool: true } } },
+				resistor: { name: "定值电阻", ports: [1, 3], conduct: "never", kind: "resistor", params: { r: { label: "阻值", unit: "Ω", def: 10, min: 0.1, step: 1 } } },
+				rheostat: { name: "滑动变阻器", ports: [1, 3, 0], conduct: "wiper", kind: "rheostat", params: { r: { label: "总阻值", unit: "Ω", def: 20, min: 1, step: 1 }, pos: { label: "滑片位置", def: 0.5, min: 0, max: 1, step: 0.05 } } },
+				bulb: { name: "小灯泡", ports: [1, 3], conduct: "never", kind: "resistor", params: { r: { label: "阻值", unit: "Ω", def: 10, min: 0.1, step: 1 } } },
+				motor: { name: "电动机", ports: [1, 3], conduct: "never", kind: "resistor", params: { r: { label: "阻值", unit: "Ω", def: 10, min: 0.1, step: 1 } } },
+				ammeter: { name: "电流表", ports: [1, 3], conduct: "never", kind: "ammeter", params: {} },
+				voltmeter: { name: "电压表", ports: [1, 3], conduct: "never", kind: "voltmeter", params: {} },
+				ground: { name: "接地", ports: [0], conduct: "never", kind: "ground", params: {} }
+			};
+
+			var PALETTE = ["wire", "corner", "tee", "cross", "battery", "sw", "spdt", "resistor", "rheostat", "bulb", "motor", "ammeter", "voltmeter", "ground"];
+			var SAVE_KEY = "zhujingqi.circuitpro.v1";
+			var VOLT_R = 1e7;
+			var GMIN = 1e-12;
+			var DEMOS = [
+				{ name: "极简电路", d: { rows: 8, cols: 12, cell: 64, cells: {"2,2":{type:"battery",rot:90,p:{v:5}},"2,1":{type:"corner",rot:90,p:{}},"3,1":{type:"sw",rot:90,p:{closed:false}},"4,1":{type:"corner",rot:0,p:{}},"4,2":{type:"bulb",rot:0,p:{r:10}},"4,3":{type:"corner",rot:270,p:{}},"2,3":{type:"corner",rot:180,p:{}},"3,3":{type:"wire",rot:90,p:{}}}, sel: "3,1" } },
+				{ name: "简单串联", d: { rows: 8, cols: 12, cell: 64, cells: {"4,2":{type:"resistor",rot:0,p:{r:10}},"4,3":{type:"resistor",rot:0,p:{r:10}},"4,4":{type:"resistor",rot:0,p:{r:10}},"4,1":{type:"corner",rot:0,p:{}},"3,1":{type:"corner",rot:90,p:{}},"3,2":{type:"battery",rot:90,p:{v:5}},"3,3":{type:"sw",rot:0,p:{closed:false}},"3,4":{type:"wire",rot:0,p:{}},"3,5":{type:"corner",rot:180,p:{}},"4,5":{type:"corner",rot:270,p:{}}}, sel: "4,5" } },
+				{ name: "简单并联", d: { rows: 8, cols: 12, cell: 64, cells: {"3,1":{type:"tee",rot:90,p:{}},"4,1":{type:"tee",rot:90,p:{}},"5,1":{type:"corner",rot:0,p:{}},"3,2":{type:"resistor",rot:0,p:{r:10}},"4,2":{type:"resistor",rot:0,p:{r:10}},"5,2":{type:"resistor",rot:0,p:{r:10}},"5,3":{type:"corner",rot:270,p:{}},"4,3":{type:"tee",rot:270,p:{}},"3,3":{type:"tee",rot:270,p:{}},"2,1":{type:"wire",rot:90,p:{}},"2,3":{type:"sw",rot:90,p:{closed:false}},"1,1":{type:"corner",rot:90,p:{}},"1,3":{type:"corner",rot:180,p:{}},"1,2":{type:"battery",rot:90,p:{v:5}}}, sel: null } },
+				{ name: "简单串并联", d: { rows: 8, cols: 12, cell: 64, cells: {"1,2":{type:"battery",rot:90,p:{v:5}},"1,1":{type:"corner",rot:90,p:{}},"2,1":{type:"sw",rot:90,p:{closed:false}},"3,1":{type:"bulb",rot:90,p:{r:10}},"4,1":{type:"tee",rot:90,p:{}},"4,2":{type:"bulb",rot:0,p:{r:10}},"5,1":{type:"corner",rot:0,p:{}},"5,2":{type:"bulb",rot:0,p:{r:10}},"5,3":{type:"corner",rot:270,p:{}},"4,3":{type:"tee",rot:270,p:{}},"3,3":{type:"bulb",rot:90,p:{r:10}},"1,3":{type:"corner",rot:180,p:{}},"2,3":{type:"bulb",rot:90,p:{r:10}}}, sel: "2,3" } },
+				{ name: "伏安法测电阻", d: { rows: 8, cols: 12, cell: 64, cells: {"3,1":{type:"corner",rot:0,p:{}},"3,2":{type:"ammeter",rot:0,p:{}},"3,3":{type:"tee",rot:180,p:{}},"3,5":{type:"tee",rot:270,p:{}},"3,4":{type:"bulb",rot:0,p:{r:10}},"4,4":{type:"voltmeter",rot:0,p:{}},"4,3":{type:"corner",rot:0,p:{}},"4,5":{type:"corner",rot:270,p:{}},"2,2":{type:"battery",rot:270,p:{v:5}},"2,1":{type:"corner",rot:90,p:{}},"2,3":{type:"sw",rot:0,p:{closed:false}},"2,4":{type:"wire",rot:0,p:{}},"2,5":{type:"corner",rot:180,p:{}}}, sel: "2,3" } },
+				{ name: "简单家庭电路", d: { rows: 8, cols: 12, cell: 64, cells: {"1,2":{type:"battery",rot:90,p:{v:5}},"1,1":{type:"corner",rot:90,p:{}},"1,3":{type:"wire",rot:0,p:{}},"1,4":{type:"sw",rot:0,p:{closed:false}},"2,1":{type:"tee",rot:90,p:{}},"4,2":{type:"tee",rot:0,p:{}},"3,2":{type:"corner",rot:90,p:{}},"2,2":{type:"wire",rot:0,p:{}},"2,3":{type:"sw",rot:0,p:{closed:false}},"3,3":{type:"sw",rot:0,p:{closed:false}},"4,3":{type:"sw",rot:0,p:{closed:false}},"2,4":{type:"bulb",rot:0,p:{r:10}},"3,4":{type:"bulb",rot:0,p:{r:10}},"4,4":{type:"bulb",rot:0,p:{r:10}},"1,5":{type:"corner",rot:180,p:{}},"2,5":{type:"tee",rot:270,p:{}},"3,5":{type:"tee",rot:270,p:{}},"4,5":{type:"tee",rot:270,p:{}},"4,1":{type:"corner",rot:0,p:{}},"3,1":{type:"sw",rot:270,p:{closed:false}},"5,5":{type:"ground",rot:0,p:{}}}, sel: "1,4" } },
+				{ name: "你的电加热 :)", d: { rows: 8, cols: 12, cell: 64, cells: {"1,2":{type:"battery",rot:90,p:{v:5}},"1,1":{type:"corner",rot:90,p:{}},"2,1":{type:"corner",rot:0,p:{}},"2,2":{type:"wire",rot:0,p:{}},"1,3":{type:"corner",rot:180,p:{}},"2,3":{type:"corner",rot:270,p:{}}}, sel: "2,3" } },
+				{ name: "等效电阻1", d: { rows: 8, cols: 12, cell: 64, cells: {"1,4":{type:"resistor",rot:0,p:{r:10}},"2,5":{type:"resistor",rot:90,p:{r:10}},"2,3":{type:"resistor",rot:90,p:{r:10}},"3,4":{type:"resistor",rot:0,p:{r:10}},"1,2":{type:"resistor",rot:0,p:{r:10}},"3,2":{type:"resistor",rot:0,p:{r:10}},"1,6":{type:"resistor",rot:0,p:{r:10}},"3,6":{type:"resistor",rot:0,p:{r:10}},"1,3":{type:"tee",rot:180,p:{}},"3,3":{type:"tee",rot:0,p:{}},"3,5":{type:"tee",rot:0,p:{}},"1,5":{type:"tee",rot:180,p:{}},"1,1":{type:"corner",rot:90,p:{}},"2,1":{type:"wire",rot:90,p:{}},"3,1":{type:"tee",rot:90,p:{}},"4,1":{type:"corner",rot:0,p:{}},"4,2":{type:"sw",rot:0,p:{closed:false}},"4,3":{type:"battery",rot:90,p:{v:5}},"4,4":{type:"wire",rot:0,p:{}},"4,5":{type:"wire",rot:0,p:{}},"4,6":{type:"wire",rot:0,p:{}},"4,7":{type:"corner",rot:270,p:{}},"1,7":{type:"corner",rot:180,p:{}},"2,7":{type:"wire",rot:90,p:{}},"3,7":{type:"tee",rot:270,p:{}}}, sel: "4,2" } },
+				{ name: "等效电阻2", d: { rows: 8, cols: 12, cell: 64, cells: {"3,4":{type:"resistor",rot:0,p:{r:10}},"5,4":{type:"resistor",rot:0,p:{r:10}},"4,3":{type:"resistor",rot:90,p:{r:10}},"4,5":{type:"resistor",rot:90,p:{r:10}},"3,3":{type:"cross",rot:0,p:{}},"5,3":{type:"cross",rot:0,p:{}},"5,5":{type:"cross",rot:0,p:{}},"3,5":{type:"cross",rot:0,p:{}},"2,3":{type:"resistor",rot:90,p:{r:10}},"1,4":{type:"resistor",rot:0,p:{r:10}},"2,5":{type:"resistor",rot:90,p:{r:10}},"1,3":{type:"corner",rot:90,p:{}},"1,5":{type:"corner",rot:180,p:{}},"7,3":{type:"corner",rot:0,p:{}},"6,3":{type:"resistor",rot:90,p:{r:10}},"7,4":{type:"resistor",rot:0,p:{r:10}},"6,5":{type:"resistor",rot:90,p:{r:10}},"7,5":{type:"corner",rot:270,p:{}},"3,2":{type:"resistor",rot:0,p:{r:10}},"5,2":{type:"resistor",rot:0,p:{r:10}},"4,1":{type:"resistor",rot:90,p:{r:10}},"5,1":{type:"corner",rot:0,p:{}},"3,1":{type:"tee",rot:90,p:{}},"2,1":{type:"wire",rot:90,p:{}},"1,1":{type:"sw",rot:270,p:{closed:false}},"0,1":{type:"corner",rot:90,p:{}},"0,2":{type:"battery",rot:90,p:{v:5}},"3,6":{type:"resistor",rot:0,p:{r:10}},"5,6":{type:"resistor",rot:0,p:{r:10}},"4,7":{type:"resistor",rot:90,p:{r:10}},"5,7":{type:"corner",rot:270,p:{}},"3,7":{type:"tee",rot:270,p:{}},"2,7":{type:"wire",rot:90,p:{}},"1,7":{type:"wire",rot:90,p:{}},"0,3":{type:"wire",rot:0,p:{}},"0,6":{type:"wire",rot:0,p:{}},"0,4":{type:"wire",rot:0,p:{}},"0,5":{type:"wire",rot:0,p:{}},"0,7":{type:"corner",rot:180,p:{}}}, sel: "1,1" } },
+				{ name: "奇妙电路", d: { rows: 8, cols: 12, cell: 64, cells: {"1,2":{type:"wire",rot:0,p:{}},"1,1":{type:"corner",rot:90,p:{}},"2,1":{type:"tee",rot:90,p:{}},"1,3":{type:"battery",rot:90,p:{v:5}},"1,4":{type:"sw",rot:0,p:{closed:false}},"2,2":{type:"resistor",rot:0,p:{r:10}},"3,1":{type:"spdt",rot:180,p:{up:false}},"3,2":{type:"bulb",rot:0,p:{r:10}},"4,1":{type:"motor",rot:90,p:{r:10}},"3,3":{type:"cross",rot:0,p:{}},"5,1":{type:"corner",rot:0,p:{}},"5,2":{type:"ammeter",rot:0,p:{}},"3,4":{type:"voltmeter",rot:0,p:{}},"4,3":{type:"wire",rot:90,p:{}},"2,3":{type:"tee",rot:180,p:{}},"2,4":{type:"rheostat",rot:0,p:{r:20,pos:0.5}},"3,5":{type:"corner",rot:270,p:{}},"1,5":{type:"corner",rot:180,p:{}},"2,5":{type:"tee",rot:270,p:{}},"5,4":{type:"ground",rot:270,p:{}},"5,3":{type:"tee",rot:0,p:{}}}, sel: "3,1" } },
+				{ name: "双控开关", d: { rows: 8, cols: 12, cell: 64, cells: {"1,2":{type:"battery",rot:90,p:{v:5}},"1,1":{type:"corner",rot:90,p:{}},"3,2":{type:"spdt",rot:0,p:{up:false}},"2,1":{type:"wire",rot:90,p:{}},"3,1":{type:"corner",rot:0,p:{}},"2,2":{type:"corner",rot:90,p:{}},"4,2":{type:"corner",rot:0,p:{}},"2,3":{type:"wire",rot:0,p:{}},"4,3":{type:"wire",rot:0,p:{}},"3,4":{type:"spdt",rot:180,p:{up:false}},"2,4":{type:"corner",rot:180,p:{}},"4,4":{type:"corner",rot:270,p:{}},"3,5":{type:"corner",rot:270,p:{}},"2,5":{type:"bulb",rot:90,p:{r:10}},"1,5":{type:"corner",rot:180,p:{}},"1,3":{type:"wire",rot:0,p:{}},"1,4":{type:"wire",rot:0,p:{}}}, sel: "3,4" } },
+				{ name: "滑动变阻器", d: { rows: 8, cols: 12, cell: 64, cells: {"1,1":{type:"corner",rot:90,p:{}},"1,2":{type:"battery",rot:90,p:{v:5}},"1,3":{type:"sw",rot:0,p:{closed:false}},"1,4":{type:"corner",rot:180,p:{}},"2,1":{type:"corner",rot:0,p:{}},"2,2":{type:"wire",rot:0,p:{}},"2,4":{type:"rheostat",rot:270,p:{r:20,pos:0.5}},"2,3":{type:"bulb",rot:0,p:{r:10}}}, sel: "1,3" } },
+				{ name: "经典并联骗局", d: { rows: 8, cols: 12, cell: 64, cells: {"1,2":{type:"battery",rot:90,p:{v:5}},"1,1":{type:"corner",rot:90,p:{}},"2,1":{type:"wire",rot:90,p:{}},"3,2":{type:"bulb",rot:0,p:{r:10}},"3,4":{type:"bulb",rot:0,p:{r:10}},"3,6":{type:"bulb",rot:0,p:{r:10}},"3,1":{type:"tee",rot:90,p:{}},"4,1":{type:"corner",rot:0,p:{}},"4,2":{type:"wire",rot:0,p:{}},"3,3":{type:"tee",rot:0,p:{}},"3,5":{type:"tee",rot:180,p:{}},"4,5":{type:"corner",rot:270,p:{}},"4,3":{type:"wire",rot:0,p:{}},"4,4":{type:"wire",rot:0,p:{}},"2,4":{type:"wire",rot:0,p:{}},"2,5":{type:"wire",rot:0,p:{}},"2,3":{type:"corner",rot:90,p:{}},"3,7":{type:"corner",rot:270,p:{}},"2,7":{type:"tee",rot:270,p:{}},"2,6":{type:"wire",rot:0,p:{}},"1,7":{type:"corner",rot:180,p:{}},"1,3":{type:"wire",rot:0,p:{}},"1,5":{type:"wire",rot:0,p:{}},"1,6":{type:"wire",rot:0,p:{}},"1,4":{type:"sw",rot:0,p:{closed:false}}}, sel: null } },
+				{ name: "发电厂", d: { rows: 8, cols: 12, cell: 64, cells: {"2,0":{type:"battery",rot:0,p:{v:5}},"3,0":{type:"battery",rot:0,p:{v:5}},"4,0":{type:"battery",rot:0,p:{v:5}},"1,0":{type:"corner",rot:90,p:{}},"1,1":{type:"sw",rot:0,p:{closed:false}},"1,3":{type:"tee",rot:180,p:{}},"1,4":{type:"tee",rot:180,p:{}},"1,5":{type:"tee",rot:180,p:{}},"1,6":{type:"tee",rot:180,p:{}},"1,2":{type:"tee",rot:180,p:{}},"5,1":{type:"wire",rot:0,p:{}},"5,2":{type:"tee",rot:0,p:{}},"5,3":{type:"tee",rot:0,p:{}},"5,4":{type:"tee",rot:0,p:{}},"5,5":{type:"tee",rot:0,p:{}},"5,6":{type:"tee",rot:0,p:{}},"2,2":{type:"sw",rot:90,p:{closed:false}},"2,3":{type:"sw",rot:90,p:{closed:false}},"2,4":{type:"sw",rot:90,p:{closed:false}},"2,5":{type:"sw",rot:90,p:{closed:false}},"2,6":{type:"sw",rot:90,p:{closed:false}},"1,7":{type:"wire",rot:0,p:{}},"5,7":{type:"wire",rot:0,p:{}},"3,2":{type:"resistor",rot:90,p:{r:10}},"3,3":{type:"bulb",rot:90,p:{r:10}},"3,4":{type:"motor",rot:90,p:{r:10}},"4,2":{type:"wire",rot:90,p:{}},"4,3":{type:"wire",rot:90,p:{}},"4,4":{type:"wire",rot:90,p:{}},"4,5":{type:"wire",rot:90,p:{}},"4,6":{type:"wire",rot:90,p:{}},"6,0":{type:"ground",rot:0,p:{}},"5,0":{type:"tee",rot:90,p:{}},"3,5":{type:"resistor",rot:90,p:{r:10}},"3,6":{type:"bulb",rot:90,p:{r:10}}}, sel: "1,1" } }
+			];
+
+			var GUTTER = 20;
+
+			var state = {
+				rows: 8, cols: 12, cell: 64,
+				cells: {},
+				mode: "edit",
+				place: "wire",
+				sel: null,
+				showRead: true
+			};
+			var undoStack = [];
+			var redoStack = [];
+			var lastResult = null;
+
+			var svg = document.getElementById("board");
+			var paletteEl = document.getElementById("palette");
+			var selPanel = document.getElementById("selPanel");
+			var warnBox = document.getElementById("warnBox");
+			var resList = document.getElementById("resList");
+			var modeBar = document.getElementById("modeBar");
+
+			function defParams(type) {
+				var t = TYPES[type];
+				var p = {};
+				if (!t.params) return p;
+				for (var k in t.params) p[k] = t.params[k].def;
+				return p;
+			}
+
+			function portsOf(cell) {
+				var t = TYPES[cell.type];
+				var q = cell.rot / 90;
+				var out = [];
+				for (var i = 0; i < t.ports.length; i++) out.push((t.ports[i] + q) % 4);
+				return out;
+			}
+
+			var OPP = [2, 3, 0, 1];
+			function sideConnected(key, side) {
+				var rc = key.split(","), r = +rc[0], c = +rc[1];
+				var nr = r + (side === 2 ? 1 : side === 0 ? -1 : 0);
+				var nc = c + (side === 1 ? 1 : side === 3 ? -1 : 0);
+				if (nr < 0 || nc < 0 || nr >= state.rows || nc >= state.cols) return false;
+				var nb = state.cells[nr + "," + nc];
+				if (!nb) return false;
+				return portsOf(nb).indexOf(OPP[side]) >= 0;
+			}
+
+			function rheoInfo(key) {
+				var cell = state.cells[key];
+				var R = Math.max(cell.p && cell.p.r != null ? cell.p.r : 20, 0.01);
+				var pos = Math.min(1, Math.max(0, cell.p && cell.p.pos != null ? cell.p.pos : 0.5));
+				var A = sideConnected(key, 1), B = sideConnected(key, 3);
+				var C = sideConnected(key, 0);
+				var rin = null;
+				var ra = pos * R, rb = (1 - pos) * R;
+				if (A && B && C) rin = (ra * rb) / (ra + rb);
+				else if (C && A) rin = ra;
+				else if (C && B) rin = rb;
+				else if (A && B) rin = R;
+				return { R: R, pos: pos, rin: rin, ok: rin != null };
+			}
+
+			function buildNets(rows, cols, cells) {
+				var n = rows * cols * 4;
+				var parent = new Int32Array(n);
+				for (var i = 0; i < n; i++) parent[i] = i;
+				function find(x) { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+				function union(x, y) { x = find(x); y = find(y); if (x !== y) parent[y] = x; }
+				function pid(r, c, s) { return ((r * cols + c) * 4 + s); }
+
+				var keys = Object.keys(cells);
+				var sides = {}, keySet = {};
+				for (var a = 0; a < keys.length; a++) {
+					var key = keys[a];
+					keySet[key] = true;
+					var rc = key.split(",");
+					sides[key] = portsOf(cells[key]);
+					void rc;
+				}
+				for (var b = 0; b < keys.length; b++) {
+					var key2 = keys[b];
+					var cell = cells[key2];
+					var t = TYPES[cell.type];
+					var r2 = +key2.split(",")[0], c2 = +key2.split(",")[1];
+					var s2 = sides[key2];
+					if (t.conduct === "always") {
+						for (var pi = 1; pi < s2.length; pi++) union(pid(r2, c2, s2[0]), pid(r2, c2, s2[pi]));
+					} else if (t.conduct === "wiper") {
+						for (var wi = 3; wi < s2.length; wi++) union(pid(r2, c2, s2[2]), pid(r2, c2, s2[wi]));
+					} else if (t.conduct === "switch" && cell.p && cell.p.closed) {
+						union(pid(r2, c2, s2[0]), pid(r2, c2, s2[1]));
+					} else if (t.conduct === "spdt") {
+						union(pid(r2, c2, s2[0]), pid(r2, c2, (cell.p && !cell.p.up) ? s2[2] : s2[1]));
+					}
+				}
+				var g0 = -1;
+				for (var gi = 0; gi < keys.length; gi++) {
+					if (TYPES[cells[keys[gi]].type].kind !== "ground") continue;
+					var gr = +keys[gi].split(",")[0], gc = +keys[gi].split(",")[1];
+					var gp = pid(gr, gc, sides[keys[gi]][0]);
+					if (g0 < 0) g0 = gp; else union(g0, gp);
+				}
+				for (var d = 0; d < keys.length; d++) {
+					var key3 = keys[d];
+					var r3 = +key3.split(",")[0], c3 = +key3.split(",")[1];
+					var s3 = sides[key3];
+					if (s3.indexOf(1) >= 0 && c3 + 1 < cols) {
+						var nkE = r3 + "," + (c3 + 1);
+						if (keySet[nkE] && sides[nkE].indexOf(3) >= 0) union(pid(r3, c3, 1), pid(r3, c3 + 1, 3));
+					}
+					if (s3.indexOf(2) >= 0 && r3 + 1 < rows) {
+						var nkS = (r3 + 1) + "," + c3;
+						if (keySet[nkS] && sides[nkS].indexOf(0) >= 0) union(pid(r3, c3, 2), pid(r3 + 1, c3, 0));
+					}
+					if (s3.indexOf(3) >= 0 && c3 - 1 >= 0) {
+						var nkW = r3 + "," + (c3 - 1);
+						if (keySet[nkW] && sides[nkW].indexOf(1) >= 0) union(pid(r3, c3, 3), pid(r3, c3 - 1, 1));
+					}
+					if (s3.indexOf(0) >= 0 && r3 - 1 >= 0) {
+						var nkN = (r3 - 1) + "," + c3;
+						if (keySet[nkN] && sides[nkN].indexOf(2) >= 0) union(pid(r3, c3, 0), pid(r3 - 1, c3, 2));
+					}
+				}
+				var rootToNet = {}, netCount = 0;
+				var netOfPort = new Int32Array(n).fill(-1);
+				for (var e = 0; e < keys.length; e++) {
+					var key4 = keys[e];
+					var r4 = +key4.split(",")[0], c4 = +key4.split(",")[1];
+					var s4 = sides[key4];
+					for (var si = 0; si < s4.length; si++) {
+						var p = pid(r4, c4, s4[si]);
+						var rt = find(p);
+						if (!(rt in rootToNet)) rootToNet[rt] = netCount++;
+						netOfPort[p] = rootToNet[rt];
+					}
+				}
+				return { netOfPort: netOfPort, netCount: netCount, sides: sides, pid: pid, keySet: keySet };
+			}
+
+			function collectElements(rows, cols, cells, net) {
+				var els = [];
+				var keys = Object.keys(cells);
+				for (var k = 0; k < keys.length; k++) {
+					var key = keys[k];
+					var cell = cells[key];
+					var t = TYPES[cell.type];
+					if (t.kind === "none" || t.kind === "ground") continue;
+					var r = +key.split(",")[0], c = +key.split(",")[1];
+					var ss = net.sides[key];
+					if (t.kind === "rheostat") {
+						var nA = net.netOfPort[net.pid(r, c, ss[0])];
+						var nB = net.netOfPort[net.pid(r, c, ss[1])];
+						var nW = net.netOfPort[net.pid(r, c, ss[2])];
+						var R = Math.max(cell.p && cell.p.r != null ? cell.p.r : 20, 0.01);
+						var pos = Math.min(1, Math.max(0, cell.p && cell.p.pos != null ? cell.p.pos : 0.5));
+						els.push({ id: key + "#a", kind: "resistor", a: nA, b: nW, value: pos * R });
+						els.push({ id: key + "#b", kind: "resistor", a: nW, b: nB, value: (1 - pos) * R });
+						continue;
+					}
+					var a = net.netOfPort[net.pid(r, c, ss[0])];
+					var b = net.netOfPort[net.pid(r, c, ss[1])];
+					var value = t.kind === "resistor" ? (cell.p && cell.p.r != null ? cell.p.r : 10)
+						: t.kind === "vsource" ? (cell.p && cell.p.v != null ? cell.p.v : 0) : 0;
+					els.push({ id: key, kind: t.kind, a: a, b: b, value: value });
+				}
+				return els;
+			}
+
+			function gauss(A, z) {
+				var N = z.length;
+				for (var col = 0; col < N; col++) {
+					var piv = col, mx = Math.abs(A[col][col]);
+					for (var r = col + 1; r < N; r++) { var v = Math.abs(A[r][col]); if (v > mx) { mx = v; piv = r; } }
+					if (mx < 1e-18) return null;
+					if (piv !== col) {
+						var tmp = A[piv]; A[piv] = A[col]; A[col] = tmp;
+						var tz = z[piv]; z[piv] = z[col]; z[col] = tz;
+					}
+					var p = A[col][col];
+					for (var r2 = col + 1; r2 < N; r2++) {
+						var f = A[r2][col] / p;
+						if (f === 0) continue;
+						A[r2][col] = 0;
+						for (var c2 = col + 1; c2 < N; c2++) A[r2][c2] -= f * A[col][c2];
+						z[r2] -= f * z[col];
+					}
+				}
+				var x = new Float64Array(N);
+				for (var r3 = N - 1; r3 >= 0; r3--) {
+					var s = z[r3];
+					for (var c3 = r3 + 1; c3 < N; c3++) s -= A[r3][c3] * x[c3];
+					x[r3] = s / A[r3][r3];
+				}
+				return x;
+			}
+
+			function solveNetwork(elements, netCount, groundNet) {
+				var srcs = elements.filter(function (e) { return e.kind === "vsource" || e.kind === "ammeter"; });
+				if (netCount === 0) return { ok: false, msg: "电路是空的" };
+				if (srcs.length === 0) return { ok: false, msg: "电路里没有电源" };
+				var N = netCount + srcs.length;
+				var A = [];
+				for (var i = 0; i < N; i++) A.push(new Float64Array(N));
+				var z = new Float64Array(N);
+				var g = (typeof groundNet === "number" && groundNet >= 0 && groundNet < netCount) ? groundNet : 0;
+				var vidx = {};
+				for (var j = 0; j < srcs.length; j++) vidx[srcs[j].id] = netCount + j;
+				function stampR(a, b, G) {
+					if (a !== g) A[a][a] += G;
+					if (b !== g) A[b][b] += G;
+					if (a !== g && b !== g) { A[a][b] -= G; A[b][a] -= G; }
+				}
+				for (var ei = 0; ei < elements.length; ei++) {
+					var e = elements[ei];
+					var a = e.a, b = e.b;
+					if (e.kind === "resistor" || e.kind === "voltmeter") {
+						var R = e.kind === "voltmeter" ? VOLT_R : Math.max(e.value, 1e-6);
+						stampR(a, b, 1 / R);
+					} else if (e.kind === "vsource" || e.kind === "ammeter") {
+						var jj = vidx[e.id];
+						if (a !== g) A[a][jj] -= 1;
+						if (b !== g) A[b][jj] += 1;
+						if (a !== g) A[jj][a] += 1;
+						if (b !== g) A[jj][b] -= 1;
+						z[jj] = e.kind === "vsource" ? e.value : 0;
+					}
+				}
+				for (var kk = 0; kk < netCount; kk++) if (kk !== g) A[kk][kk] += GMIN;
+				A[g] = new Float64Array(N); A[g][g] = 1; z[g] = 0;
+				var x = gauss(A, z);
+				if (!x) return { ok: false, msg: "电路有冲突：电源被短路，或电压表/电源接线有误" };
+				var V = new Float64Array(netCount);
+				for (var q = 0; q < netCount; q++) V[q] = x[q];
+				var res = {};
+				for (var ei2 = 0; ei2 < elements.length; ei2++) {
+					var e2 = elements[ei2];
+					var va = e2.a === g ? 0 : V[e2.a];
+					var vb = e2.b === g ? 0 : V[e2.b];
+					var u = va - vb;
+					var ii;
+					if (e2.kind === "vsource" || e2.kind === "ammeter") ii = x[vidx[e2.id]];
+					else ii = u / (e2.kind === "voltmeter" ? VOLT_R : Math.max(e2.value, 1e-6));
+					res[e2.id] = { i: ii, u: u, p: u * ii };
+				}
+				return { ok: true, V: V, res: res };
+			}
+
+			function solve() {
+				var net = buildNets(state.rows, state.cols, state.cells);
+				var els = collectElements(state.rows, state.cols, state.cells, net);
+				var groundNet = -1;
+				var gkeys = Object.keys(state.cells);
+				for (var gi = 0; gi < gkeys.length; gi++) {
+					if (TYPES[state.cells[gkeys[gi]].type].kind !== "ground") continue;
+					var gr = +gkeys[gi].split(",")[0], gc = +gkeys[gi].split(",")[1];
+					groundNet = net.netOfPort[net.pid(gr, gc, net.sides[gkeys[gi]][0])];
+					break;
+				}
+				var out = solveNetwork(els, net.netCount, groundNet);
+				out.nets = net;
+				out.els = els;
+				return out;
+			}
+
+			var ART = {
+				wire: '<path class="ln" d="M0 32H64"/>',
+				corner: '<path class="ln" d="M32 0V32H64"/>',
+				tee: '<path class="ln" d="M0 32H64M32 0V32"/><circle class="dot" cx="32" cy="32" r="4"/>',
+				cross: '<path class="ln" d="M0 32H64M32 0V64"/><circle class="dot" cx="32" cy="32" r="4"/>',
+				battery: '<path class="ln" d="M32 0V21"/><path class="ln" d="M15 21H49"/><path class="ln" d="M25 33H39"/><path class="ln" d="M32 33V64"/>',
+				sw: {
+					open: '<path class="ln" d="M0 32H16M48 32H64"/><circle class="dot" cx="16" cy="32" r="3.5"/><circle class="dot" cx="48" cy="32" r="3.5"/><path class="ln" d="M16 32L44 17"/>',
+					closed: '<path class="ln" d="M0 32H16M48 32H64"/><circle class="dot" cx="16" cy="32" r="3.5"/><circle class="dot" cx="48" cy="32" r="3.5"/><path class="ln" d="M16 32H48"/>'
+				},
+				spdt: {
+					up: '<path class="ln" d="M0 32H20M32 0V16M32 64V48"/><circle class="dot" cx="20" cy="32" r="3.5"/><circle class="dot" cx="32" cy="16" r="3.5"/><circle class="dot" cx="32" cy="48" r="3.5"/><path class="ln" d="M20 32L32 16"/>',
+					down: '<path class="ln" d="M0 32H20M32 0V16M32 64V48"/><circle class="dot" cx="20" cy="32" r="3.5"/><circle class="dot" cx="32" cy="16" r="3.5"/><circle class="dot" cx="32" cy="48" r="3.5"/><path class="ln" d="M20 32L32 48"/>'
+				},
+				resistor: '<path class="ln" d="M0 32H14M50 32H64"/><rect class="bx" x="14" y="22" width="36" height="20" rx="2"/>',
+				rheostat: '<path class="ln" d="M0 32H14M50 32H64M32 0V23"/><rect class="bx" x="14" y="24" width="36" height="16" rx="2"/><path class="bx" d="M25 14L32 23L39 14"/>',
+				bulb: '<path class="ln" d="M0 32H17M47 32H64"/><circle class="bulbx" cx="32" cy="32" r="15"/><path class="ln" d="M21.4 21.4L42.6 42.6M42.6 21.4L21.4 42.6"/>',
+				motor: '<path class="ln" d="M0 32H17M47 32H64"/><circle class="bx" cx="32" cy="32" r="15"/><g class="rotor"><text class="sym2" x="32" y="32" dominant-baseline="central" text-anchor="middle">M</text></g>',
+				ammeter: '<path class="ln" d="M0 32H17M47 32H64"/><circle class="bx" cx="32" cy="32" r="15"/><text class="sym" x="32" y="40">A</text><text class="pm" x="56" y="18">+</text>',
+				voltmeter: '<path class="ln" d="M0 32H17M47 32H64"/><circle class="bx" cx="32" cy="32" r="15"/><text class="sym" x="32" y="40">V</text><text class="pm" x="56" y="18">+</text>',
+				ground: '<path class="ln" d="M32 0V24"/><path class="ln" d="M13 24H51"/><path class="ln" d="M19 33H45"/><path class="ln" d="M25 42H39"/>'
+			};
+
+			function art(type, comp) {
+				var a = ART[type];
+				if (!a) return "";
+				if (type === "sw") return (comp && comp.p && comp.p.closed) ? a.closed : a.open;
+				if (type === "spdt") return (comp && comp.p && !comp.p.up) ? a.down : a.up;
+				return a;
+			}
+
+			function esc(s) { return String(s).replace(/[&<>"]/g, function (m) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[m]; }); }
+			function coord(key) { var rc = key.split(","); return (+rc[0] + 1) + "," + (+rc[1] + 1); }
+			function fmt(x) {
+				var a = Math.abs(x);
+				if (a < 1e-9) return "0";
+				var s, suf = "";
+				if (a >= 1e6) { s = (x / 1e6).toFixed(2); suf = "M"; }
+				else if (a >= 1e3) { s = (x / 1e3).toFixed(2); suf = "k"; }
+				else if (a >= 1) s = x.toFixed(2);
+				else if (a >= 0.01) s = x.toFixed(3);
+				else s = x.toFixed(4);
+				if (s.indexOf(".") >= 0) s = s.replace(/0+$/, "").replace(/\.$/, "");
+				return s + suf;
+			}
+
+			function renderPalette() {
+				var html = "";
+				for (var i = 0; i < PALETTE.length; i++) {
+					var t = PALETTE[i];
+					html += '<button data-type="' + t + '"' + (state.mode === "place" && state.place === t ? ' class="on"' : "") + '>' +
+						'<svg viewBox="0 0 64 64">' + art(t, { p: defParams(t) }) + "</svg>" + esc(TYPES[t].name) + "</button>";
+				}
+				paletteEl.innerHTML = html;
+				if (state.mode === "place") {
+					modeBar.innerHTML = "正在放置 <b>" + esc(TYPES[state.place].name) + "</b>：点格子放置；再点一次该元件可取消。";
+				} else {
+					modeBar.innerHTML = "点上面的元件，再点格子放置。";
+				}
+			}
+
+			function render() {
+				var cell = state.cell, rows = state.rows, cols = state.cols;
+				var gw = cols * cell, gh = rows * cell;
+				var W = gw + GUTTER, H = gh + GUTTER;
+				svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+				svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+				var axis = [];
+				for (var ac = 0; ac < cols; ac++) axis.push('<text class="axis" x="' + (GUTTER + ac * cell + cell / 2) + '" y="' + (GUTTER - 6) + '">' + (ac + 1) + "</text>");
+				for (var ar = 0; ar < rows; ar++) axis.push('<text class="axis y" x="' + (GUTTER - 6) + '" y="' + (GUTTER + ar * cell + cell / 2 + 4) + '">' + (ar + 1) + "</text>");
+
+				var out = [];
+				var g = [];
+				for (var c = 1; c < cols; c++) g.push("M" + (c * cell) + " 0V" + gh);
+				for (var r = 1; r < rows; r++) g.push("M0 " + (r * cell) + "H" + gw);
+				out.push('<path class="gridline" d="' + g.join("") + '"/>');
+
+				if (state.hover && state.hover !== state.sel) {
+					var hr = +state.hover.split(",")[0], hc = +state.hover.split(",")[1];
+					out.push('<rect class="hotbox" x="' + (hc * cell) + '" y="' + (hr * cell) + '" width="' + cell + '" height="' + cell + '"/>');
+				}
+
+				var keys = Object.keys(state.cells);
+				for (var k = 0; k < keys.length; k++) {
+					var key = keys[k];
+					var comp = state.cells[key];
+					var rr = +key.split(",")[0], cc = +key.split(",")[1];
+					var s = cell / 64;
+					out.push('<g transform="translate(' + (cc * cell) + ',' + (rr * cell) + ') scale(' + s + ') rotate(' + comp.rot + ' 32 32)">' + art(comp.type, comp) + "</g>");
+				}
+
+				if (state.sel && state.cells[state.sel]) {
+					var sr = +state.sel.split(",")[0], sc = +state.sel.split(",")[1];
+					out.push('<rect class="selbox" x="' + (sc * cell + 1) + '" y="' + (sr * cell + 1) + '" width="' + (cell - 2) + '" height="' + (cell - 2) + '" rx="6"/>');
+				}
+
+				if (lastResult) {
+					var rr2 = lastResult.res || {};
+					if (state.showRead) {
+						for (var k2 = 0; k2 < keys.length; k2++) {
+							var key2 = keys[k2];
+							var comp2 = state.cells[key2];
+							var kind = TYPES[comp2.type].kind;
+							if (kind === "none") continue;
+							var cr = +key2.split(",")[0], ccc = +key2.split(",")[1];
+							var txt = "", bad = false;
+							if (kind === "rheostat") {
+								var ri2 = rheoInfo(key2);
+								txt = ri2.ok ? (Math.round(ri2.pos * 100) + "% " + fmt(ri2.rin) + "Ω") : "未接入";
+								bad = !ri2.ok || ri2.rin < 0.001;
+							} else {
+								var res = rr2[key2];
+								if (!res) continue;
+								if (kind === "vsource") txt = fmt(Math.abs(res.i)) + "A";
+								else if (kind === "ammeter") { txt = fmt(Math.abs(res.i)) + "A"; bad = res.i < -1e-6; }
+								else if (kind === "voltmeter") txt = fmt(Math.abs(res.u)) + "V";
+								else txt = fmt(Math.abs(res.i)) + "A";
+							}
+							out.push('<text class="ro' + (bad ? " bad" : "") + '" x="' + (ccc * cell + cell / 2) + '" y="' + (cr * cell + cell - 4) + '">' + esc(txt) + "</text>");
+						}
+					}
+				}
+
+				svg.innerHTML = '<g transform="translate(' + GUTTER + ',' + GUTTER + ')">' + out.join("") + "</g>" + axis.join("");
+				applyEffects();
+			}
+
+			var spinRAF = 0, spinLast = 0;
+			function spinFrame(t) {
+				var dt = spinLast ? Math.min(64, t - spinLast) : 16;
+				spinLast = t;
+				var rotors = svg.querySelectorAll("g.rotor[data-on]");
+				for (var i = 0; i < rotors.length; i++) {
+					var node = rotors[i];
+					var dur = parseFloat(node.getAttribute("data-dur")) || 900;
+					var phase = ((parseFloat(node.getAttribute("data-phase")) || 0) + dt / dur * 360) % 360;
+					node.setAttribute("data-phase", phase.toFixed(2));
+					node.setAttribute("transform", "rotate(" + phase.toFixed(1) + " 32 32)");
+				}
+				spinRAF = (rotors.length && typeof requestAnimationFrame === "function") ? requestAnimationFrame(spinFrame) : 0;
+				if (!spinRAF) spinLast = 0;
+			}
+
+			function applyEffects() {
+				if (!lastResult || !lastResult.ok) {
+					if (spinRAF) { cancelAnimationFrame(spinRAF); spinRAF = 0; }
+					return;
+				}
+				var keys = Object.keys(state.cells);
+				var bnodes = svg.querySelectorAll("circle.bulbx");
+				var bi = 0;
+				var mrotors = svg.querySelectorAll("g.rotor");
+				var mi = 0;
+				var anySpin = false;
+				for (var k = 0; k < keys.length; k++) {
+					var type = state.cells[keys[k]].type;
+					var res = lastResult.res[keys[k]];
+					if (type === "bulb") {
+						var bnode = bnodes[bi++];
+						if (!bnode || !res) continue;
+						var p = Math.abs(res.p);
+						var a = Math.min(0.95, Math.sqrt(p) / 1.1);
+						bnode.style.fill = a < 0.05 ? "none" : "rgba(255,205,45," + a.toFixed(3) + ")";
+						bnode.style.stroke = a < 0.05 ? "currentColor" : "#e8a300";
+					} else if (type === "motor") {
+						var mnode = mrotors[mi++];
+						if (!mnode || !res) continue;
+						if (Math.abs(res.i) > 1e-4) {
+							var rps = Math.min(9, 0.3 + 2.6 * Math.abs(res.i));
+							mnode.setAttribute("data-dur", (1000 / rps).toFixed(0));
+							mnode.setAttribute("data-on", "1");
+							anySpin = true;
+						} else {
+							mnode.removeAttribute("data-on");
+						}
+					}
+				}
+				if (anySpin && !spinRAF && typeof requestAnimationFrame === "function") { spinLast = 0; spinRAF = requestAnimationFrame(spinFrame); }
+				if (!anySpin && spinRAF) { cancelAnimationFrame(spinRAF); spinRAF = 0; }
+			}
+
+			function renderPanel() {
+				var html = "";
+				if (state.sel && state.cells[state.sel]) {
+					var comp = state.cells[state.sel];
+					var t = TYPES[comp.type];
+					html += "<div><b>" + esc(t.name) + "</b> @ " + esc(coord(state.sel)) + "</div>";
+					if (t.params) {
+						for (var pk in t.params) {
+							var pd = t.params[pk];
+							if (pd.bool) {
+								html += '<label class="field"><input type="checkbox" data-p="' + pk + '"' + (comp.p[pk] ? " checked" : "") + "> " + esc(pd.label) + "</label>";
+							} else if (pd.max != null) {
+								html += '<label class="field field-col">' + esc(pd.label) +
+									'<input type="range" data-p="' + pk + '" min="' + pd.min + '" max="' + pd.max + '" step="' + pd.step + '" value="' + comp.p[pk] + '">' +
+									'<span class="pval" data-pv="' + pk + '">' + Math.round(comp.p[pk] * 100) + "%</span></label>";
+							} else {
+								html += '<label class="field">' + esc(pd.label) + '<input type="number" data-p="' + pk + '" value="' + comp.p[pk] + '" min="' + pd.min + '" step="' + pd.step + '"> ' + esc(pd.unit || "") + "</label>";
+							}
+						}
+						if (comp.type === "rheostat") {
+							var info = rheoInfo(state.sel);
+							if (info.ok) {
+								html += '<div class="rheoInfo">接入阻值 <b>' + fmt(info.rin) + " Ω</b></div>";
+							} else {
+								html += '<div class="rheoInfo warn2">还没接入电路：要接<b>上面的滑片柱</b>和<b>左边或右边的固定柱</b>。</div>';
+							}
+						}
+					} else {
+						html += '<div class="legend">此元件无参数。</div>';
+					}
+				} else {
+					html += '<div class="legend">未选中元件。点画布上的元件查看参数。</div>';
+				}
+				selPanel.innerHTML = html;
+			}
+
+			function renderResults() {
+				var r = lastResult;
+				var warns = [];
+				var list = "";
+				if (!r) { warnBox.innerHTML = ""; resList.innerHTML = ""; return; }
+				if (!r.ok) {
+					warnBox.textContent = r.msg;
+					resList.innerHTML = "";
+					return;
+				}
+				var keys = Object.keys(state.cells).sort();
+				var anyCurrent = false;
+				for (var k = 0; k < keys.length; k++) {
+					var key = keys[k];
+					var comp = state.cells[key];
+					var t = TYPES[comp.type];
+					var res = r.res[key];
+					if (t.kind === "rheostat") {
+						var ri = rheoInfo(key);
+						var rv = [];
+						if (ri.ok) {
+							rv.push("接入 R = " + fmt(ri.rin) + " Ω");
+							rv.push("总 R = " + fmt(ri.R) + " Ω");
+							rv.push("滑片 " + Math.round(ri.pos * 100) + "%");
+							var ra2 = r.res[key + "#a"], rb2 = r.res[key + "#b"];
+							if (ra2 && rb2) {
+								rv.push("U = " + fmt(Math.abs(ra2.u + rb2.u)) + " V");
+								rv.push("I = " + fmt(Math.max(Math.abs(ra2.i), Math.abs(rb2.i))) + " A");
+							}
+							if (Math.abs(ri.rin) < 0.001) warns.push("⚠ 滑动变阻器 @ " + coord(key) + " 接入阻值几乎为 0，等于短路");
+						} else {
+							rv.push("未接入（需要滑片柱 + 一个固定柱）");
+						}
+						list += '<div class="ritem"><div class="rname">' + esc(t.name + " @ " + coord(key)) + '</div><div class="rval">' + esc(rv.join("　")) + "</div></div>";
+						continue;
+					}
+					if (!res || t.kind === "none") continue;
+					if (Math.abs(res.i) > 1e-6) anyCurrent = true;
+					var name = t.name + " @ " + coord(key);
+					var vals = [];
+					if (t.kind === "ammeter") vals.push("I = " + fmt(res.i) + " A");
+					else if (t.kind === "voltmeter") vals.push("U = " + fmt(res.u) + " V");
+					else if (t.kind === "vsource") {
+						vals.push("U = " + fmt(Math.abs(res.u)) + " V");
+						vals.push("I = " + fmt(Math.abs(res.i)) + " A");
+					} else {
+						vals.push("R = " + fmt(comp.p.r) + " Ω");
+						vals.push("U = " + fmt(Math.abs(res.u)) + " V");
+						vals.push("I = " + fmt(Math.abs(res.i)) + " A");
+						if (comp.type === "bulb" || comp.type === "motor") vals.push("P = " + fmt(Math.abs(res.p)) + " W");
+					}
+					list += '<div class="ritem"><div class="rname">' + esc(name) + '</div><div class="rval">' + esc(vals.join("　")) + "</div></div>";
+					if (t.kind === "ammeter" && res.i < -1e-6) warns.push("⚠ 电流表 @ " + coord(key) + " 接线柱接反了（电流从负接线柱流入）");
+					if (t.kind === "ammeter" && Math.abs(res.i) > 3 + 1e-9) warns.push("⚠ 电流表 @ " + coord(key) + " 超出量程（3A）");
+					if (t.kind === "voltmeter" && Math.abs(res.u) > 15 + 1e-9) warns.push("⚠ 电压表 @ " + coord(key) + " 超出量程（15V）");
+					if (t.kind === "resistor" && comp.type === "bulb" && Math.abs(res.p) > 5) warns.push("⚠ 小灯泡 @ " + coord(key) + " 实际功率过大（" + fmt(Math.abs(res.p)) + " W），可能烧坏");
+				}
+				if (!anyCurrent) warns.push("⚠ 电路中几乎所有电流都为零：可能开关断开或电路某处断路");
+				warnBox.innerHTML = warns.join("<br>");
+				resList.innerHTML = list;
+			}
+
+			function refresh(keepSel) {
+				lastResult = solve();
+				render();
+				if (!keepSel) renderPanel();
+				renderResults();
+				saveLocal();
+			}
+
+			function snapshot() { return JSON.stringify({ rows: state.rows, cols: state.cols, cell: state.cell, cells: state.cells, sel: state.sel }); }
+			function pushUndo() {
+				undoStack.push(snapshot());
+				if (undoStack.length > 60) undoStack.shift();
+				redoStack.length = 0;
+			}
+			function restore(snap) {
+				var o = JSON.parse(snap);
+				state.rows = o.rows; state.cols = o.cols; state.cell = o.cell; state.cells = o.cells; state.sel = o.sel || null;
+			}
+			function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); refresh(); renderPanel(); }
+			function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); refresh(); renderPanel(); }
+
+			function saveLocal() {
+				try { localStorage.setItem(SAVE_KEY, snapshot()); } catch (e) { }
+			}
+			function loadLocal() {
+				try {
+					var s = localStorage.getItem(SAVE_KEY);
+					if (!s) return false;
+					var o = JSON.parse(s);
+					if (!o || !o.cells || typeof o.rows !== "number") return false;
+					restore(s);
+					return true;
+				} catch (e) { return false; }
+			}
+
+			function setTypeIfFresh(type) {
+				var t = TYPES[type];
+				if (!state.cells[state.sel]) return;
+				if (state.cells[state.sel].type === type) return;
+				void t;
+			}
+
+			function placeAt(key, type) {
+				pushUndo();
+				state.cells[key] = { type: type, rot: 0, p: defParams(type) };
+				state.sel = key;
+				refresh();
+				renderPanel();
+			}
+
+			function moveComp(from, to) {
+				if (from === to) return;
+				pushUndo();
+				var a = state.cells[from];
+				var b = state.cells[to];
+				state.cells[to] = a;
+				if (b) state.cells[from] = b; else delete state.cells[from];
+				state.sel = to;
+				refresh();
+				renderPanel();
+			}
+
+			function cellFromEvent(e) {
+				var rect = svg.getBoundingClientRect();
+				if (!rect.width || !rect.height) return null;
+				var W = state.cols * state.cell + GUTTER, H = state.rows * state.cell + GUTTER;
+				var sc = Math.min(rect.width / W, rect.height / H);
+				var ox = rect.left + (rect.width - W * sc) / 2;
+				var oy = rect.top + (rect.height - H * sc) / 2;
+				var x = (e.clientX - ox) / sc - GUTTER;
+				var y = (e.clientY - oy) / sc - GUTTER;
+				var c = Math.floor(x / state.cell), r = Math.floor(y / state.cell);
+				if (r < 0 || c < 0 || r >= state.rows || c >= state.cols) return null;
+				return { r: r, c: c, key: r + "," + c };
+			}
+
+			var drag = null;
+			var lastTap = { key: null, time: 0 };
+			var pending = null;
+			var LP_MS = 550;
+			var TAP_MS = 250;
+			var DBL_MS = 450;
+
+			function isSwitchable(comp) { return !!comp && (comp.type === "sw" || comp.type === "spdt"); }
+
+			function rotateCell(key) {
+				if (!state.cells[key]) return;
+				pushUndo();
+				state.cells[key].rot = (state.cells[key].rot + 90) % 360;
+				state.sel = key;
+				refresh();
+				renderPanel();
+			}
+			function deleteCell(key) {
+				if (!state.cells[key]) return;
+				pushUndo();
+				delete state.cells[key];
+				if (state.sel === key) state.sel = null;
+				refresh();
+				renderPanel();
+			}
+			function toggleComp(key) {
+				var c = state.cells[key];
+				if (!c) return;
+				if (c.type !== "sw" && c.type !== "spdt") return;
+				pushUndo();
+				if (c.type === "sw") c.p.closed = !c.p.closed;
+				else c.p.up = !c.p.up;
+				refresh();
+				renderPanel();
+			}
+			function armPending(key, delay) {
+				pending = { key: key, timer: setTimeout(function () { var p = pending; pending = null; if (p) toggleComp(p.key); }, delay) };
+			}
+			function flushPending() {
+				if (!pending) return;
+				clearTimeout(pending.timer);
+				var p = pending;
+				pending = null;
+				toggleComp(p.key);
+			}
+			function rotateSel() { if (state.sel) rotateCell(state.sel); }
+			function deleteSel() { if (state.sel) deleteCell(state.sel); }
+
+			svg.addEventListener("pointerdown", function (e) {
+				if (e.pointerType === "mouse" && e.button !== 0) return;
+				var cell = cellFromEvent(e);
+				if (!cell) return;
+				e.preventDefault();
+				try { svg.setPointerCapture(e.pointerId); } catch (err) { }
+				if (state.mode === "place" && !state.cells[cell.key]) {
+					placeAt(cell.key, state.place);
+					return;
+				}
+				if (state.cells[cell.key]) {
+					state.sel = cell.key;
+					drag = { key: cell.key, x: e.clientX, y: e.clientY, moved: false, longFired: false, lp: 0 };
+					if (!(lastTap.key === cell.key && Date.now() - lastTap.time < DBL_MS)) {
+						var d = drag;
+						d.lp = setTimeout(function () {
+							if (drag === d && !d.moved) {
+								d.longFired = true;
+								try { if (navigator.vibrate) navigator.vibrate(15); } catch (ve) { }
+								rotateCell(d.key);
+							}
+						}, LP_MS);
+					}
+				} else {
+					state.sel = null;
+					drag = { key: null, x: e.clientX, y: e.clientY, moved: false, longFired: false, lp: 0 };
+				}
+				render();
+				renderPanel();
+			});
+
+			svg.addEventListener("pointermove", function (e) {
+				if (!drag) return;
+				var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+				if (!drag.moved) {
+					if (dx * dx + dy * dy < 64) return;
+					drag.moved = true;
+					if (drag.lp) { clearTimeout(drag.lp); drag.lp = 0; }
+				}
+				if (drag.longFired) return;
+				var cell = cellFromEvent(e);
+				state.hover = cell ? cell.key : null;
+				render();
+			});
+
+			svg.addEventListener("pointerup", function (e) {
+				if (!drag) return;
+				var d = drag;
+				drag = null;
+				if (d.lp) clearTimeout(d.lp);
+				state.hover = null;
+				if (d.longFired) { render(); return; }
+				var cell = cellFromEvent(e);
+				if (d.moved) {
+					if (d.key && cell && cell.key !== d.key) moveComp(d.key, cell.key);
+					render();
+					return;
+				}
+				var now = Date.now();
+				if (d.key && lastTap.key === d.key && now - lastTap.time < DBL_MS) {
+					if (pending && pending.key === d.key) { clearTimeout(pending.timer); pending = null; }
+					lastTap = { key: null, time: 0 };
+					deleteCell(d.key);
+					return;
+				}
+				if (pending && pending.key !== d.key) flushPending();
+				lastTap = { key: d.key, time: now };
+				render();
+				if (d.key && isSwitchable(state.cells[d.key])) armPending(d.key, TAP_MS);
+			});
+
+			svg.addEventListener("dblclick", function (e) {
+				e.preventDefault();
+				var cell = cellFromEvent(e);
+				if (!cell) return;
+				if (pending) { clearTimeout(pending.timer); pending = null; }
+				lastTap = { key: null, time: 0 };
+				if (state.cells[cell.key]) deleteCell(cell.key);
+			});
+
+			svg.addEventListener("pointercancel", function () {
+				if (drag && drag.lp) clearTimeout(drag.lp);
+				drag = null; state.hover = null; render();
+			});
+
+			svg.addEventListener("contextmenu", function (e) {
+				e.preventDefault();
+				var cell = cellFromEvent(e);
+				if (cell && state.cells[cell.key]) rotateCell(cell.key);
+			});
+
+			paletteEl.addEventListener("click", function (e) {
+				var btn = e.target.closest ? e.target.closest("button[data-type]") : null;
+				if (!btn) return;
+				var t = btn.getAttribute("data-type");
+				if (state.mode === "place" && state.place === t) { state.mode = "edit"; }
+				else { state.mode = "place"; state.place = t; }
+				renderPalette();
+			});
+
+			document.getElementById("btnUndo").addEventListener("click", undo);
+			document.getElementById("btnRedo").addEventListener("click", redo);
+			var confirmEl = document.getElementById("confirm");
+			var confirmMsgEl = document.getElementById("confirmMsg");
+			var confirmOkBtn = document.getElementById("confirmOk");
+			function askConfirm(msg, onOk) {
+				confirmMsgEl.textContent = msg;
+				confirmOkBtn._onOk = onOk;
+				confirmEl.classList.add("open");
+				confirmEl.setAttribute("aria-hidden", "false");
+			}
+			function closeConfirm() {
+				confirmEl.classList.remove("open");
+				confirmEl.setAttribute("aria-hidden", "true");
+				confirmOkBtn._onOk = null;
+			}
+			document.getElementById("confirmCancel").addEventListener("click", closeConfirm);
+			confirmOkBtn.addEventListener("click", function () {
+				var f = confirmOkBtn._onOk;
+				closeConfirm();
+				if (f) f();
+			});
+			confirmEl.addEventListener("click", function (e) { if (e.target === confirmEl) closeConfirm(); });
+
+			document.getElementById("btnClear").addEventListener("click", function () {
+				if (!Object.keys(state.cells).length) return;
+				askConfirm("确定要清空整个画布吗？所有元件都会被删除（之后可以用「撤销」恢复）。", function () {
+					pushUndo(); state.cells = {}; state.sel = null; refresh(); renderPanel();
+				});
+			});
+			document.getElementById("chkRead").addEventListener("change", function (e) { state.showRead = e.target.checked; render(); });
+
+			var modalEl = document.getElementById("modal");
+			var SEEN_KEY = "zhujingqi.circuitpro.seen";
+			function openModal() {
+				modalEl.classList.add("open");
+				modalEl.setAttribute("aria-hidden", "false");
+				try { localStorage.setItem(SEEN_KEY, "1"); } catch (e) { }
+			}
+			function closeModal() {
+				modalEl.classList.remove("open");
+				modalEl.setAttribute("aria-hidden", "true");
+			}
+			document.getElementById("btnHelp").addEventListener("click", openModal);
+			document.getElementById("modalClose").addEventListener("click", closeModal);
+			modalEl.addEventListener("click", function (e) { if (e.target === modalEl) closeModal(); });
+
+			document.addEventListener("keydown", function (e) {
+				if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+				if (e.key === "r" || e.key === "R") { e.preventDefault(); rotateSel(); }
+				else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteSel(); }
+				else if (e.key === "Escape") {
+					closeConfirm(); closeModal();
+					if (demoModalEl && demoModalEl.classList.contains("open")) { closeDemoModal(); return; }
+					state.mode = "edit"; state.sel = null; renderPalette(); render(); renderPanel();
+				}
+				else if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
+					e.preventDefault(); if (e.shiftKey) redo(); else undo();
+				}
+			});
+
+			selPanel.addEventListener("input", function (e) {
+				var el = e.target;
+				var pk = el.getAttribute("data-p");
+				if (!pk || !state.sel || !state.cells[state.sel]) return;
+				var comp = state.cells[state.sel];
+				if (el.type === "checkbox") comp.p[pk] = el.checked;
+				else {
+					var v = parseFloat(el.value);
+					if (!isFinite(v)) return;
+					comp.p[pk] = v;
+					var pv = selPanel.querySelector('[data-pv="' + pk + '"]');
+					if (pv) pv.textContent = Math.round(v * 100) + "%";
+				}
+				lastResult = solve();
+				render();
+				renderResults();
+				if (comp.type === "rheostat") {
+					var box = selPanel.querySelector(".rheoInfo");
+					if (box) {
+						var info = rheoInfo(state.sel);
+						box.className = "rheoInfo" + (info.ok ? "" : " warn2");
+						box.innerHTML = info.ok
+							? "接入阻值 <b>" + fmt(info.rin) + " Ω</b>"
+							: "还没接入电路：要接<b>上面的滑片柱</b>和<b>左边或右边的固定柱</b>。";
+					}
+				}
+				saveLocal();
+			});
+
+			document.getElementById("selGrid").addEventListener("change", function (e) {
+				var p = e.target.value.split(",");
+				pushUndo();
+				state.rows = +p[0]; state.cols = +p[1];
+				var keys = Object.keys(state.cells), changed = false;
+				for (var i = 0; i < keys.length; i++) {
+					var rc = keys[i].split(",");
+					if (+rc[0] >= state.rows || +rc[1] >= state.cols) { delete state.cells[keys[i]]; changed = true; }
+				}
+				void changed;
+				refresh(); renderPanel();
+			});
+			document.getElementById("selCell").addEventListener("change", function (e) {
+				state.cell = +e.target.value;
+				render();
+			});
+
+			document.getElementById("btnExport").addEventListener("click", function () {
+				var data = JSON.stringify({ version: 1, rows: state.rows, cols: state.cols, cell: state.cell, cells: state.cells }, null, 2);
+				var blob = new Blob([data], { type: "application/json" });
+				var a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = "circuit.json";
+				a.click();
+				setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+			});
+			document.getElementById("btnImport").addEventListener("click", function () { document.getElementById("fileImport").click(); });
+			document.getElementById("fileImport").addEventListener("change", function (e) {
+				var f = e.target.files[0];
+				if (!f) return;
+				var rd = new FileReader();
+				rd.onload = function () {
+					try {
+						var o = JSON.parse(rd.result);
+						if (!o || !o.cells) return;
+						pushUndo();
+						state.rows = o.rows || 8; state.cols = o.cols || 12; state.cell = o.cell || 64;
+						state.cells = o.cells; state.sel = null;
+						document.getElementById("selGrid").value = state.rows + "," + state.cols;
+						document.getElementById("selCell").value = String(state.cell);
+						refresh(); renderPanel();
+					} catch (err) { alert("JSON 解析失败"); }
+				};
+				rd.readAsText(f);
+				e.target.value = "";
+			});
+
+			// ---- 示例电路 ----
+			function loadDemo(i) {
+				var d = DEMOS[i];
+				if (!d) return;
+				pushUndo();
+				state.rows = d.d.rows; state.cols = d.d.cols; state.cell = d.d.cell;
+				state.cells = {};
+				for (var k in d.d.cells) state.cells[k] = { type: d.d.cells[k].type, rot: d.d.cells[k].rot, p: JSON.parse(JSON.stringify(d.d.cells[k].p || {})) };
+				state.sel = d.d.sel && state.cells[d.d.sel] ? d.d.sel : null;
+				state.mode = "edit"; state.place = null;
+				document.getElementById("selGrid").value = state.rows + "," + state.cols;
+				document.getElementById("selCell").value = state.cell;
+				closeDemoModal();
+				refresh(); renderPalette(); renderPanel();
+			}
+
+function demoTag(d) {
+				var n = 0;
+				for (var k in d.d.cells) if (TYPES[d.d.cells[k].type].kind !== "none") n++;
+				return n + " 个元件";
+			}
+
+			function renderDemoList() {
+				var g = document.getElementById("demoGrid");
+				var html = "";
+				for (var i = 0; i < DEMOS.length; i++) {
+					html += '<button class="demo-item" data-i="' + i + '">' +
+						'<span class="demo-name">' + esc(DEMOS[i].name) + '</span>' +
+						'<span class="demo-tag">' + demoTag(DEMOS[i]) + "</span></button>";
+				}
+				g.innerHTML = html;
+				g.onclick = function (e) {
+					var b = e.target.closest ? e.target.closest(".demo-item") : null;
+					if (b) loadDemo(+b.getAttribute("data-i"));
+				};
+			}
+
+			var demoModalEl = document.getElementById("demoModal");
+			function openDemoModal() {
+				renderDemoList();
+				demoModalEl.classList.add("open");
+				demoModalEl.setAttribute("aria-hidden", "false");
+			}
+			function closeDemoModal() {
+				demoModalEl.classList.remove("open");
+				demoModalEl.setAttribute("aria-hidden", "true");
+			}
+			document.getElementById("btnDemo").addEventListener("click", openDemoModal);
+			document.getElementById("demoModalClose").addEventListener("click", closeDemoModal);
+			demoModalEl.addEventListener("click", function (e) { if (e.target === demoModalEl) closeDemoModal(); });
+
+			var isMobile = !!(window.matchMedia && window.matchMedia("(max-width: 780px)").matches);
+			if (!loadLocal()) {
+				if (isMobile) { state.cell = 40; document.getElementById("selCell").value = "40"; }
+				renderPalette();
+				refresh();
+			} else {
+				document.getElementById("selGrid").value = state.rows + "," + state.cols;
+				document.getElementById("selCell").value = String(state.cell);
+				renderPalette();
+				refresh();
+			}
+			try { if (!localStorage.getItem(SEEN_KEY)) openModal(); } catch (e) { openModal(); }
+		})();
+		</script>
+	</body>
+</html>
