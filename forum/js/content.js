@@ -55,6 +55,22 @@ function showMentionBox(el, items, start, end) {
 }
 
 function getMentionContext(el) {
+	if (!el) return null;
+
+	// 富文本编辑器（contenteditable）没有 value/selectionStart，用光标前的文字判断
+	if (el.isContentEditable) {
+		const sel = window.getSelection();
+		if (!sel || sel.rangeCount === 0) return null;
+		const node = sel.getRangeAt(0).startContainer;
+		if (!el.contains(node)) return null;
+		const before = (node.nodeType === 3 ? node.nodeValue : node.textContent) || "";
+		const upto = before.slice(0, sel.getRangeAt(0).startOffset);
+		const m = upto.match(/(^|[\s(])@([\p{L}\p{N}_-]{0,32})$/u);
+		if (!m) return null;
+		// contenteditable 用 Range 定位，不返回 start/end
+		return { range: null, query: m[2], editable: true };
+	}
+
 	const caret = el.selectionStart ?? 0;
 	const text = el.value.slice(0, caret);
 	const match = text.match(/(^|[\s(])@([\p{L}\p{N}_-]{0,32})$/u);
@@ -72,9 +88,19 @@ async function updateMentionBox(el) {
 		return;
 	}
 	const users = await ensureAllUsersCache();
-	const q = ctx.query.toLowerCase();
+	const q = ctx.query;
+	// 账号名大小写敏感，昵称大小写不敏感（昵称库里有 lower() 唯一索引）
 	const items = users
-		.filter(u => ((u.name || "") + " " + (u.nickname || "")).toLowerCase().includes(q))
+		.filter(u =>
+			(u.name || "").includes(q) ||
+			(u.nickname || "").toLowerCase().includes(q.toLowerCase())
+		)
+		.sort((a, b) => {
+			// 完全匹配账号名的排最前，避免 FXDhxc / FXDHXC 互相遮挡
+			const am = (a.name || "") === q ? 0 : (a.name || "").startsWith(q) ? 1 : 2;
+			const bm = (b.name || "") === q ? 0 : (b.name || "").startsWith(q) ? 1 : 2;
+			return am - bm;
+		})
 		.slice(0, 6);
 	if (!items.length) {
 		hideMentionBox();
@@ -86,6 +112,36 @@ async function updateMentionBox(el) {
 function insertMentionFromBox(userId, userName) {
 	const el = mentionState.el;
 	if (!el) return;
+
+	// 富文本编辑器：直接把光标处的 @xxx 片段换成可点击的提及节点
+	if (el.isContentEditable) {
+		el.focus();
+		const sel = window.getSelection();
+		if (!sel || sel.rangeCount === 0) return;
+		const node = sel.getRangeAt(0).startContainer;
+		const upto = (node.nodeType === 3 ? node.nodeValue : node.textContent) || "";
+		const m = /@([\p{L}\p{N}_-]*)$/u.exec(upto);
+		if (!m) { hideMentionBox(); return; }
+		const range = document.createRange();
+		try {
+			range.setStart(node, upto.length - m[0].length);
+			range.setEnd(node, upto.length);
+		} catch (e) { hideMentionBox(); return; }
+		range.deleteContents();
+		const span = document.createElement("span");
+		span.className = "mentionLink edMention";
+		span.dataset.uname = userName;
+		span.textContent = "@" + userName + " ";
+		range.insertNode(span);
+		range.setStartAfter(span);
+		range.collapse(true);
+		sel.removeAllRanges();
+		sel.addRange(range);
+		hideMentionBox();
+		el.dispatchEvent(new Event("input", { bubbles: true }));
+		return;
+	}
+
 	const before = el.value.slice(0, mentionState.start);
 	const after = el.value.slice(mentionState.end);
 	el.value = before + "@" + userName + " " + after;
@@ -118,7 +174,7 @@ function linkifyMentions(root) {
 			const full = m[0];
 			const prefix = m[1] || "";
 			const uname = m[2];
-			const found = users.find(u => u.name && u.name.toLowerCase() === uname.toLowerCase());
+			const found = users.find(u => u.name === uname);
 			const before = text.slice(last, m.index);
 			if (before) frag.appendChild(document.createTextNode(before));
 			if (found) {
@@ -219,12 +275,10 @@ async function notifyMentions(rawText, postId, commentId = null) {
 	const matches = [...plain.matchAll(/@([\p{L}\p{N}_-]{1,32})/gu)];
 	const targetIds = [];
 	for (const m of matches) {
-		const uname = m[1].trim().toLowerCase();
-		const u = users.find(
-			x =>
-			x.name &&
-			x.name.trim().toLowerCase() === uname
-		);
+		// 账号名在库里是大小写敏感唯一（users_name_key on btree(name)），
+		// 所以这里必须精确匹配：FXDhxc 和 FXDHXC 是两个不同账号。
+		const uname = m[1].trim();
+		const u = users.find(x => x.name && x.name === uname);
 		if (u && !targetIds.includes(u.id)) {
 			targetIds.push(u.id);
 		}

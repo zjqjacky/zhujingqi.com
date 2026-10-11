@@ -124,6 +124,562 @@ a {
 	height: 100vh;
 }
 
+/* 发布页改为顶部对齐 + 撑满可用高度。
+   .center 的 justify-content:center 把内容压在视口正中，但底部有
+   40px 固定导航栏（.bottom，position:fixed），居中基准没扣掉它，
+   视觉重心偏下；小屏上还会顶出大片留白。
+   这里只覆盖 #editorPage，登录/注册页仍保持居中。
+
+   高度方案：不再让整页滚动（overflow:hidden），而是把剩余高度
+   分配给正文区 —— 卡片 flex:1，网格 flex:1，textarea height:100%。
+   这样 textarea 会"撑到满屏"，且永远不会溢出视口。
+   右侧栏内容少时自然留白，这就是要的优美留白。 */
+#editorPage {
+	justify-content: flex-start;
+	height: 100vh;
+	height: 100dvh;
+	overflow: hidden;
+	/* .center 是 align-items:center，子元素会被居中收窄；
+	   改成 stretch 让卡片正常撑满宽度 */
+	align-items: stretch;
+	/* 留白：上小、左右适中、下最大。
+	   上边距小一点，logo 靠近顶部；下边距最大，因为底部有 40px 高的
+	   固定导航栏，留白必须大于它，否则发布按钮会被遮住。
+	   移动端底栏更高（50px + 安全区），另有一条规则单独处理。 */
+	padding: 16px clamp(32px, 5vw, 88px) clamp(72px, 6vw, 104px);
+	box-sizing: border-box;
+}
+
+/* 与个人主页同理：flex 容器里子元素默认会被压扁，这里锁定不伸缩 */
+#editorPage>* {
+	flex-shrink: 0;
+}
+
+/* 移动端底栏更高（50px + 安全区），四周留白另行设定 */
+@media (max-width: 800px) {
+	#editorPage {
+		padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+	}
+}
+
+/* ===== 发布页：占满屏幕 / 左正文 / 右侧栏 / 底栏工具+发布 =====
+   注意：这些选择器必须带 #editorPage 前缀。
+   基础 .card 定义在文件更靠后（width:340px / padding:30px），
+   与 .editorCard 特异性相同(0-1-0)但写在后面，会覆盖掉后面的声明。
+   加 #editorPage 前缀提升特异性，才能稳定生效。 */
+#editorPage .editorCard {
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+	border-radius: 20px;
+	padding: 16px 18px 20px;
+	/* .card 基础样式没有 border-box，width:100% 会把 padding 算到外面，
+	   窄屏上左右溢出。必须显式指定。 */
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	/* 占满 logo 之下的剩余高度，正文区才能撑到满屏 */
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+/* logo 靠左上角，尺寸与「探索」页一致（图标 80px / 文字 40px） */
+#editorPage .editorLogoRow {
+	max-width: 100%;
+	width: 100%;
+	padding: 0 0 14px 0;
+	justify-content: flex-start;
+	box-sizing: border-box;
+	flex-shrink: 0;
+}
+
+#editorPage .editorLogoRow #logo {
+	font-size: 40px;
+}
+
+#editorPage .editorLogoRow #logo img {
+	width: 80px;
+	height: 80px;
+}
+
+.editorGrid {
+	display: flex;
+	flex-direction: row;
+	gap: 18px;
+	align-items: stretch;
+	/* 吃掉卡片剩余高度，这是正文能撑满的关键 */
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+
+/* 左：工具栏 + 富文本正文。纵向排列，正文吃掉剩余高度。 */
+.editorMain {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	gap: 8px;
+}
+
+/* 富文本编辑器：所见即所得，用户永远看不到 <b> 这类源码 */
+.richEditor {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+	background: var(--card);
+	color: var(--text);
+	border: 1px solid var(--border);
+	border-radius: 20px;
+	padding: 16px 18px;
+	font-size: 17px;
+	line-height: 1.75;
+	box-sizing: border-box;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	white-space: pre-wrap;
+	outline: none;
+	user-select: text;
+	-webkit-user-select: text;
+}
+
+.richEditor:empty::before {
+	content: attr(data-placeholder);
+	color: var(--sub);
+	opacity: .7;
+	pointer-events: none;
+}
+
+.richEditor:focus {
+	border-color: var(--sub);
+}
+
+/* 私有标记：不可编辑的小挂件。显示为"图片/音乐/投票/背景/遮罩"，
+   淡色背景区分类型，点一下即选中，按删除键整个移除。
+   用户从头到尾都看不到 [img:...] 这类源码。 */
+.richEditor .edMarker,
+.richEditor .edChip {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: baseline;
+	margin: 0 2px;
+	padding: 1px 9px;
+	border-radius: 999px;
+	font-size: 13px;
+	line-height: 1.6;
+	white-space: nowrap;
+	user-select: none;
+	-webkit-user-select: none;
+	cursor: pointer;
+	border: 1px solid transparent;
+	background: rgba(0, 0, 0, .05);
+	color: var(--text);
+}
+
+.richEditor .edChip-img { background: rgba(0, 122, 255, .10); }
+.richEditor .edChip-music { background: rgba(155, 89, 182, .12); }
+.richEditor .edChip-poll { background: rgba(255, 149, 0, .14); }
+.richEditor .edChip-bg { background: rgba(52, 199, 89, .12); }
+.richEditor .edChip-warn { background: rgba(255, 59, 48, .10); }
+
+.richEditor .edChipSelected {
+	border-color: var(--sub);
+	filter: brightness(.94);
+}
+
+.richEditor .edChipText {
+	pointer-events: none;
+}
+
+/* 编辑器内的表情与提及 */
+.richEditor .emojiInPost {
+	width: 1.1em;
+	height: 1.1em;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.richEditor .mentionLink,
+.richEditor .edMention {
+	color: var(--green);
+	cursor: pointer;
+}
+
+/* 标题沿用帖子正文的收敛字号，所见即所得 */
+.richEditor h1 {
+	font-size: 1.35em;
+	line-height: 1.4;
+	margin: 12px 0 6px;
+}
+
+.richEditor h2 {
+	font-size: 1.18em;
+	line-height: 1.45;
+	margin: 10px 0 5px;
+}
+
+.richEditor h1:first-child,
+.richEditor h2:first-child {
+	margin-top: 0;
+}
+
+.richEditor a {
+	color: var(--green);
+}
+
+/* 简易富文本工具栏：按钮无边框，靠悬停底色区分，更简洁 */
+.formatBar {
+	display: flex;
+	gap: 2px;
+	align-items: center;
+	flex: 0 0 auto;
+	flex-wrap: wrap;
+	min-width: 0;
+}
+
+.formatBar button {
+	min-width: 32px;
+	height: 28px;
+	padding: 0 8px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	border-radius: 8px;
+	background: transparent;
+	border: none;
+	color: var(--sub);
+	cursor: pointer;
+	transition: background .15s, color .15s;
+	user-select: none;
+	flex-shrink: 0;
+	/* 按钮里的 B/I/U 只是字母标记本身，不做粗体/斜体/下划线 */
+	font-weight: 600;
+	font-style: normal;
+	text-decoration: none;
+}
+
+.formatBar button:hover {
+	background: var(--card);
+	color: var(--text);
+}
+
+/* 撤销 / 重做：图标用 mask + currentColor，深浅色自动适配 */
+.formatBar button:disabled {
+	opacity: .3;
+	cursor: default;
+	background: transparent;
+	color: var(--sub);
+}
+
+.formatIcon {
+	width: 17px;
+	height: 17px;
+	display: block;
+	background-color: currentColor;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	-webkit-mask-position: center;
+	mask-position: center;
+}
+
+.formatIcon[data-icon="undo"] {
+	-webkit-mask-image: url(icon/undo.svg);
+	mask-image: url(icon/undo.svg);
+}
+
+.formatIcon[data-icon="redo"] {
+	-webkit-mask-image: url(icon/redo.svg);
+	mask-image: url(icon/redo.svg);
+}
+
+/* 右：标签 + 内容提示，只用间距分组，不画分隔线 */
+.editorSide {
+	flex: 0 0 300px;
+	width: 300px;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.editorSide .sideGroup {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding-bottom: 18px;
+	margin-bottom: 18px;
+}
+
+/* 末组（内容提示）留白收尾 */
+.editorSide .sideGroupLast {
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+.editorSide .sideTitle {
+	font-size: 13px;
+	color: var(--sub);
+	padding-left: 2px;
+}
+
+.editorSide .tagBar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 0;
+	min-width: 0;
+}
+
+/* 原来 customTag 是 width:300px + flex-shrink:0，
+   在窄屏必然横向溢出；这里改为占满侧栏宽度且可收缩。 */
+.editorSide #customTag {
+	width: 100%;
+	height: 36px;
+	font-size: 14px;
+	margin: 0;
+	flex-shrink: 1;
+	min-width: 0;
+}
+
+.editorSide .sensitiveRow {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+.editorSide #isSensitive {
+	width: 18px;
+	height: 18px;
+	margin: 2px 0 0 0;
+	flex-shrink: 0;
+	cursor: pointer;
+	accent-color: var(--green);
+}
+
+.editorSide #sensitiveLabel {
+	cursor: pointer;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--sub);
+}
+
+.editorSide #warnText {
+	width: 100%;
+	height: 34px;
+	font-size: 13px;
+	margin: 0;
+	min-width: 0;
+}
+
+/* 背景按钮已移到左侧工具栏，不再占满右栏 */
+
+/* 底栏：左工具 右发布 */
+.editorFoot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	/* 与正文之间用留白分隔，不画线 */
+	padding-top: 14px;
+}
+
+.editorTools {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+	min-width: 0;
+}
+
+/* 发布按钮：箭头图标。
+   用 mask + currentColor 绘制（与底部导航 .navIcon 同一套做法），
+   这样图标颜色跟随按钮文字色，深浅色主题都自动适配，
+   不需要为深色模式单独写 filter/invert。 */
+#sendBtn {
+	height: 48px;
+	width: 48px;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--green);
+	color: #fff;
+	flex-shrink: 0;
+	border-radius: 50%;
+}
+
+#sendBtn::before {
+	content: "";
+	width: 22px;
+	height: 22px;
+	display: block;
+	background-color: currentColor;
+	-webkit-mask: url(icon/arrow.svg) center / contain no-repeat;
+	mask: url(icon/arrow.svg) center / contain no-repeat;
+}
+
+#sendBtn:hover {
+	background: var(--grad);
+	color: #fff;
+}
+
+/* 深色模式下箭头保持白色（按钮底色始终是绿色，currentColor 即白色） */
+body.dark #sendBtn::before {
+	background-color: #fff;
+}
+
+/* 窄屏：侧栏移到正文下方，工具与发布按钮各占一行 */
+@media (max-width: 800px) {
+	/* 注意：这些也必须带 #editorPage 前缀，否则输给上面的
+	   #editorPage .editorCard / .editorSide 等规则 */
+
+	/* 窄屏下 html/body 是 overflow:hidden 的应用外壳，
+	   所以 #editorPage 自己必须是滚动容器。
+	   注意：不能用 height:auto —— 那样元素只会变高而不会产生滚动，
+	   多出来的部分被 body 的 overflow:hidden 裁掉，就再也够不着了。
+	   必须锁死高度 100dvh，再由 overflow-y:auto 在内部滚动。 */
+	#editorPage {
+		height: 100vh;
+		height: 100dvh;
+		min-height: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
+		align-items: stretch;
+		/* 窄屏留白略收，避免正文被挤得太窄 */
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+
+	#editorPage .editorCard {
+		padding: 14px 14px 16px;
+		flex: 0 0 auto;
+	}
+
+	#editorPage .editorLogoRow {
+		padding: 0 0 10px 0;
+	}
+
+	#editorPage .editorLogoRow #logo {
+		font-size: 30px;
+	}
+
+	#editorPage .editorLogoRow #logo img {
+		width: 56px;
+		height: 56px;
+	}
+
+	.editorGrid {
+		flex-direction: column;
+		gap: 14px;
+		flex: 0 0 auto;
+	}
+
+	/* 窄屏纵向堆叠时正文跟随内容，给一个舒适的初始高度。
+	   不写死过大值，矮屏由下面的 max-height 规则兜底。 */
+	.editorMain .richEditor {
+		height: auto;
+		min-height: 180px;
+		flex: 0 0 auto;
+	}
+
+	.editorSide {
+		flex: 1 1 auto;
+		width: 100%;
+	}
+
+	/* 移动端：工具按钮和发布按钮保持同一行。
+	   工具按钮允许收缩（flex:0 1 auto），空间不够时先压缩文字宽度，
+	   表情和发布两个图标按钮固定不缩。 */
+	.editorFoot {
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.editorTools {
+		justify-content: flex-start;
+		flex: 1 1 auto;
+		min-width: 0;
+		flex-wrap: nowrap;
+		gap: 6px;
+	}
+
+	.editorTools button {
+		flex: 0 1 auto;
+		min-width: 0;
+		padding: 0 8px;
+		font-size: 14px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* 表情按钮里是图片，保持固定尺寸不参与收缩 */
+	.editorTools .emojiBtn {
+		flex: 0 0 36px;
+		width: 36px;
+	}
+
+	/* 发布按钮固定在右端 */
+	#sendBtn {
+		width: 48px;
+		height: 48px;
+		flex: 0 0 48px;
+	}
+}
+
+/* 极窄屏（iPhone SE 等）：按钮仍保持单行，进一步压缩文字与间距 */
+@media (max-width: 480px) {
+	.editorTools button {
+		padding: 0 5px;
+		font-size: 13px;
+	}
+
+	.editorTools {
+		gap: 4px;
+	}
+
+	.editorFoot {
+		gap: 6px;
+	}
+}
+
+/* 矮屏（横屏手机、拉矮的笔记本窗口）：纵向空间不够，
+   再让正文撑满剩余空间会被挤没。
+   同样是「锁定高度 + 内部滚动」，不能用 height:auto（见上面窄屏段的说明）。 */
+@media (max-height: 640px) {
+	#editorPage {
+		height: 100vh;
+		height: 100dvh;
+		min-height: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	#editorPage .editorCard {
+		flex: 0 0 auto;
+	}
+
+	.editorGrid {
+		flex: 0 0 auto;
+	}
+
+	.editorMain .richEditor {
+		height: auto;
+		min-height: 140px;
+		flex: 0 0 auto;
+	}
+}
+
 .card {
 	background: var(--card);
 	padding: 30px;
@@ -160,6 +716,40 @@ a {
 	overflow-y: hidden;
 }
 
+/* #main 靠内部 #posts 自己滚动（flex:1 + overflow-y:auto）；
+   #profilePage 没有那层内滚动容器，若沿用 overflow-y:hidden，
+   小屏上溢出的部分会被裁掉且无法滚动 —— 这里让整页自身滚动。 */
+#profilePage {
+	/* 高度仍取 100dvh（承接上面共享规则），保持视口高度、自己滚动 */
+	height: 100vh;
+	height: 100dvh;
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+	/* 返回按钮改为 sticky 后需要顶部留白，避免压住卡片 */
+	padding-top: 20px;
+	padding-bottom: 24px;
+	box-sizing: border-box;
+	justify-content: flex-start;
+}
+
+/* #profilePage 的直接子元素不能被 flex 压缩。
+   #profilePage 是 display:flex; flex-direction:column，子元素默认
+   flex-shrink:1 —— 一旦内容超过视口要滚动，卡片/等级条就会被挤扁
+   （头像被压、简介看不见）。统一锁定为不伸缩。 */
+#profilePage>* {
+	flex-shrink: 0;
+}
+
+/* #userPosts 在主页是内滚动容器（flex:1），
+   在个人主页它只是普通内容块，应跟随整页滚动，不要再自己撑高。 */
+#profilePage #userPosts {
+	flex: 0 0 auto;
+	max-width: 800px;
+	overflow-y: visible;
+	min-height: 0;
+}
+
 #profileCard {
 	display: flex;
 	gap: 24px;
@@ -169,7 +759,8 @@ a {
 	box-shadow: 0 8px 30px rgba(0, 0, 0, .1);
 	width: 80%;
 	max-width: 700px;
-	margin: 70px auto 16px auto;
+	/* 顶部返回按钮已改为 sticky 并自行占一行，这里不再需要 70px 的大留白 */
+	margin: 12px auto 16px auto;
 	box-sizing: border-box;
 	align-items: flex-start;
 	position: relative;
@@ -379,6 +970,8 @@ body.dark #profileCard {
 	word-wrap: break-word;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
 	line-height: 1.6;
+	/* 简介里的换行要真的换行：默认 HTML 会把 \n 折叠成空格 */
+	white-space: pre-wrap;
 }
 
 #profileBio .bioEditBtn {
@@ -496,7 +1089,30 @@ body.dark #profileCard {
 		align-items: center;
 		text-align: center;
 		padding: 24px 20px;
-		margin-top: 60px;
+		margin-top: 12px;
+		/* 小屏上 80% 偏窄，且卡片内容可能很长，统一收窄内边距避免溢出 */
+		width: 92%;
+		max-width: 100%;
+	}
+
+	#profileBio {
+		width: 92%;
+		max-width: 100%;
+		padding: 14px 16px;
+		/* 长简介（如含链接或连续长串）不应把卡片撑破 */
+		overflow-wrap: anywhere;
+	}
+
+	#levelProgress {
+		width: 92%;
+		max-width: 100%;
+	}
+
+	/* 上面的 #levelProgress 特异性低于 #profilePage #levelProgress，需要带上前缀 */
+	#profilePage #levelProgress {
+		width: 92%;
+		max-width: 100%;
+		padding: 14px 16px;
 	}
 
 	#profileNameRow {
@@ -1058,6 +1674,38 @@ body.dark .post.custom-bg::before {
 	margin: 4px 0 8px 0;
 }
 
+/* 帖子正文里的标题：白名单放行了 h1-h6，但浏览器默认 h1 是 2em（正文 17px
+   时约 34px），在帖子流里过大，这里按层级收敛到适合阅读的尺寸。 */
+.postContent h1,
+.commentContent h1 {
+	font-size: 1.35em;
+	line-height: 1.4;
+	margin: 12px 0 6px;
+	font-weight: 700;
+}
+
+.postContent h2,
+.commentContent h2 {
+	font-size: 1.18em;
+	line-height: 1.45;
+	margin: 10px 0 5px;
+	font-weight: 700;
+}
+
+.postContent h3,
+.commentContent h3 {
+	font-size: 1.08em;
+	line-height: 1.5;
+	margin: 10px 0 4px;
+	font-weight: 700;
+}
+
+.postContent h1:first-child,
+.postContent h2:first-child,
+.postContent h3:first-child {
+	margin-top: 0;
+}
+
 .comment {
 	font-size: 16px;
 	display: flex;
@@ -1128,6 +1776,17 @@ body.dark .post.custom-bg::before {
 	border-radius: 20px;
 	cursor: pointer;
 	transition: 0.2s;
+	z-index: 100;
+}
+
+/* 个人主页整页滚动时，返回按钮要贴顶常驻，不能随内容滚走。
+   #profilePage 是滚动容器，这里用 sticky 让它固定在顶部；
+   按钮正常占据一行流内高度（不用负 margin 抵消，避免和卡片间距打架）。 */
+#profilePage>#backBtn {
+	position: sticky;
+	top: 8px;
+	align-self: flex-start;
+	margin: 0 0 4px 20px;
 	z-index: 100;
 }
 
@@ -2074,6 +2733,16 @@ body.dark .roleBadge.blue_diamond {
 #viewer img {
 	max-width: 90%;
 	max-height: 90%;
+	cursor: grab;
+	/* 移动端必须禁掉默认手势，否则拖动会变成滚动页面而不是平移图片 */
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+}
+
+#viewer img.dragging {
+	cursor: grabbing;
 }
 
 .loadingMask {
@@ -3730,11 +4399,6 @@ body.dark .musicCard {
 		display: none !important;
 	}
 
-	#editorPage .card {
-		width: 80% !important;
-		max-width: 500px !important;
-	}
-
 	.postActions button[data-del] {
 		font-size: 14px;
 	}
@@ -4331,25 +4995,6 @@ html.watch .pager {
 	padding-bottom: 0;
 }
 
-html.watch #editorPage .card {
-	width: 94vw !important;
-	padding: 14px;
-}
-
-html.watch #editorPage textarea {
-	height: 110px;
-	font-size: 14px;
-}
-
-html.watch #editorPage .card button {
-	height: 36px;
-	font-size: 13px;
-}
-
-html.watch #customTag {
-	width: 160px !important;
-}
-
 html.watch #singlePost {
 	padding: 10px;
 }
@@ -4530,17 +5175,6 @@ html.watch .bottom button {
 
 html.watch #logoRow {
 	padding: 4px 10px;
-}
-
-html.watch #editorPage #logoRow,
-html.watch #editorPage #insertImgBtn,
-html.watch #editorPage #insertMusicBtn,
-html.watch #editorPage #insertPollBtn,
-html.watch #editorPage #editorEmojiBtn,
-html.watch #editorPage #customTag,
-html.watch #editorPage .sensitiveWrap,
-html.watch #editorPage .postBgRow {
-	display: none !important;
 }
 
 html.watch body {

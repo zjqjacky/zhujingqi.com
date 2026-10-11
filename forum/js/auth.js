@@ -99,7 +99,23 @@ document.addEventListener("click", e => {
 		}
 	}
 }, true);
-$("sendBtn").onclick = async () => {
+// 深夜时段（22:30–06:00）：随机抽一条作息提醒，点「确定」照常发帖。
+// 判断用本地时间：toTimeString(0,2) 在个别实现里不可靠，直接用 getHours/getMinutes。
+function isLateNightNow() {
+	const now = new Date();
+	const mins = now.getHours() * 60 + now.getMinutes();
+	return mins >= 22 * 60 + 30 || mins < 6 * 60;
+}
+
+// 提示语是数组，t() 只认字符串，所以这里自己按语言取并回退 zh
+function randomLateNightTip() {
+	const all = TRANSLATIONS.late_night_tips || {};
+	const list = all[currentLang] || all.zh || [];
+	if (!list.length) return "";
+	return list[Math.floor(Math.random() * list.length)];
+}
+
+async function submitNewPost() {
 	let txt = $("text").value.trim();
 	if (!txt) return;
 	closeEmojiPicker();
@@ -136,6 +152,7 @@ $("sendBtn").onclick = async () => {
 		}
 	} catch {}
 	$("text").value = "";
+	if (window.clearRichEditor) window.clearRichEditor();
 	$("customTag").value = "";
 	selectedTags = [];
 	selectedPostBg = "";
@@ -148,4 +165,13 @@ $("sendBtn").onclick = async () => {
 	loadPosts(1);
 	setActive("homeBtn");
 	loadAnnouncements();
+}
+
+$("sendBtn").onclick = () => {
+	if (isLateNightNow()) {
+		// 第3个参数 okText 传 null 走默认「确定」，第4个 hideCancel 隐藏取消按钮
+		modalConfirm(randomLateNightTip(), submitNewPost, null, true);
+		return;
+	}
+	submitNewPost();
 };

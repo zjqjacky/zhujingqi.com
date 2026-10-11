@@ -165,10 +165,28 @@ function renderTagBar() {
 		span.className = "tag";
 		span.innerText = display;
 		span.onclick = () => {
-			selectedTags = [value];
+			// 单选：再次点击已选中的标签即取消选择
+			const isActive = span.classList.contains("active");
 			bar.querySelectorAll(".tag").forEach(tagEl => {
-				tagEl.classList.toggle("active", tagEl === span);
+				tagEl.classList.remove("active");
+				tagEl.setAttribute("aria-pressed", "false");
 			});
+			if (isActive) {
+				selectedTags = [];
+			} else {
+				span.classList.add("active");
+				span.setAttribute("aria-pressed", "true");
+				selectedTags = [value];
+			}
+		};
+		span.setAttribute("role", "button");
+		span.setAttribute("tabindex", "0");
+		span.setAttribute("aria-pressed", "false");
+		span.onkeydown = (e) => {
+			if (e.key === "Enter" || e.key === " ") {
+				e.preventDefault();
+				span.click();
+			}
 		};
 		bar.appendChild(span);
 	}
@@ -313,7 +331,15 @@ setT("welcomeTitle", t("login_title"));
 	setT("insertMusicBtn", t("editor_insert_music"));
 	setT("insertPollBtn", t("editor_insert_poll"));
 	setPH("customTag", t("editor_custom_tag_ph"));
-	setT("sendBtn", t("editor_send"));
+	// 撤销/重做按钮的 title 跟随语言
+	const undoBtnEl = $("undoBtn"), redoBtnEl = $("redoBtn");
+	if (undoBtnEl) undoBtnEl.title = t("editor_undo");
+	if (redoBtnEl) redoBtnEl.title = t("editor_redo");
+	// sendBtn 是纯图标按钮（箭头），图标由 CSS 绘制。
+	// 这里不能 setT —— textContent 会把图标内容清掉并塞回文字。
+	// 改用 aria-label 保留多语言无障碍提示。
+	const sendBtnEl = $("sendBtn");
+	if (sendBtnEl) sendBtnEl.setAttribute("aria-label", t("editor_send"));
 	setT("randomPostBtn", t("random_post_btn"));
 	setT("fortuneBtn", t("fortune_btn"));
 	setT("fortuneTitle", t("fortune_title"));
@@ -416,7 +442,8 @@ function closeModalDialog() {
 $("closeModal").onclick = closeModalDialog;
 
 // 确认弹窗：需要用户点「确定」才执行 onOk，点「取消」或关闭按钮都不执行
-function modalConfirm(msg, onOk, okText) {
+// hideCancel=true 时只留「确定」——弹窗本身已有右上角关闭键，取消按钮是多余的
+function modalConfirm(msg, onOk, okText, hideCancel) {
 	const box = $("modalText");
 	if (!box) return;
 	modalText("");
@@ -436,7 +463,7 @@ function modalConfirm(msg, onOk, okText) {
 	ok.style.background = "#e0403f";
 	ok.style.color = "#fff";
 	ok.style.borderColor = "#e0403f";
-	row.appendChild(cancel);
+	if (!hideCancel) row.appendChild(cancel);
 	row.appendChild(ok);
 	box.appendChild(row);
 
@@ -458,6 +485,8 @@ function modalConfirm(msg, onOk, okText) {
 		}
 		finish();
 	};
+	// 没有取消按钮时把焦点给「确定」，回车即可确认
+	if (hideCancel) ok.focus();
 }
 function escapeHtml(str) {
 	return String(str ?? "").replace(/[&<>"']/g, c => ({

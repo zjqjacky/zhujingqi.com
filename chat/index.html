@@ -1960,42 +1960,61 @@
 				let currentChatMessages = [];
 				let replyToId = null;
 				const VERIFIED_ROLES = ["owner", "admin", "official"];
+				// 与论坛 EMOJI_MAP（forum/js/i18n.js）保持一致，共 38 个。
+				// 新增表情时两处都要改，否则 JC 面板和 JF 不匹配。
+				//
+				// 面板按 EMOJI_ORDER 渲染，不直接遍历 EMOJIS：
+				// "14"、"67" 是整数字面量键，Object.keys() 会把它们排到最前面，
+				// 导致面板顺序和论坛的分组顺序不一致。
+				const EMOJI_ORDER = [
+					"happy", "hmm", "sweat", "sad", "cry", "sob",
+					"haha", "cool", "pirate", "eat", "love", "amazed",
+					"scared", "eyeroll", "updown", "blank", "angry", "dead",
+					"right", "wrong", "ok", "ke", "good", "bad",
+					"alien", "bot", "ask", "doge", "chill", "strange",
+					"maga", "jesus", "14", "saka", "beng",
+					"please", "67", "nfls", "music",
+				];
 				const EMOJIS = {
-					"14": "/forum/emojis/14.svg",
-					alien: "/forum/emojis/alien.svg",
-					amazed: "/forum/emojis/amazed.svg",
-					angry: "/forum/emojis/angry.svg",
-					ask: "/forum/emojis/ask.svg",
-					bad: "/forum/emojis/bad.svg",
-					beng: "/forum/emojis/beng.svg",
-					blank: "/forum/emojis/blank.svg",
-					bot: "/forum/emojis/bot.svg",
-					chill: "/forum/emojis/chill.svg",
-					cool: "/forum/emojis/cool.svg",
-					cry: "/forum/emojis/cry.svg",
-					dead: "/forum/emojis/dead.svg",
-					doge: "/forum/emojis/doge.svg",
-					eat: "/forum/emojis/eat.svg",
-					eyeroll: "/forum/emojis/eyeroll.svg",
-					good: "/forum/emojis/good.svg",
-					haha: "/forum/emojis/haha.svg",
 					happy: "/forum/emojis/happy.svg",
 					hmm: "/forum/emojis/hmm.svg",
-					jesus: "/forum/emojis/jesus.svg",
-					ke: "/forum/emojis/ke.svg",
-					love: "/forum/emojis/love.svg",
-					maga: "/forum/emojis/maga.svg",
-					ok: "/forum/emojis/ok.svg",
-					pirate: "/forum/emojis/pirate.svg",
-					right: "/forum/emojis/right.svg",
-					sad: "/forum/emojis/sad.svg",
-					saka: "/forum/emojis/saka.svg",
-					scared: "/forum/emojis/scared.svg",
-					sob: "/forum/emojis/sob.svg",
-					strange: "/forum/emojis/strange.svg",
 					sweat: "/forum/emojis/sweat.svg",
+					sad: "/forum/emojis/sad.svg",
+					cry: "/forum/emojis/cry.svg",
+					sob: "/forum/emojis/sob.svg",
+					haha: "/forum/emojis/haha.svg",
+					cool: "/forum/emojis/cool.svg",
+					pirate: "/forum/emojis/pirate.svg",
+					eat: "/forum/emojis/eat.svg",
+					love: "/forum/emojis/love.svg",
+					amazed: "/forum/emojis/amazed.svg",
+					scared: "/forum/emojis/scared.svg",
+					eyeroll: "/forum/emojis/eyeroll.svg",
 					updown: "/forum/emojis/updown.svg",
+					blank: "/forum/emojis/blank.svg",
+					angry: "/forum/emojis/angry.svg",
+					dead: "/forum/emojis/dead.svg",
+					right: "/forum/emojis/right.svg",
 					wrong: "/forum/emojis/wrong.svg",
+					ok: "/forum/emojis/ok.svg",
+					ke: "/forum/emojis/ke.svg",
+					good: "/forum/emojis/good.svg",
+					bad: "/forum/emojis/bad.svg",
+					alien: "/forum/emojis/alien.svg",
+					bot: "/forum/emojis/bot.svg",
+					ask: "/forum/emojis/ask.svg",
+					doge: "/forum/emojis/doge.svg",
+					chill: "/forum/emojis/chill.svg",
+					strange: "/forum/emojis/strange.svg",
+					maga: "/forum/emojis/maga.svg",
+					jesus: "/forum/emojis/jesus.svg",
+					"14": "/forum/emojis/14.svg",
+					saka: "/forum/emojis/saka.svg",
+					beng: "/forum/emojis/beng.svg",
+					please: "/forum/emojis/please.svg",
+					67: "/forum/emojis/67.svg",
+					nfls: "/forum/emojis/nfls.svg",
+					music: "/forum/emojis/music.svg",
 				};
 				async function loadBar() {
 					const bar = document.getElementById('load-bar');
@@ -2958,12 +2977,14 @@
 				const panel = $("emojiPanel");
 				if (!panel) return;
 				panel.innerHTML = "";
-				for (const code of Object.keys(EMOJIS)) {
+				for (const code of EMOJI_ORDER) {
+					const src = EMOJIS[code];
+					if (!src) continue;
 					const item = document.createElement("button");
 					item.type = "button";
 					item.className = "emojiItem";
 					item.innerHTML = `
-						<img src="${EMOJIS[code]}" alt="${code}">
+						<img src="${src}" alt="${code}">
 					`;
 					item.onclick = (e) => {
 						e.stopPropagation();

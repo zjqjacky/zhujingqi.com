@@ -238,10 +238,10 @@ function escapeAttr(s) {
 								<button class="settingsLinkBtn" id="setAboutBtn">${t("profile_about")}</button>
 								<button class="settingsLinkBtn" id="setSponsorBtn">${t("profile_sponsor")}</button>
 							</div>
-							${"" /* AI 日志按钮已移除 */}
-							<a class="settingsLinkBtn" id="setRssBtn" href="rss.xml" target="_blank" rel="noopener" style="margin-top:6px;text-decoration:none;box-sizing:border-box;">${t("settings_rss")}</a>
-						</div>
-					`);
+						${"" /* AI 日志按钮已移除 */}
+						${"" /* RSS 订阅按钮已移到「探索」页，设置里不再重复 */}
+					</div>
+				`);
 					const langSel = box.querySelector("#settingsLangSelect");
 					if (langSel) renderLangSelect(langSel);
 					box.querySelectorAll(".settingsThemeBtn").forEach(btn => {

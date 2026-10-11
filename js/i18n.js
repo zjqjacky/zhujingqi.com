@@ -3,7 +3,7 @@ const TRANSLATIONS = {
 	nav_me: { zh: "介绍", en: "Me", es: "Sobre mí" },
 	nav_game: { zh: "游戏", en: "Game", es: "Juegos" },
 	nav_tool: { zh: "工具", en: "Tool", es: "Herramientas" },
-	msg_update: { zh: "🔔 zhujingqi.com 首页更新", en: "🔔 zhujingqi.com updated", es: "🔔 zhujingqi.com actualizado" },
+	msg_update: { zh: '🔔 <a href="/tool/circuitpro/">Circuit Pro</a>', en: '🔔 <a href="/tool/circuitpro/">Circuit Pro</a>', es: '🔔 <a href="/tool/circuitpro/">Circuit Pro</a>' },
 	hero_intro: {
 		zh: 'Hello，我是Jacky！我热爱学习，喜欢出游，开朗乐观，擅长做手工，十分有创意。（更多详见 <a href="/me/">个人介绍</a>、<a href="/about">关于</a> ）',
 		en: 'Hello, I\'m Jacky! I love studying and traveling, and I\'m an optimistic, outgoing person full of crazy ideas. (See more at <a href="/me/">Me</a>, <a href="/about">About</a>)',

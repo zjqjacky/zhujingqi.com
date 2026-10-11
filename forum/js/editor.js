@@ -49,6 +49,21 @@ $("termsBtn").onclick = () => {
 
 $("bgBuyBtn").textContent = selectedPostBg ? t("editor_bg_used") : t("editor_bg");
 $("bgBuyBtn").onclick = openPostBgPicker;
+
+/**
+ * 往富文本编辑器里插入一个论坛私有标记。
+ * 标记在编辑器里显示为一个零宽的不可见节点，用户看不到源码，
+ * 序列化时由 richeditor.js 原样还原成 [img:..] / [[music:..]] / [poll:..]。
+ */
+function insertEditorMarker(marker) {
+	if (window.richEditor && typeof window.richEditor.insertMarker === "function") {
+		window.richEditor.insertMarker(marker);
+		return;
+	}
+	// 富文本模块不可用时的兜底（理论上不会发生）
+	const ta = $("text");
+	if (ta) ta.value += (ta.value ? "\n" : "") + marker + "\n";
+}
 const warnTextInput = $("warnText");
 $("isSensitive").onchange = () => {
 	if (!warnTextInput) return;
@@ -77,8 +92,7 @@ function openImagePicker() {
 		const url = $("imgUrlInput").value.trim();
 		if (!url) return modalError(t("img_enter_url"));
 		if (!/^https?:\/\//i.test(url)) return modalError(t("img_invalid_url"));
-		const textArea = $("text");
-		textArea.value += (textArea.value ? "\n" : "") + `[img:${url}]` + "\n";
+		insertEditorMarker(`[img:${url}]`);
 		$("modal").classList.add("hidden");
 	};
 }
@@ -112,7 +126,7 @@ function openMusicPicker() {
 		} else {
 			return modalError(t("music_invalid"));
 		}
-		textArea.value += (textArea.value ? "\n" : "") + marker + "\n";
+		insertEditorMarker(marker);
 		$("modal").classList.add("hidden");
 	};
 }
@@ -169,13 +183,44 @@ function getPostMeta(content) {
 	};
 }
 
+/**
+ * 按"可见文字数"截断 HTML，且只在文本节点边界下刀，不会切坏标签。
+ * 之前是「有 HTML 就不折叠」，导致加粗一个词就能让整篇长帖永久展开。
+ */
+function foldHtmlByText(html, maxChars) {
+	const box = document.createElement("div");
+	box.innerHTML = html;
+	const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+	const nodes = [];
+	while (walker.nextNode()) nodes.push(walker.currentNode);
+	let count = 0;
+	let cut = false;
+	for (let i = 0; i < nodes.length; i++) {
+		const node = nodes[i];
+		const len = (node.nodeValue || "").length;
+		if (count + len <= maxChars) {
+			count += len;
+			continue;
+		}
+		const keep = Math.max(0, maxChars - count);
+		node.nodeValue = (node.nodeValue || "").slice(0, keep);
+		count += keep;
+		cut = true;
+		for (let k = i + 1; k < nodes.length; k++) nodes[k].nodeValue = "";
+		break;
+	}
+	return { html: box.innerHTML, truncated: cut };
+}
+
 async function renderPostBody(box, fullContent, post) {
 	const meta = getPostMeta(fullContent);
 	const safeContent = sanitizePostHtml(meta.content || "");
-	const hasHtml = /<[^>]+>/.test(safeContent);
-	const plainText = safeContent.replace(/<[^>]*>/g, "");
-	const needFold = !hasHtml && plainText.length > (postLayout === "dense" ? 120 : 300);
-	const foldedText = needFold ? escapeHtml(plainText.slice(0, 300)) + " ..." : "";
+	// 不再因为含 HTML 就放弃折叠：统一按"可见文字长度"判断。
+	// 截断通过 DOM 在文本节点边界下刀，标签不会被切坏。
+	const foldLimit = postLayout === "dense" ? 120 : 300;
+	const folded = foldHtmlByText(safeContent, foldLimit);
+	const needFold = folded.truncated;
+	const foldedText = needFold ? folded.html + " ..." : "";
 	let html = "";
 	if (meta.music) {
 		html += renderMusicCard(meta.music) + '<div style="height:12px"></div>';
@@ -349,8 +394,7 @@ function openPollPicker() {
 			deadline: $("pollDeadline").value ? new Date($("pollDeadline").value).toISOString() : null,
 		};
 		const poll = { options, settings, ended: false, votes: options.map(() => []) };
-		const textArea = $("text");
-		textArea.value += (textArea.value ? "\n" : "") + "[poll:" + JSON.stringify(poll) + "]" + "\n";
+		insertEditorMarker("[poll:" + JSON.stringify(poll) + "]");
 		$("modal").classList.add("hidden");
 	};
 }

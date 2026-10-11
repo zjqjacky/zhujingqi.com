@@ -295,11 +295,68 @@ const TRANSLATIONS = {
 		"zh-TW": "最新公告"
 	},
 	editor_custom_tag_ph: {
-		zh: "自定义标签（你也可以不选择任何标签）",
+		zh: "自定义标签（可不填）",
 		en: "Custom tag (optional)",
 		es: "Etiqueta personalizada (opcional)",
 		de: "Eigenes Tag (optional)",
-		"zh-TW": "自定義標籤（你也可以不選擇任何標籤）"
+		"zh-TW": "自定義標籤（可不填）"
+	},
+	// 编辑器里不可编辑挂件的显示名（图片/音乐/投票/背景/遮罩）
+	editor_chip_img: {
+		zh: "图片",
+		en: "Image",
+		es: "Imagen",
+		de: "Bild",
+		"zh-TW": "圖片"
+	},
+	editor_chip_music: {
+		zh: "音乐",
+		en: "Music",
+		es: "Música",
+		de: "Musik",
+		"zh-TW": "音樂"
+	},
+	editor_chip_poll: {
+		zh: "投票",
+		en: "Poll",
+		es: "Encuesta",
+		de: "Umfrage",
+		"zh-TW": "投票"
+	},
+	editor_chip_bg: {
+		zh: "背景",
+		en: "Background",
+		es: "Fondo",
+		de: "Hintergrund",
+		"zh-TW": "背景"
+	},
+	editor_chip_warn: {
+		zh: "遮罩",
+		en: "Warning",
+		es: "Aviso",
+		de: "Warnung",
+		"zh-TW": "遮罩"
+	},
+	editor_chip_other: {
+		zh: "内容",
+		en: "Content",
+		es: "Contenido",
+		de: "Inhalt",
+		"zh-TW": "內容"
+	},
+	editor_undo: {
+		zh: "撤销",
+		en: "Undo",
+		es: "Deshacer",
+		de: "Rückgängig",
+		"zh-TW": "撤銷"
+	},
+	editor_redo: {
+		zh: "重做",
+		en: "Redo",
+		es: "Rehacer",
+		de: "Wiederholen",
+		"zh-TW": "重做"
 	},
 	editor_sensitive: {
 		zh: "此帖子可能包含不适宜的内容",
@@ -337,11 +394,11 @@ const TRANSLATIONS = {
 		"zh-TW": "發佈"
 	},
 	editor_ph: {
-		zh: "发布新鲜事（最多5000字符）",
-		en: "Post something new (max 5000 chars)",
-		es: "Publica algo nuevo (máx 5000 caracteres)",
-		de: "Poste etwas Neues (max 5000 Zeichen)",
-		"zh-TW": "發佈新鮮事（最多5000字符）"
+		zh: "发布新鲜事…",
+		en: "Post something new…",
+		es: "Publica algo nuevo…",
+		de: "Poste etwas Neues…",
+		"zh-TW": "發佈新鮮事…"
 	},
 	editor_insert_img: {
 		zh: "插图",
@@ -734,6 +791,61 @@ const TRANSLATIONS = {
 		es: "Cancelar",
 		de: "Abbrechen",
 		"zh-TW": "取消"
+	},
+	// 深夜发帖提醒（22:30–06:00 随机抽一条）。
+	// 这里存的是数组而非字符串，所以不能走 t()——t() 只处理字符串，
+	// 调用方需要自己按 currentLang 取，取不到时回退 zh。
+	late_night_tips: {
+		zh: [
+			"夜深了，请注意休息。",
+			"合理安排上网时间，保持良好作息。",
+			"网络不打烊，健康更重要，记得早点休息。",
+			"保证充足睡眠，明天再继续精彩。",
+			"夜已深，好好休息吧。",
+			"健康上网，拒绝熬夜。",
+			"规律作息，健康生活。",
+			"夜间请适度使用网络，珍惜睡眠。"
+		],
+		en: [
+			"It's late. Please remember to rest.",
+			"Plan your time online wisely and keep a healthy routine.",
+			"The internet never closes, but your health comes first — get some rest.",
+			"Get enough sleep and save the fun for tomorrow.",
+			"The night is deep — get some rest.",
+			"Browse healthily, say no to all-nighters.",
+			"Keep a regular routine for a healthy life.",
+			"Use the internet in moderation at night and treasure your sleep."
+		],
+		es: [
+			"Es tarde. Recuerda descansar.",
+			"Planifica bien tu tiempo en línea y mantén una rutina saludable.",
+			"Internet nunca cierra, pero tu salud es más importante: descansa.",
+			"Duerme lo suficiente y guarda lo divertido para mañana.",
+			"Es de noche, descansa.",
+			"Navega con salud, di no a las noches en vela.",
+			"Mantén un horario regular para una vida sana.",
+			"Usa internet con moderación de noche y respeta tu sueño."
+		],
+		de: [
+			"Es ist spät. Denk an deine Ruhe.",
+			"Plane deine Online-Zeit sinnvoll und halte einen gesunden Rhythmus ein.",
+			"Das Internet schließt nie, deine Gesundheit ist wichtiger – ruh dich aus.",
+			"Sorge für ausreichenden Schlaf und hebe dir die Höhepunkte für morgen auf.",
+			"Die Nacht ist tief – ruh dich aus.",
+			"Gesund online gehen – gegen durchgemachte Nächte.",
+			"Regelmäßige Routine für ein gesundes Leben.",
+			"Nutze das Internet nachts maßvoll und schlaf gut."
+		],
+		"zh-TW": [
+			"夜深了，請注意休息。",
+			"合理安排上網時間，保持良好作息。",
+			"網路不打烊，健康更重要，記得早點休息。",
+			"保證充足睡眠，明天再繼續精彩。",
+			"夜已深，好好休息吧。",
+			"健康上網，拒絕熬夜。",
+			"規律作息，健康生活。",
+			"夜間請適度使用網路，珍惜睡眠。"
+		]
 	},
 	poll_end_confirm: {
 		zh: "结束后将无法再投票，且此操作无法撤销。确定要结束这个投票吗？",
@@ -2052,11 +2164,11 @@ const TRANSLATIONS = {
 		"zh-TW": "點擊完成人機驗證"
 	},
 	captcha_modal_title: {
-		zh: "人机验证 — 拖到闪烁虚线框中",
-		en: "Verification — drag to the dashed box",
-		es: "Verificación — arrastra hasta la caja punteada",
-		de: "Verifizierung — in das gestrichelte Feld ziehen",
-		"zh-TW": "人機驗證 — 拖到閃爍虛線框中"
+		zh: "人机验证 — 请计算算式结果",
+		en: "Verification — calculate the result",
+		es: "Verificación — calcula el resultado",
+		de: "Verifizierung — Ergebnis berechnen",
+		"zh-TW": "人機驗證 — 請計算算式結果"
 	},
 	captcha_not_done: {
 		zh: "请先完成人机验证",
@@ -2184,4 +2296,5 @@ const EMOJI_MAP = [
 		"please",
 		"67",
 		"nfls",
+		"music",
 	];
