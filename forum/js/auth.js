@@ -1,5 +1,6 @@
 $("registerBtn").onclick = async () => {
 	if (!captchaPassed) return modal(t("captcha_not_done"));
+	if (!($("agreeTerms") && $("agreeTerms").checked)) return modal(t("agree_required"));
 	let u = $("regUser").value.trim();
 	let nick = $("regNickname") ? $("regNickname").value.trim() : "";
 	let p1 = $("regPass").value.trim();
@@ -51,12 +52,7 @@ $("loginBtn").onclick = async () => {
 		renderPostFilters();
 		syncLayoutMode();
 		syncLayoutBtn();
-		loadStats();
-		loadPosts(1);
-		loadOnlineUsers();
-		startPresence();
-		refreshNotificationBadge();
-		loadAnnouncements();
+		loadFeedPage(1);
 		modal(t("welcome_back", escapeHtml(getDisplayName(data))));
 	} catch (e) {
 		const msg = e.message;
@@ -115,7 +111,9 @@ function randomLateNightTip() {
 	return list[Math.floor(Math.random() * list.length)];
 }
 
+let postingPost = false;
 async function submitNewPost() {
+	if (postingPost) return;
 	let txt = $("text").value.trim();
 	if (!txt) return;
 	closeEmojiPicker();
@@ -133,38 +131,44 @@ async function submitNewPost() {
 	if (selectedPostBg) {
 		finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 	}
-	let created;
+
+	postingPost = true;
+	setBtnBusy($("sendBtn"), true);
 	try {
-		created = await apiPost("/api/posts", {
-			content: finalContent,
-			tag: tag,
-		});
-	} catch (e) {
-		if (e.message === "JWT_EXPIRED") return;
-		return modalText(t("post_fail", e.message));
-	}
-	const postId = (created && created.id) || Date.now();
-	applyCoinDelta(created && created.coinsDelta);
-	await notifyMentions(finalContent, postId, null);
-	try {
-		for (const k of Object.keys(sessionStorage)) {
-			if (k.startsWith("tlDays_")) sessionStorage.removeItem(k);
+		let created;
+		try {
+			created = await apiPost("/api/posts", {
+				content: finalContent,
+				tag: tag,
+			});
+		} catch (e) {
+			if (e.message === "JWT_EXPIRED") return;
+			return modalText(t("post_fail", e.message));
 		}
-	} catch {}
-	$("text").value = "";
-	if (window.clearRichEditor) window.clearRichEditor();
-	$("customTag").value = "";
-	selectedTags = [];
-	selectedPostBg = "";
-	$("bgBuyBtn").textContent = t("editor_bg");
-	$("isSensitive").checked = false;
-	$("warnText").value = "";
-	$("warnText").classList.remove("show");
-	show("main");
-	loadStats();
-	loadPosts(1);
-	setActive("homeBtn");
-	loadAnnouncements();
+		const postId = (created && created.id) || Date.now();
+		applyCoinDelta(created && created.coinsDelta);
+		await notifyMentions(finalContent, postId, null);
+		try {
+			for (const k of Object.keys(sessionStorage)) {
+				if (k.startsWith("tlDays_")) sessionStorage.removeItem(k);
+			}
+		} catch {}
+		$("text").value = "";
+		if (window.clearRichEditor) window.clearRichEditor();
+		$("customTag").value = "";
+		selectedTags = [];
+		selectedPostBg = "";
+		$("bgBuyBtn").textContent = t("editor_bg");
+		$("isSensitive").checked = false;
+		$("warnText").value = "";
+		$("warnText").classList.remove("show");
+		show("main");
+		loadFeedPage(1);
+		setActive("homeBtn");
+	} finally {
+		postingPost = false;
+		setBtnBusy($("sendBtn"), false);
+	}
 }
 
 $("sendBtn").onclick = () => {

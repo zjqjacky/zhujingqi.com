@@ -10,67 +10,68 @@ function getLevelInfo(coins) {
 			color: "#77bb00"
 		},
 		{
-			min: 20,
+			min: 10,
 			name: "LV2",
 			color: "#00aaff"
 		},
 		{
-			min: 40,
+			min: 20,
 			name: "LV3",
 			color: "#ffcc00"
 		},
 		{
-			min: 80,
+			min: 40,
 			name: "LV4",
 			color: "#ff9900"
 		},
 		{
-			min: 160,
+			min: 80,
 			name: "LV5",
 			color: "#ff5500"
 		},
 		{
-			min: 320,
+			min: 160,
 			name: "LV6",
 			color: "#d93131"
 		},
 		{
-			min: 640,
+			min: 320,
 			name: "LV7",
 			color: "#ff55ff"
 		},
 		{
-			min: 1280,
+			min: 640,
 			name: "LV8",
 			color: "#9900ff"
 		},
 		{
-			min: 2560,
+			min: 1280,
 			name: "LV9",
 			color: "#55007f"
 		},
 		{
-			min: 5120,
+			min: 2560,
 			name: "LV10",
 			color: "#d4a017",
 			cssClass: "lv10"
 		},
 		{
-			min: 10240,
+			min: 5120,
 			name: "LV11",
 			color: "#ff4500",
 			cssClass: "lv11"
 		},
 		{
-			min: 20480,
+			min: 10240,
 			name: "LV12",
 			color: "#ffd700",
 			cssClass: "lv12"
 		},
 		{
-			min: 40960,
-			name: "MAX",
-			color: "#000000"
+			min: 20480,
+			name: "LV13",
+			color: "#e8e8ff",
+			cssClass: "lv13"
 		}
 	];
 	let current = levels[0];
@@ -120,6 +121,17 @@ function renderLevelProgress(coins) {
 							${t("level_distance", '<b style="color:'+next.color+';">'+next.name+'</b>', '<b>'+(next.min - coins)+'</b>')}
 						</div>
 					`;
+}
+
+/**
+ * 等级按「累计获得」算，不看当前余额 —— 花币、抽奖、删帖都不会掉级。
+ * 老数据没有 earned_total 时退回 coins，保证兼容。
+ */
+function userLevelCoins(user) {
+	if (!user) return 0;
+	const earned = user.earned_total;
+	if (typeof earned === "number" && earned > 0) return earned;
+	return user.coins || 0;
 }
 
 function getUserLevel(coins) {

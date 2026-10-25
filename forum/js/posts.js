@@ -326,7 +326,55 @@ if (toggleBtn) {
 		toggleBtn.style.right = "8px";
 	};
 }
-async function loadPosts(page = 1, container = $("posts")) {
+// 一次刷新只发一个请求：帖子 + 评论 + 统计 + 在线 + 公告都由 /api/feed 返回
+async function fetchFeed(page, perPage) {
+	let q = `?page=${page}&perPage=${perPage}`;
+	if (currentUser) q += "&userId=" + currentUser.id;
+	if (activePostTag && activePostTag !== "全部" && activePostTag !== "其它" && activePostTag !== "关注") q +=
+		"&tag=" + encodeURIComponent(activePostTag);
+	if (postSearch) q += "&search=" + encodeURIComponent(postSearch);
+	if (activePostDay) q += "&day=" + activePostDay + "&tz=" + (-new Date().getTimezoneOffset());
+	return apiGet("/api/feed" + q);
+}
+
+async function loadFeedPage(page = 1) {
+	const perPage = guestMode ? 4 : getPostsPerPage();
+	let feed = null;
+	try {
+		feed = await fetchFeed(page, perPage);
+	} catch (e) {
+		console.error("feed 失败，退回逐个请求", e);
+	}
+	if (!feed || !Array.isArray(feed.posts)) {
+		await loadPosts(page);
+		loadStats();
+		loadOnlineUsers();
+		loadAnnouncements();
+		return;
+	}
+	// 先把 feed 里的数据塞进各自缓存，后面的 loadStats/loadOnlineUsers 就不会再发请求
+	if (feed.stats) statsCache = {
+		data: feed.stats,
+		time: Date.now()
+	};
+	if (Array.isArray(feed.online)) {
+		onlineUsersCache = feed.online;
+		onlineUsersCacheTime = Date.now();
+	}
+	await loadPosts(page, $("posts"), feed);
+	loadStats();
+	loadOnlineUsers();
+	loadAnnouncements(feed.announcements);
+	if (feed.unread) {
+		applyNotificationBadge(feed.unread.notifications, feed.unread.chat);
+		lastNotifRefresh = Date.now();
+	} else {
+		refreshNotificationBadge();
+	}
+	startPresence();
+}
+
+async function loadPosts(page = 1, container = $("posts"), prefetched = null) {
 	if (guestMode) page = 1;
 	const token = ++currentLoadToken;
 	const perPage = guestMode ? 4 : getPostsPerPage();
@@ -335,7 +383,10 @@ async function loadPosts(page = 1, container = $("posts")) {
 	try {
 		postPage = page;
 		renderPager();
-		const pageData = await fetchPostPage(page, perPage);
+		const pageData = prefetched ? {
+			posts: prefetched.posts || [],
+			count: prefetched.count || 0
+		} : await fetchPostPage(page, perPage);
 		totalPostCount = pageData.count || 0;
 		renderPager();
 		if (token !== currentLoadToken) return;
@@ -386,7 +437,7 @@ async function loadPosts(page = 1, container = $("posts")) {
 				'<img class="avatar" src="' + avatar +
 				'" onerror="this.onerror=null;this.src=\'assets/img/head.svg\'">' +
 				escapeHtml(getDisplayName(p.users)) +
-				'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
+				'<span class="userLevel">' + getUserLevel(userLevelCoins(p.users)) + '</span>' +
 				'<span>' + getRoleBadge(p.users) + '</span>' +
 				'</span>' +
 				'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
@@ -486,9 +537,21 @@ async function loadPosts(page = 1, container = $("posts")) {
 						shareBtn.nextElementSibling.classList.remove("show");
 					};
 				}
-				const submit = () => {
-					const text = postDiv.querySelector("[data-input]")?.value.trim();
-					if (text) addComment(p.id, text, p.author);
+				let commentSending = false;
+				const submit = async () => {
+					if (commentSending) return;
+					const input = postDiv.querySelector("[data-input]");
+					const text = input?.value.trim();
+					if (!text) return;
+					const btn = postDiv.querySelector("[data-comment]");
+					commentSending = true;
+					setBtnBusy(btn, true);
+					try {
+						await addComment(p.id, text, p.author);
+					} finally {
+						commentSending = false;
+						if (btn && btn.isConnected) setBtnBusy(btn, false);
+					}
 				};
 				postDiv.querySelector("[data-comment]").onclick = submit;
 				postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key ===
@@ -498,12 +561,16 @@ async function loadPosts(page = 1, container = $("posts")) {
 		}
 		if (token !== currentLoadToken) return;
 		let allComments = [];
-		try {
-			allComments = await apiPost("/api/comments/batch", {
-				postIds
-			}) || [];
-		} catch {
-			allComments = [];
+		if (prefetched && Array.isArray(prefetched.comments)) {
+			allComments = prefetched.comments;
+		} else {
+			try {
+				allComments = await apiPost("/api/comments/batch", {
+					postIds
+				}) || [];
+			} catch {
+				allComments = [];
+			}
 		}
 		if (token !== currentLoadToken) return;
 		const commentsByPost = {};

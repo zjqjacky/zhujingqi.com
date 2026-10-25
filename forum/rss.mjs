@@ -70,7 +70,9 @@ const emojiNames = new Set(
 //   - mentions are processed first, then URLs — so a URL never gets wrapped
 //     inside an existing anchor (SPA skips .mentionLink nodes in linkifyUrls)
 const URL_REG = /(^|[\s(])((?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?(?:\/[^\s<>"']*)?)/gi;
-const MENTION_REG = /(^|[\s(])@([\p{L}\p{N}_-]{1,32})/gu;
+// 与 SPA 一致：@ 前不限（中文可直接写「今天@张三」），@ 后紧跟 .com/.cn 视为邮箱；
+// 全角 ＠ 与半角 @ 等价。
+const MENTION_REG = /[@＠]([\p{L}\p{N}_-]{1,32})/gu;
 
 const linkifyUrls = (text) => {
   if (!text) return "";
@@ -90,23 +92,25 @@ const linkifyUrls = (text) => {
 };
 
 const linkifyMentions = (text, userByName) => {
-  if (!text || !text.includes("@") || userByName.size === 0) return text;
+  if (!text || !/[@＠]/.test(text) || userByName.size === 0) return text;
   MENTION_REG.lastIndex = 0;
   let out = "";
   let last = 0;
   let m;
   while ((m = MENTION_REG.exec(text))) {
-    out += text.slice(last, m.index);
     const full = m[0];
-    const prefix = m[1] || "";
-    const uname = m[2];
+    const end = m.index + full.length;
+    // 后面紧跟 .com / .cn 这种域名 -> 当邮箱，跳过
+    if (/^\.[\p{L}]{2,}/u.test(text.slice(end))) continue;
+    out += text.slice(last, m.index);
+    const uname = m[1];
     const found = userByName.get(uname.toLowerCase());
     if (found) {
-      out += `${prefix}<a class="mentionLink" href="${FORUM_URL}?uid=${found.id}" target="_blank" rel="noopener noreferrer">@${found.name}</a>`;
+      out += `<a class="mentionLink" href="${FORUM_URL}?uid=${found.id}" target="_blank" rel="noopener noreferrer">@${found.name}</a>`;
     } else {
       out += full;
     }
-    last = m.index + full.length;
+    last = end;
   }
   return out + text.slice(last);
 };

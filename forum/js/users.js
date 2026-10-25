@@ -110,7 +110,7 @@ function escapeAttr(s) {
 								<div style="min-width:0;">
 									<div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
 										<span>${escapeHtml(getDisplayName(u))}</span>
-										<span class="userLevel">${getUserLevel(u.coins || 0)}${getRoleBadge(u)}</span>
+										<span class="userLevel">${getUserLevel(userLevelCoins(u))}${getRoleBadge(u)}</span>
 									</div>
 								</div>
 							</div>
@@ -151,10 +151,10 @@ function escapeAttr(s) {
 						$("pname").innerHTML =
 							`<span class="pnickWrap"><span class="pNick">${escapeHtml(user.nickname)}</span>` +
 							`<span class="pAccount">@${escapeHtml(user.name)}</span></span>` +
-							`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+							`<span class="userLevel">${getUserLevel(userLevelCoins(user))}</span>` +
 							getRoleBadge(user);
 					} else {
-						$("pname").innerHTML = escapeHtml(user.name) + `<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+						$("pname").innerHTML = escapeHtml(user.name) + `<span class="userLevel">${getUserLevel(userLevelCoins(user))}</span>` +
 							getRoleBadge(user);
 					}
 					if (currentUser && Number(user.id) === Number(currentUser.id)) {
@@ -172,6 +172,7 @@ function escapeAttr(s) {
 					$("modalText").innerHTML = `
 						<h3>${t("settings_change_nickname")}</h3>
 						<input id="nickInput" maxlength="20" placeholder="${t("nickname_placeholder")}" value="${user.nickname ? escapeHtml(user.nickname) : ""}">
+						<div style="margin-top:6px;font-size:12px;color:var(--sub);">${t("rename_card_hint")} · ${t("rename_card_owned", (currentUser.inventory && currentUser.inventory.rename_card) || 0)}</div>
 						<div style="margin-top:14px;">
 							<button id="nickSaveBtn">${t("profile_save")}</button>
 						</div>
@@ -187,7 +188,13 @@ function escapeAttr(s) {
 							});
 						} catch (e) {
 							if (/taken/i.test(e.message)) return modal(t("nickname_taken"));
+							if (/rename card/i.test(e.message)) return modal(t("rename_card_needed"));
 							return modalText(t("save_fail", e.message));
+						}
+						if ((currentUser.nickname || "") !== (newNick || "")) {
+							const inv = currentUser.inventory || {};
+							inv.rename_card = Math.max(0, (inv.rename_card || 0) - 1);
+							currentUser.inventory = inv;
 						}
 						currentUser.nickname = newNick || null;
 						if (user) user.nickname = newNick || null;
@@ -237,6 +244,9 @@ function escapeAttr(s) {
 							<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
 								<button class="settingsLinkBtn" id="setAboutBtn">${t("profile_about")}</button>
 								<button class="settingsLinkBtn" id="setSponsorBtn">${t("profile_sponsor")}</button>
+							</div>
+							<div style="margin-top:6px;">
+								<button class="settingsLinkBtn" id="setDisclaimerBtn" style="width:100%;">${t("terms_doc")}</button>
 							</div>
 						${"" /* AI 日志按钮已移除 */}
 						${"" /* RSS 订阅按钮已移到「探索」页，设置里不再重复 */}
@@ -356,6 +366,9 @@ function escapeAttr(s) {
 	$("setSponsorBtn").onclick = () => {
 		modal(`<h2>${t("sponsor_title")}</h2>${t("sponsor_content")}`);
 	};
+	$("setDisclaimerBtn").onclick = () => {
+		window.open("terms.html", "_blank", "noopener");
+	};
 	// AI 日志入口已移除（AI 功能暂时下线）
 	// const aiLogsBtn = box.querySelector("#setAILogsBtn");
 	// if (aiLogsBtn) {
@@ -435,7 +448,7 @@ async function viewUser(uid) {
 						<div class="metaRow">${t("profile_reg_time")}：${new Date(user.time).toLocaleString()}</div>
 						<div class="metaRow">${t("profile_coins")}：${user.coins || 0}</div>
 					`;
-					renderLevelProgress(user.coins || 0);
+					renderLevelProgress(userLevelCoins(user));
 					const bio = document.getElementById("profileBio");
 					bio.innerHTML = sanitizePostHtml(user.description || t("profile_no_desc"));
 					if (isSelf) {
@@ -611,7 +624,7 @@ async function viewUser(uid) {
 							return `<div class="onlineUser voteUser" data-user="${u?.id}" style="display:flex;align-items:center;gap:8px;">
 								<img class="avatar onlineAvatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
 								<span>${escapeHtml(getDisplayName(u))}</span>
-								<span class="userLevel">${getUserLevel(u?.coins || 0)}</span>
+								<span class="userLevel">${getUserLevel(userLevelCoins(u))}</span>
 								${getRoleBadge(u)}
 							</div>`;
 						}).join("") :

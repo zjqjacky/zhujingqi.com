@@ -15,6 +15,16 @@ async function openShop() {
 	}
 	let coins = userData?.coins || 0;
 	let roleArr = userData?.role || [];
+	let cardCount = (userData?.inventory && userData.inventory.rename_card) || 0;
+
+	// 商品清单来自服务端，价格只此一份
+	let items = [];
+	try {
+		const res = await apiGet("/api/shop/items");
+		items = res && Array.isArray(res.items) ? res.items : [];
+	} catch {
+		items = [];
+	}
 
 	function getActiveBadge() {
 		for (const r of roleArr) {
@@ -26,8 +36,8 @@ async function openShop() {
 
 	function renderShop() {
 		const active = getActiveBadge();
-		const badges = SHOP_ITEMS.filter(i => !i.gift);
-		const gifts = SHOP_ITEMS.filter(i => i.gift);
+		const badges = items.filter(i => i.kind === "badge");
+		const cards = items.filter(i => i.kind === "card");
 		const itemsHtml = badges.map(item => {
 			const owned = roleArr.includes(item.id);
 			const isActive = active === item.id;
@@ -43,7 +53,7 @@ async function openShop() {
 					`<button class="buyBtn owned" data-equip="${item.id}">${t("shop_equip")}</button>`;
 			} else if (coins >= item.price) {
 				btnHtml =
-					`<button class="buyBtn buy" data-buy="${item.id}">${item.price} ${t("profile_coins")}</button>`;
+					`<button class="buyBtn buy" data-buy="${item.id}">${t("shop_buy")}</button>`;
 			} else {
 				btnHtml =
 					`<button class="buyBtn owned" style="opacity:.5;">${t("coins_insufficient")}</button>`;
@@ -53,45 +63,75 @@ async function openShop() {
 				`<div class="preview"><span class="shopPreviewBadge roleBadge ${item.id}"></span></div>` :
 				'';
 			return `
-								<div class="shopItem">
-									${previewHtml}
-									<div class="info"><div class="name">${t("shop_item_"+item.id)}</div><div class="desc">${item.price} ${t("profile_coins")}</div></div>
-									${btnHtml}
+								<div class="shopRow${isActive ? " active" : ""}">
+									<div class="shopRowIcon">${previewHtml}</div>
+									<div class="shopRowText">
+										<div class="shopRowName">${t("shop_item_" + item.id)}</div>
+										<div class="shopRowPrice">${item.price} ${t("profile_coins")}</div>
+									</div>
+									<div class="shopRowActions">${btnHtml}</div>
 								</div>`;
 		}).join("");
-		const giftsHtml = gifts.map(item => {
-			const afford = coins >= item.price;
+
+		const cardsHtml = cards.map(item => {
+			const bulk = item.bulk || null;
+			const bulkCount = bulk ? bulk.count : 10;
+			const bulkPrice = bulk ? bulk.price : item.price * bulkCount;
+			const desc = [t("shop_price_each", item.price)];
+			if (bulk) desc.push(t("shop_bulk_price", bulkPrice));
+			desc.push(t("rename_card_owned", cardCount));
+			const btn = (n, label, cost) =>
+				`<button class="buyBtn ${coins >= cost ? "buy" : "owned"}" data-buy-card="${n}"${coins >= cost ? "" : ' style="opacity:.5;"'}>${label}</button>`;
 			return `
-								<div class="shopItem">
-									<div class="info"><div class="name">${item.name}</div><div class="desc">${item.price} ${t("profile_coins")} · 对方收到 ${item.gift} ${t("profile_coins")}</div></div>
-									${afford
-						? `<button class="buyBtn buy" data-buy-gift="${item.id}">${item.price} ${t("profile_coins")}</button>`
-						: `<button class="buyBtn owned" style="opacity:.5;">${t("coins_insufficient")}</button>`}
+								<div class="shopRow">
+									<div class="shopRowIcon"><span class="shopRowGlyph">✎</span></div>
+									<div class="shopRowText">
+										<div class="shopRowName">${t("shop_item_" + item.id)}</div>
+										<div class="shopRowPrice">${desc.join(" · ")}</div>
+									</div>
+									<div class="shopRowActions">
+										${btn(1, t("shop_buy_one"), item.price)}
+										${btn(bulkCount, t("shop_buy_ten"), bulkPrice)}
+									</div>
 								</div>`;
 		}).join("");
 
 		shopDiv.innerHTML = `
 							<div class="shopBox">
-								<div class="closeRow"><button id="shopCloseBtn">${t("shop_close")}</button></div>
-								<h2>${t("shop_title")}</h2>
-								<div style="font-size:15px;color:var(--sub);margin-bottom:16px;">${t("shop_coins", '<b style="color:var(--green);">'+coins+'</b>')}</div>
+								<div class="shopHead">
+									<div>
+										<h2 class="shopTitle">${t("shop_title")}</h2>
+										<div class="shopBalance">${t("shop_coins", '<b style="color:var(--green);">' + coins + '</b>')}</div>
+									</div>
+									<button id="shopCloseBtn" class="shopClose">${t("shop_close")}</button>
+								</div>
 								<div class="shopSection">
 									<h3>${t("shop_badges")}</h3>
-									${itemsHtml}
+									<div class="shopGrid shopGridBadge">${itemsHtml}</div>
 								</div>
-								<!-- <div class="shopSection">
-									<h3>礼物</h3>
-									${giftsHtml}
-								</div> -->
+								<div class="shopSection">
+									<h3>${t("shop_tools")}</h3>
+									<div class="shopGrid shopGridTool">${cardsHtml}</div>
+								</div>
 								<div class="shopSection">
 									<h3>${t("shop_lottery_section")}</h3>
-									<div class="lotteryEntry" id="lotteryEntry">
-										<div class="lotteryEntryIcon" style="font-size:22px;">&#x25cf;</div>
-										<div class="lotteryEntryInfo">
-											<div class="lotteryEntryTitle">${t("shop_lottery")}</div>
-											<div class="lotteryEntryDesc">${t("shop_lottery_desc")}</div>
+									<div class="shopGrid shopGridPlay">
+										<div class="shopRow shopPlay" id="lotteryEntry">
+											<div class="shopRowIcon"><span class="shopRowGlyph">◎</span></div>
+											<div class="shopRowText">
+												<div class="shopRowName">${t("shop_lottery")}</div>
+												<div class="shopRowPrice">${t("shop_lottery_desc")}</div>
+											</div>
+											<div class="shopRowActions"><button class="buyBtn buy" id="lotteryEntryBtn">${t("shop_lottery_start")}</button></div>
 										</div>
-										<button class="lotteryEntryBtn" id="lotteryEntryBtn">${t("shop_lottery_start")}</button>
+										<div class="shopRow shopPlay" id="plinkoEntry">
+											<div class="shopRowIcon"><span class="shopRowGlyph">◉</span></div>
+											<div class="shopRowText">
+												<div class="shopRowName">${t("shop_plinko")}</div>
+												<div class="shopRowPrice">${t("shop_plinko_desc")}</div>
+											</div>
+											<div class="shopRowActions"><button class="buyBtn buy" id="plinkoEntryBtn">${t("shop_lottery_start")}</button></div>
+										</div>
 									</div>
 								</div>
 							</div>`;
@@ -104,8 +144,8 @@ async function openShop() {
 		shopDiv.querySelectorAll("[data-buy]").forEach(btn => {
 			btn.onclick = async () => {
 				const itemId = btn.dataset.buy;
-				const item = SHOP_ITEMS.find(i => i.id === itemId);
-				if (!item || coins < item.price) return;
+				const item = items.find(i => i.id === itemId);
+				if (!item) return;
 				try {
 					const res = await apiPost("/api/shop/buy", { itemId });
 					if (res && typeof res.coins === "number") coins = res.coins;
@@ -139,8 +179,31 @@ async function openShop() {
 			};
 		});
 
+		shopDiv.querySelectorAll("[data-buy-card]").forEach(btn => {
+			btn.onclick = async () => {
+				const count = Number(btn.dataset.buyCard) || 1;
+				try {
+					const res = await apiPost("/api/shop/rename-card", { count });
+					if (res && typeof res.coins === "number") coins = res.coins;
+					if (res && typeof res.rename_card === "number") cardCount = res.rename_card;
+					if (currentUser) {
+						currentUser.coins = coins;
+						if (!currentUser.inventory) currentUser.inventory = {};
+						currentUser.inventory.rename_card = cardCount;
+					}
+					showCoinMsg(t("coin_sub", (res && res.cost) || count * 30));
+				} catch (e) {
+					if (e.message === "JWT_EXPIRED") return;
+					showCoinMsg(t("coins_insufficient"));
+				}
+				renderShop();
+			};
+		});
+
 		const lotteryEntry = shopDiv.querySelector("#lotteryEntry");
 		if (lotteryEntry) lotteryEntry.onclick = openLottery;
+		const plinkoEntry = shopDiv.querySelector("#plinkoEntry");
+		if (plinkoEntry && typeof openPlinko === "function") plinkoEntry.onclick = openPlinko;
 
 		shopDiv.querySelectorAll("[data-remove]").forEach(btn => {
 			btn.onclick = async () => {
@@ -159,115 +222,14 @@ async function openShop() {
 		});
 	}
 
+	if (!items.length) {
+		modalText(t("modal_load_fail"));
+		return;
+	}
 	$("modal").classList.add("hidden");
 	renderShop();
 	document.body.appendChild(shopDiv);
 }
-
-// async function openGiftPicker(item) {
-// 	const users = await ensureAllUsersCache();
-// 	return new Promise(resolve => {
-// 		const modal = document.createElement("div");
-// 		modal.id = "giftPicker";
-// 		modal.innerHTML = `
-// 			<div class="giftBox">
-// 				<h3>选择收礼人 · ${item.name}</h3>
-// 				<input class="giftSearch" id="giftSearch" placeholder="搜索用户名..." autofocus>
-// 				<div class="giftUserList" id="giftUserList"></div>
-// 				<div class="giftActions">
-// 					<button class="giftCancel" id="giftCancel">取消</button>
-// 					<button class="giftConfirm" id="giftConfirm" disabled>确认赠送</button>
-// 				</div>
-// 			</div>`;
-// 		document.body.appendChild(modal);
-
-// 		let selectedId = null;
-// 		const list = modal.querySelector("#giftUserList");
-// 		const input = modal.querySelector("#giftSearch");
-// 		const confirmBtn = modal.querySelector("#giftConfirm");
-
-// 		function renderList(q) {
-// 			const ql = q.toLowerCase().trim();
-// 			const matches = users.filter(u => u.id !== currentUser.id && u.name && u.name
-// 				.toLowerCase().includes(ql));
-// 			if (!matches.length) {
-// 				list.innerHTML =
-// 					'<div style="color:var(--sub);padding:12px;text-align:center;">无匹配用户</div>';
-// 				return;
-// 			}
-// 			list.innerHTML = matches.map(u => `
-// 				<div class="giftUserItem${u.id === selectedId ? ' selected' : ''}" data-uid="${u.id}">
-// 					<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
-// 					<div class="name">${u.name}</div>
-// 				</div>
-// 			`).join("");
-// 			list.querySelectorAll(".giftUserItem").forEach(el => {
-// 				el.onclick = () => {
-// 					selectedId = Number(el.dataset.uid);
-// 					list.querySelectorAll(".giftUserItem").forEach(x => x
-// 						.classList.toggle("selected", Number(x.dataset
-// 							.uid) === selectedId));
-// 					confirmBtn.disabled = false;
-// 				};
-// 			});
-// 		}
-
-// 		input.oninput = () => renderList(input.value);
-// 		if (users) renderList("");
-
-// 		modal.querySelector("#giftCancel").onclick = () => {
-// 			modal.remove();
-// 			resolve(false);
-// 		};
-// 		modal.onclick = e => {
-// 			if (e.target === modal) {
-// 				modal.remove();
-// 				resolve(false);
-// 			}
-// 		};
-
-// 		confirmBtn.onclick = async () => {
-// 			if (!selectedId) return;
-// 			const recipient = users.find(u => u.id === selectedId);
-// 			if (!recipient) return;
-// 			try {
-// 				confirmBtn.disabled = true;
-// 				confirmBtn.textContent = "发送中...";
-// 				const {
-// 					data: cur
-// 				} = await supabase.from("users").select("coins").eq("id", selectedId)
-// 					.single();
-// 				const curCoins = (cur?.coins || 0) + item.gift;
-// 				const {
-// 					error: updErr
-// 				} = await supabase.from("users").update({
-// 					coins: curCoins
-// 				}).eq("id", selectedId);
-// 				if (updErr) {
-// 					showCoinMsg("赠送失败：" + updErr.message);
-// 					modal.remove();
-// 					resolve(false);
-// 					return;
-// 				}
-// 				await createNotification({
-// 					targetId: selectedId,
-// 					actorId: currentUser.id,
-// 					postId: null,
-// 					type: "gift"
-// 				});
-// 				await refreshNotificationBadge();
-// 				showCoinMsg(`送了 ${recipient.name} 一个${item.name}！`);
-// 				modal.remove();
-// 				resolve(true);
-// 			} catch (e) {
-// 				console.error("赠送失败:", e);
-// 				showCoinMsg("赠送失败：" + e.message);
-// 				modal.remove();
-// 				resolve(false);
-// 			}
-// 		};
-// 	});
-// }
 
 function openAvatarEditor() {
 	const oldUrl = currentUser?.avatar || "";

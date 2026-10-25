@@ -1941,6 +1941,50 @@ body.dark .authorTag.self {
 	animation: lvShimmer 4s ease-in-out infinite;
 }
 
+.userLevel.lv13 {
+	background: linear-gradient(90deg, #6a5acd, #00e5ff, #ffd700, #ff4fa3, #6a5acd);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: lvShimmer 3s ease-in-out infinite;
+}
+
+/* ===== 提交中：按钮隐藏内容 + 转圈，并禁止再次点击 ===== */
+.btn-loading {
+	position: relative;
+	pointer-events: none;
+	color: transparent !important;
+}
+
+.btn-loading::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	border: 2px solid rgba(128, 128, 128, .35);
+	border-top-color: var(--green);
+	animation: btnSpin .7s linear infinite;
+}
+
+#sendBtn.btn-loading::before {
+	display: none;
+}
+
+#sendBtn.btn-loading::after {
+	border-color: rgba(255, 255, 255, .35);
+	border-top-color: #fff;
+}
+
+@keyframes btnSpin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 @keyframes lvShimmer {
 	0% {
 		background-position: 0% 50%;
@@ -2230,109 +2274,6 @@ body.dark .roleBadge.blue_diamond {
 	font-weight: 700;
 	font-size: 14px;
 	cursor: pointer;
-}
-
-#giftPicker {
-	position: fixed;
-	inset: 0;
-	z-index: 99999;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: rgba(0, 0, 0, .45);
-}
-
-#giftPicker .giftBox {
-	background: var(--card);
-	border-radius: 24px;
-	width: min(400px, 94vw);
-	padding: 24px;
-	box-sizing: border-box;
-	box-shadow: 0 16px 60px rgba(0, 0, 0, .25);
-}
-
-#giftPicker h3 {
-	margin: 0 0 12px 0;
-	font-size: 20px;
-}
-
-#giftPicker .giftSearch {
-	width: 100%;
-	padding: 10px 14px;
-	border-radius: 12px;
-	border: 1px solid rgba(0, 0, 0, .15);
-	font-size: 15px;
-	box-sizing: border-box;
-	background: var(--card);
-	color: var(--text);
-	outline: none;
-}
-
-#giftPicker .giftSearch:focus {
-	border-color: var(--green);
-}
-
-#giftPicker .giftUserList {
-	max-height: 280px;
-	overflow-y: auto;
-	margin: 12px 0;
-}
-
-#giftPicker .giftUserItem {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 10px 12px;
-	border-radius: 14px;
-	cursor: pointer;
-	transition: .15s;
-}
-
-#giftPicker .giftUserItem:hover,
-#giftPicker .giftUserItem.selected {
-	background: var(--bg);
-}
-
-#giftPicker .giftUserItem .avatar {
-	width: 32px;
-	height: 32px;
-	border-radius: 50%;
-}
-
-#giftPicker .giftUserItem .name {
-	font-weight: 600;
-	font-size: 15px;
-}
-
-#giftPicker .giftActions {
-	display: flex;
-	gap: 10px;
-	justify-content: flex-end;
-}
-
-#giftPicker .giftActions button {
-	height: 38px;
-	padding: 0 20px;
-	border-radius: 19px;
-	border: none;
-	font-size: 14px;
-	font-weight: 700;
-	cursor: pointer;
-}
-
-#giftPicker .giftActions .giftCancel {
-	background: var(--sub);
-	color: #fff;
-}
-
-#giftPicker .giftActions .giftConfirm {
-	background: var(--green);
-	color: #fff;
-}
-
-#giftPicker .giftActions .giftConfirm:disabled {
-	opacity: .4;
-	cursor: default;
 }
 
 #lotteryModal {
@@ -5463,5 +5404,230 @@ body.dark .pollVoterGroup {
 
 	.pollSetRow {
 		font-size: 13px;
+	}
+}
+
+/* ===== 商店：行式布局（紧凑、大字、少留白） ===== */
+#shopModal .shopBox {
+	width: min(96vw, 720px);
+	max-height: 90vh;
+	background: var(--card);
+	border-radius: 20px;
+	padding: 14px 16px 16px;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: none;
+}
+
+#shopModal .shopBox::-webkit-scrollbar {
+	display: none;
+}
+
+.shopHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 2px;
+}
+
+#shopModal .shopTitle {
+	margin: 0;
+	font-size: 19px;
+	line-height: 1.2;
+	color: var(--text);
+}
+
+.shopBalance {
+	font-size: 13px;
+	color: var(--sub);
+	margin-top: 1px;
+}
+
+.shopClose {
+	height: 30px;
+	padding: 0 12px;
+	font-size: 13px;
+	border-radius: 10px;
+	flex: none;
+}
+
+.shopSection {
+	margin-top: 10px;
+	margin-bottom: 0;
+}
+
+.shopSection h3 {
+	margin: 0 0 5px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--sub);
+	letter-spacing: .06em;
+}
+
+.shopGrid {
+	display: grid;
+	gap: 7px;
+}
+
+.shopGridBadge,
+.shopGridPlay {
+	grid-template-columns: repeat(auto-fill, minmax(206px, 1fr));
+}
+
+.shopGridTool {
+	grid-template-columns: 1fr;
+}
+
+.shopRow {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 13px;
+	padding: 7px 9px;
+	min-height: 54px;
+	transition: border-color .15s;
+}
+
+.shopRow.active {
+	border-color: var(--green);
+	box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.shopPlay {
+	cursor: pointer;
+}
+
+.shopPlay:hover {
+	border-color: var(--green);
+}
+
+.shopRowIcon {
+	width: 28px;
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.shopRowIcon .preview {
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.shopRowGlyph {
+	font-size: 19px;
+	line-height: 1;
+	color: var(--green);
+}
+
+.shopRowText {
+	flex: 1;
+	min-width: 0;
+}
+
+.shopRowName {
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--text);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.shopRowPrice {
+	font-size: 12px;
+	line-height: 1.35;
+	color: var(--sub);
+	margin-top: 1px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.shopRowActions {
+	flex: none;
+	display: flex;
+	gap: 6px;
+}
+
+.shopRowActions button {
+	height: 32px;
+	padding: 0 12px;
+	font-size: 13px;
+	border-radius: 10px;
+	white-space: nowrap;
+}
+
+.shopRowActions button.buy {
+	background: var(--green);
+	color: #fff;
+}
+
+.shopRowActions button.buy:hover {
+	background: var(--green);
+	color: #fff;
+	filter: brightness(1.08);
+}
+
+.shopRowActions button.owned {
+	background: transparent;
+	border: 1px solid var(--border);
+	color: var(--sub);
+}
+
+.shopRowActions button.owned:hover {
+	background: transparent;
+	color: var(--sub);
+	border-color: var(--sub);
+}
+
+.shopRowActions button.equipped {
+	background: transparent;
+	border: 1px solid var(--green);
+	color: var(--green);
+}
+
+.shopRowActions button.equipped:hover {
+	background: transparent;
+	color: var(--green);
+	filter: brightness(1.08);
+}
+
+@media (max-width: 620px) {
+	#shopModal .shopBox {
+		padding: 12px;
+		border-radius: 16px;
+	}
+
+	.shopGridBadge,
+	.shopGridPlay {
+		grid-template-columns: 1fr;
+	}
+
+	.shopSection {
+		margin-top: 8px;
+	}
+
+	.shopRow {
+		min-height: 50px;
+		padding: 6px 8px;
+	}
+
+	.shopRowName {
+		font-size: 14px;
+	}
+
+	.shopRowActions button {
+		height: 30px;
+		padding: 0 10px;
+		font-size: 12.5px;
 	}
 }

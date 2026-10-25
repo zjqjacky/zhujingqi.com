@@ -69,12 +69,7 @@ refreshUILanguage(true);
 					syncUrlFromQuery();
 					syncLayoutBtn();
 					syncLayoutMode();
-					loadStats();
-					loadOnlineUsers();
-					startPresence();
-					refreshNotificationBadge();
-					loadPosts(1);
-					loadAnnouncements();
+					loadFeedPage(1);
 				}
 				return;
 			}

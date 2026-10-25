@@ -140,6 +140,27 @@ const TRANSLATIONS = {
 		de: "Nutzungsbedingungen",
 		"zh-TW": "用戶協議"
 	},
+	terms_doc: {
+		zh: "使用条款",
+		en: "Terms of Use",
+		es: "Términos de Uso",
+		de: "Nutzungsbedingungen",
+		"zh-TW": "使用條款"
+	},
+	reg_agree_check: {
+		zh: "我已阅读并同意",
+		en: "I have read and agree to the",
+		es: "He leído y acepto el",
+		de: "Ich habe gelesen und stimme zu:",
+		"zh-TW": "我已閱讀並同意"
+	},
+	agree_required: {
+		zh: "请先阅读并勾选同意《使用条款》",
+		en: "Please read and accept the Terms of Use first",
+		es: "Lee y acepta primero los Términos de Uso",
+		de: "Bitte zuerst die Nutzungsbedingungen lesen und akzeptieren",
+		"zh-TW": "請先閱讀並勾選同意《使用條款》"
+	},
 	terms_content: {
 		zh: '<h3>Jacky 论坛 用户协议</h3><p>注册或使用 Jacky 论坛，即表示您同意以下条款：</p><ul><li>禁止发布违法内容。</li><li>所有内容和设计归 Jacky 论坛 所有。</li><li>请妥善保管账号和密码，因账号泄露造成的损失由用户自行承担。</li><li>本论坛对内容及服务拥有最终解释权，并可随时修改协议或规则。</li><li>本论坛不保证内容绝对正确或服务持续可用。</li><li>使用本论坛即表示您接受本协议及其未来更新。</li></ul><p>如有疑问，请联系 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>',
 		en: '<h3>Jacky Forum Terms of Service</h3><p>By registering or using Jacky Forum, you agree to the following terms:</p><ul><li>Do not post illegal content.</li><li>All content and design belong to Jacky Forum.</li><li>Please safeguard your account credentials. You are responsible for any losses due to account compromise.</li><li>The forum reserves final interpretation rights over content and services, and may modify these terms at any time.</li><li>The forum does not guarantee absolute correctness of content or continuous availability of service.</li><li>By using this forum, you accept this agreement and any future updates.</li></ul><p>For questions, contact <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>',
@@ -931,13 +952,6 @@ const TRANSLATIONS = {
 		de: "hat dich @erwähnt",
 		"zh-TW": "@ 了你"
 	},
-	notif_gift: {
-		zh: "送了你一个礼物！",
-		en: "sent you a gift!",
-		es: "¡te envió un regalo!",
-		de: "hat dir ein Geschenk geschickt!",
-		"zh-TW": "送了你一個禮物！"
-	},
 	notif_follow: {
 		zh: "关注了你",
 		en: "followed you",
@@ -1294,6 +1308,118 @@ const TRANSLATIONS = {
 		es: "¡Monedas -{0}!",
 		de: "Münzen -{0}!",
 		"zh-TW": "金幣 -{0}！"
+	},
+	coin_farm_penalty: {
+		zh: "您居然在刷金币，奖励您-{0}金币 :)",
+		en: "Farming coins, are we? Here's -{0} coins for you :)",
+		es: "¿Farmear monedas? Aquí tienes -{0} monedas :)",
+		de: "Münzen farmen? Hier sind -{0} Münzen für dich :)",
+		"zh-TW": "您居然在刷金幣，獎勵您-{0}金幣 :)"
+	},
+	plinko_title: {
+		zh: "弹珠机",
+		en: "Plinko",
+		es: "Plinko",
+		de: "Plinko",
+		"zh-TW": "彈珠機"
+	},
+	plinko_drop: {
+		zh: "投一颗 · {0} 金币",
+		en: "Drop · {0} coins",
+		es: "Lanzar · {0} monedas",
+		de: "Werfen · {0} Münzen",
+		"zh-TW": "投一顆 · {0} 金幣"
+	},
+	lottery_cooldown: {
+		zh: "冷却中，请稍等一下",
+		en: "Cooling down, one moment",
+		es: "Enfriando, un momento",
+		de: "Abklingzeit, einen Moment",
+		"zh-TW": "冷卻中，請稍等一下"
+	},
+	shop_plinko: {
+		zh: "弹珠机",
+		en: "Plinko",
+		es: "Plinko",
+		de: "Plinko",
+		"zh-TW": "彈珠機"
+	},
+	shop_plinko_desc: {
+		zh: "8 金币一球，最高 60 倍",
+		en: "8 coins a ball, up to 60x",
+		es: "8 monedas por bola, hasta 60x",
+		de: "8 Münzen pro Kugel, bis 60x",
+		"zh-TW": "8 金幣一球，最高 60 倍"
+	},
+	shop_tools: {
+		zh: "道具",
+		en: "Items",
+		es: "Objetos",
+		de: "Artikel",
+		"zh-TW": "道具"
+	},
+	shop_item_rename_card: {
+		zh: "改名卡",
+		en: "Rename card",
+		es: "Tarjeta de cambio de nombre",
+		de: "Namenswechsel-Karte",
+		"zh-TW": "改名卡"
+	},
+	shop_buy_one: {
+		zh: "买一张",
+		en: "Buy 1",
+		es: "Comprar 1",
+		de: "1 kaufen",
+		"zh-TW": "買一張"
+	},
+	shop_buy_ten: {
+		zh: "买10张！",
+		en: "Buy 10!",
+		es: "¡Comprar 10!",
+		de: "10 kaufen!",
+		"zh-TW": "買10張！"
+	},
+	shop_price_each: {
+		zh: "{0} 金币/张",
+		en: "{0} coins each",
+		es: "{0} monedas cada una",
+		de: "{0} Münzen pro Stück",
+		"zh-TW": "{0} 金幣/張"
+	},
+	shop_buy: {
+		zh: "购买",
+		en: "Buy",
+		es: "Comprar",
+		de: "Kaufen",
+		"zh-TW": "購買"
+	},
+	shop_bulk_price: {
+		zh: "10 张 {0} 金币",
+		en: "10 for {0} coins",
+		es: "10 por {0} monedas",
+		de: "10 für {0} Münzen",
+		"zh-TW": "10 張 {0} 金幣"
+	},
+	rename_card_owned: {
+		zh: "拥有 {0} 张",
+		en: "{0} owned",
+		es: "{0} en posesión",
+		de: "{0} im Besitz",
+		"zh-TW": "擁有 {0} 張"
+	},
+	rename_card_hint: {
+		zh: "改名消耗 1 张改名卡（商店 30 金币）",
+		en: "Renaming uses 1 rename card (30 coins in the shop)",
+		es: "Cambiar el nombre usa 1 tarjeta (30 monedas en la tienda)",
+		de: "Umbenennen verbraucht 1 Karte (30 Münzen im Shop)",
+		"zh-TW": "改名消耗 1 張改名卡（商店 30 金幣）"
+	},
+	rename_card_needed: {
+		zh: "需要一张改名卡（商店 30 金币）",
+		en: "A rename card is required (30 coins in the shop)",
+		es: "Se requiere una tarjeta de cambio de nombre (30 monedas)",
+		de: "Eine Namenswechsel-Karte wird benötigt (30 Münzen)",
+		"zh-TW": "需要一張改名卡（商店 30 金幣）"
 	},
 	copied_link_msg: {
 		zh: "已复制链接",
@@ -1799,13 +1925,6 @@ const TRANSLATIONS = {
 		de: "Sprache",
 		"zh-TW": "語言"
 	},
-	gift_received: {
-		zh: "你收到了一个{0}已存入金币！",
-		en: "You received a {0}, added to coins!",
-		es: "¡Recibiste un {0}, añadido a monedas!",
-		de: "Du hast ein {0} erhalten, zu Münzen hinzugefügt!",
-		"zh-TW": "你收到了一個{0}已存入金幣！"
-	},
 	error_generic: {
 		zh: "出错了：{0}",
 		en: "Error: {0}",
@@ -1848,13 +1967,6 @@ const TRANSLATIONS = {
 		de: "Online ",
 		"zh-TW": "在線 "
 	},
-	shop_item_generic: {
-		zh: "礼物",
-		en: "gift",
-		es: "regalo",
-		de: "Geschenk",
-		"zh-TW": "禮物"
-	},
 	level_rules_content: {
 		zh: "1. 等级分为 LV0 - LV12 共 13 个等级<br>2. 不同等级会有不同颜色区分<br>3. 金币到达某数量后，自动升级<br>4. 获取金币并提升等级吧！",
 		en: "1. There are 13 levels: LV0 - LV12<br>2. Different levels have different colors<br>3. Auto-level-up when reaching coin thresholds<br>4. Earn coins and level up!",
@@ -1863,11 +1975,11 @@ const TRANSLATIONS = {
 		"zh-TW": "1. 等級分為 LV0 - LV12 共 13 個等級<br>2. 不同等級會有不同顏色區分<br>3. 金幣到達某數量後，自動升級<br>4. 獲取金幣並提升等級吧！"
 	},
 	coin_rules_content: {
-		zh: "1. 发布 +5 金币<br>2. 评论 +3 金币<br>3. 点赞 +1 金币<br>4. 踩帖不扣金币（取消踩也不加）<br>5. 删除帖子、内容或取消点赞，减少对应数量金币<br>金币用途：提升等级；购买彩色帖子背景；商店中购买徽章、礼物；金币抽奖",
-		en: "1. Post +5 coins<br>2. Comment +3 coins<br>3. Like +1 coin<br>4. Dislikes cost no coins (removing a dislike adds none either)<br>5. Deleting posts/content or unliking reduces coins accordingly<br>Uses: Level up; Buy colorful post backgrounds; Buy badges & gifts in shop; Coin lottery",
-		es: "1. Publicar +5 monedas<br>2. Comentar +3 monedas<br>3. Me gusta +1 moneda<br>4. No me gusta no cuesta monedas (quitarlo tampoco suma)<br>5. Eliminar publicaciones/contenido o quitar me gusta reduce monedas<br>Usos: Subir de nivel; Comprar fondos de publicación coloridos; Comprar insignias y regalos en la tienda; Lotería de monedas",
-		de: "1. Posten +5 Münzen<br>2. Kommentieren +3 Münzen<br>3. Like +1 Münze<br>4. Dislike kostet keine Münzen (Entfernen bringt auch keine)<br>5. Löschen von Posts/Inhalten oder Entfernen von Likes reduziert Münzen<br>Verwendung: Level aufsteigen; Bunte Post-Hintergründe kaufen; Abzeichen & Geschenke im Shop kaufen; Münz-Lotterie",
-		"zh-TW": "1. 發佈 +5 金幣<br>2. 評論 +3 金幣<br>3. 按讚 +1 金幣<br>4. 踩帖不扣金幣（取消踩也不加）<br>5. 刪除帖子、內容或取消按讚，減少對應數量金幣<br>金幣用途：提升等級；購買彩色帖子背景；商店中購買徽章、禮物；金幣抽獎"
+		zh: "1. 发布 +5 金币<br>2. 评论 +3 金币<br>3. 被点赞 +1 金币（给帖子作者）<br>4. 踩帖不扣金币（取消踩也不加）<br>5. 删除帖子、内容或取消点赞，减少对应数量金币<br>金币用途：提升等级；购买彩色帖子背景；商店中购买徽章、改名卡；金币抽奖",
+		en: "1. Post +5 coins<br>2. Comment +3 coins<br>3. Getting liked +1 coin (for the post author)<br>4. Dislikes cost no coins (removing a dislike adds none either)<br>5. Deleting posts/content or unliking reduces coins accordingly<br>Uses: Level up; Buy colorful post backgrounds; Buy badges & rename cards in shop; Coin lottery",
+		es: "1. Publicar +5 monedas<br>2. Comentar +3 monedas<br>3. Recibir me gusta +1 moneda (para el autor)<br>4. No me gusta no cuesta monedas (quitarlo tampoco suma)<br>5. Eliminar publicaciones/contenido o quitar me gusta reduce monedas<br>Usos: Subir de nivel; Comprar fondos de publicación coloridos; Comprar insignias y tarjetas en la tienda; Lotería de monedas",
+		de: "1. Posten +5 Münzen<br>2. Kommentieren +3 Münzen<br>3. Ein Like erhalten +1 Münze (für den Autor)<br>4. Dislike kostet keine Münzen (Entfernen bringt auch keine)<br>5. Löschen von Posts/Inhalten oder Entfernen von Likes reduziert Münzen<br>Verwendung: Level aufsteigen; Bunte Post-Hintergründe kaufen; Abzeichen & Umbenennungskarten im Shop kaufen; Münz-Lotterie",
+		"zh-TW": "1. 發佈 +5 金幣<br>2. 評論 +3 金幣<br>3. 被按讚 +1 金幣（給貼文作者）<br>4. 踩帖不扣金幣（取消踩也不加）<br>5. 刪除帖子、內容或取消按讚，減少對應數量金幣<br>金幣用途：提升等級；購買彩色帖子背景；商店中購買徽章、改名卡；金幣抽獎"
 	},
 	about_title: {
 		zh: "关于",

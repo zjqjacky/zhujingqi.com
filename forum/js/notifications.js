@@ -6,7 +6,7 @@ async function createNotification({
 	type
 }) {
 	if (!targetId || !actorId || targetId === actorId) return;
-	if (type !== "comment" && type !== "mention" && type !== "gift" && type !== "follow" && type !==
+	if (type !== "comment" && type !== "mention" && type !== "follow" && type !==
 		"reply") return;
 	try {
 		const body = {
@@ -31,25 +31,31 @@ function notifLabel(n) {
 	if (n.type === "reply") return t("notif_reply");
 	if (n.type === "comment") return t("notif_comment");
 	if (n.type === "mention") return t("notif_mention");
-	if (n.type === "gift") return t("notif_gift");
 	return t("notif_new");
 }
 
+let lastNotifRefresh = 0;
+// 只负责把数字画到徽章上；数据可能来自 /api/feed，也可能来自单独查询
+function applyNotificationBadge(notifCount, chatCount) {
+	const badge = $("notifBadge");
+	if (!badge) return;
+	const unread = (notifCount || 0) + (chatCount || 0);
+	badge.textContent = unread;
+	badge.hidden = false;
+	badge.style.background = unread === 0 ? 'var(--card)' : '#ff3b30';
+	badge.style.color = unread === 0 ? 'var(--sub)' : '#fff';
+}
 async function refreshNotificationBadge() {
 	if (!currentUser) return;
+	// 30 秒内重复调用直接跳过：登录、发帖、切页都会触发，每次是 2 个请求
+	if (Date.now() - lastNotifRefresh < 30000) return;
+	lastNotifRefresh = Date.now();
 	try {
 		const [notifRes, chatRes] = await Promise.all([
 			apiGet("/api/notifications/count?target_id=" + currentUser.id),
 			apiGet("/api/chat/unread?user_id=" + currentUser.id).catch(() => null),
 		]);
-		const chatCount = (chatRes && chatRes.count) || 0;
-		const badge = $("notifBadge");
-		if (!badge) return;
-		const unread = (notifRes.count || 0) + chatCount;
-		badge.textContent = unread;
-		badge.hidden = false;
-		badge.style.background = unread === 0 ? 'var(--card)' : '#ff3b30';
-		badge.style.color = unread === 0 ? 'var(--sub)' : '#fff';
+		applyNotificationBadge(notifRes.count || 0, (chatRes && chatRes.count) || 0);
 	} catch (e) {
 		console.error(e);
 	}
@@ -113,7 +119,7 @@ async function openSinglePost(postId) {
 		'<img class="avatar" src="' + avatar +
 		'" onerror="this.onerror=null;this.src=\'assets/img/head.svg\'">' +
 		escapeHtml(getDisplayName(post.users)) +
-		'<span class="userLevel">' + getUserLevel(post.users?.coins || 0) + '</span>' +
+		'<span class="userLevel">' + getUserLevel(userLevelCoins(post.users)) + '</span>' +
 		'<span>' + getRoleBadge(post.users) + '</span>' +
 		'</span>' +
 		'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
@@ -344,12 +350,7 @@ async function openNotifications() {
 				const post = el.dataset.post;
 				const postId = Number(post);
 				if (!post || post === "null" || post === "undefined") return;
-				if (isNaN(postId)) {
-					const gift = SHOP_ITEMS.find(i => i.id === post);
-					modal(t("gift_received", gift ? gift.name : t("shop_item_generic")));
-				} else {
-					await openNotificationPost(postId);
-				}
+				if (!isNaN(postId)) await openNotificationPost(postId);
 			})();
 		};
 	});

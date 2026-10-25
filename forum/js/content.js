@@ -8,9 +8,26 @@ let mentionState = {
 };
 async function ensureAllUsersCache() {
 	if (allUsersCache.length) return allUsersCache;
+	// 用户列表变动很慢，先看本地缓存（1 小时），省掉每次开页的一个请求
+	try {
+		const raw = localStorage.getItem("forumUsersCache");
+		if (raw) {
+			const c = JSON.parse(raw);
+			if (c && Array.isArray(c.data) && c.data.length && Date.now() - c.ts < 60 * 60 * 1000) {
+				allUsersCache = c.data;
+				return allUsersCache;
+			}
+		}
+	} catch {}
 	try {
 		const data = await apiGet("/api/users");
 		allUsersCache = data || [];
+		try {
+			localStorage.setItem("forumUsersCache", JSON.stringify({
+				ts: Date.now(),
+				data: allUsersCache
+			}));
+		} catch {}
 	} catch {
 		allUsersCache = [];
 	}
@@ -65,20 +82,20 @@ function getMentionContext(el) {
 		if (!el.contains(node)) return null;
 		const before = (node.nodeType === 3 ? node.nodeValue : node.textContent) || "";
 		const upto = before.slice(0, sel.getRangeAt(0).startOffset);
-		const m = upto.match(/(^|[\s(])@([\p{L}\p{N}_-]{0,32})$/u);
+		const m = upto.match(/[@＠]([\p{L}\p{N}_-]{0,32})$/u);
 		if (!m) return null;
 		// contenteditable 用 Range 定位，不返回 start/end
-		return { range: null, query: m[2], editable: true };
+		return { range: null, query: m[1], editable: true };
 	}
 
 	const caret = el.selectionStart ?? 0;
 	const text = el.value.slice(0, caret);
-	const match = text.match(/(^|[\s(])@([\p{L}\p{N}_-]{0,32})$/u);
+	const match = text.match(/[@＠]([\p{L}\p{N}_-]{0,32})$/u);
 	if (!match) return null;
 	return {
-		start: caret - match[2].length - 1,
+		start: caret - match[1].length - 1,
 		end: caret,
-		query: match[2]
+		query: match[1]
 	};
 }
 async function updateMentionBox(el) {
@@ -120,7 +137,7 @@ function insertMentionFromBox(userId, userName) {
 		if (!sel || sel.rangeCount === 0) return;
 		const node = sel.getRangeAt(0).startContainer;
 		const upto = (node.nodeType === 3 ? node.nodeValue : node.textContent) || "";
-		const m = /@([\p{L}\p{N}_-]*)$/u.exec(upto);
+		const m = /[@＠]([\p{L}\p{N}_-]*)$/u.exec(upto);
 		if (!m) { hideMentionBox(); return; }
 		const range = document.createRange();
 		try {
@@ -131,9 +148,15 @@ function insertMentionFromBox(userId, userName) {
 		const span = document.createElement("span");
 		span.className = "mentionLink edMention";
 		span.dataset.uname = userName;
-		span.textContent = "@" + userName + " ";
+		// chip 必须是不可编辑的整体：否则光标会停在 chip 里，
+		// 之后输入的文字会落进 chip —— 显示成绿色，序列化时被当成 chip 的一部分整段丢掉
+		span.contentEditable = "false";
+		span.textContent = "@" + userName;
 		range.insertNode(span);
-		range.setStartAfter(span);
+		// 尾随空格留在 chip 外面，光标也放到外面，后续输入才不会接进 chip
+		const space = document.createTextNode(" ");
+		span.parentNode.insertBefore(space, span.nextSibling);
+		range.setStart(space, 1);
 		range.collapse(true);
 		sel.removeAllRanges();
 		sel.addRange(range);
@@ -165,20 +188,23 @@ function linkifyMentions(root) {
 		if (!node.parentElement) continue;
 		if (node.parentElement.closest(".mentionLink,script,style")) continue;
 		const text = node.nodeValue;
-		if (!text || !text.includes("@")) continue;
+		if (!text || !/[@＠]/.test(text)) continue;
 		const frag = document.createDocumentFragment();
 		let last = 0;
-		const reg = /(^|[\s(])@([\p{L}\p{N}_-]{1,32})/gu;
+		// 不再要求 @ 前面是空白：中文可以直接写「今天@张三」。
+		// 靠两条判定歧义：① @ 后面紧跟 .com / .cn 这种域名 -> 当邮箱，跳过；
+		// ② 名字必须和真实用户名精确匹配（大小写敏感）。
+		const reg = /[@＠]([\p{L}\p{N}_-]{1,32})/gu;
 		let m;
 		while ((m = reg.exec(text))) {
 			const full = m[0];
-			const prefix = m[1] || "";
-			const uname = m[2];
+			const uname = m[1];
+			const end = m.index + full.length;
+			if (/^\.[\p{L}]{2,}/u.test(text.slice(end))) continue;
 			const found = users.find(u => u.name === uname);
 			const before = text.slice(last, m.index);
 			if (before) frag.appendChild(document.createTextNode(before));
 			if (found) {
-				if (prefix) frag.appendChild(document.createTextNode(prefix));
 				const span = document.createElement("span");
 				span.className = "mentionLink";
 				span.textContent = "@" + found.name;
@@ -187,7 +213,7 @@ function linkifyMentions(root) {
 			} else {
 				frag.appendChild(document.createTextNode(full));
 			}
-			last = m.index + full.length;
+			last = end;
 		}
 	const tail = text.slice(last);
 	if (tail) frag.appendChild(document.createTextNode(tail));
@@ -272,7 +298,9 @@ async function notifyMentions(rawText, postId, commentId = null) {
 	const users = await ensureAllUsersCache();
 	const plain = String(rawText || "")
 		.replace(/<[^>]*>/g, "");
-	const matches = [...plain.matchAll(/@([\p{L}\p{N}_-]{1,32})/gu)];
+	// 与渲染层同一套规则：@ 前不限，@ 后紧跟 .com / .cn 的当邮箱跳过
+	const matches = [...plain.matchAll(/[@＠]([\p{L}\p{N}_-]{1,32})/gu)]
+		.filter(m => !/^\.[\p{L}]{2,}/u.test(plain.slice(m.index + m[0].length)));
 	const targetIds = [];
 	for (const m of matches) {
 		// 账号名在库里是大小写敏感唯一（users_name_key on btree(name)），
@@ -302,13 +330,8 @@ $("homeBtn").onclick = () => {
 	const search = $("postSearch");
 	if (search) search.value = "";
 	renderPostFilters();
-	loadStats();
-	loadPosts(1);
-	loadOnlineUsers();
-	startPresence();
-	refreshNotificationBadge();
+	loadFeedPage(1);
 	setActive("homeBtn");
-	loadAnnouncements();
 };
 $("editorBtn").onclick = () => {
 	show("editorPage");

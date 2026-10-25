@@ -124,12 +124,27 @@
 	function mentionNode(name) {
 		const span = document.createElement("span");
 		span.className = "mentionLink " + MENTION_CLS;
+		// 原子节点：光标不能停在 chip 内部，否则后续输入会被包进 chip
+		span.contentEditable = "false";
 		span.dataset.uname = name;
 		span.textContent = "@" + name;
 		return span;
 	}
 
 	/* ================= 序列化：DOM -> 原始标记 ================= */
+
+	/**
+	 * chip 后面紧跟的字符会不会被当成名字的一部分（名字字符集是 \p{L}\p{N}_-）。
+	 * 会的话就必须补一个空格，否则 "…@张三你好" 发出去既不成提及、也发不出通知。
+	 */
+	function needsSeparatorAfter(el) {
+		const next = el.nextSibling;
+		if (!next) return false;
+		if (next.nodeType === 3) return /^[\p{L}\p{N}_-]/u.test(next.nodeValue || "");
+		if (next.nodeName === "BR" || next.nodeName === "IMG") return false;
+		// 其它元素兄弟（如 <b>）：开头字符无法预判，保守补一个分隔
+		return true;
+	}
 
 	function serializeNode(node, out) {
 		if (node.nodeType === 3) {
@@ -148,7 +163,8 @@
 			return;
 		}
 		if (el.classList && el.classList.contains(MENTION_CLS)) {
-			out.push("@" + (el.dataset.uname || el.textContent.replace(/^@/, "")));
+			out.push("@" + (el.dataset.uname || el.textContent.replace(/^[@＠]/, "")));
+			if (needsSeparatorAfter(el)) out.push(" ");
 			return;
 		}
 		if (el.tagName === "BR") { out.push("\n"); return; }
@@ -225,7 +241,7 @@
 			return;
 		}
 		if (el.classList.contains(MENTION_CLS)) {
-			parent.appendChild(mentionNode(el.dataset.uname || el.textContent.replace(/^@/, "")));
+			parent.appendChild(mentionNode(el.dataset.uname || el.textContent.replace(/^[@＠]/, "")));
 			return;
 		}
 		if (el.tagName === "BR") { parent.appendChild(document.createElement("br")); return; }
@@ -495,19 +511,27 @@
 	function convertMentionAtCaret() {
 		const node = caretTextNode();
 		if (!node) return;
+		// 光标已经落在某个提及 chip 内部时直接放弃：再套一层会把后续输入包进里层 chip，
+		// 序列化只输出 @名字，chip 里的正文就被整段吞掉
+		if (node.parentElement && node.parentElement.closest("." + MENTION_CLS)) return;
 		const upto = node.nodeValue || "";
-		const m = /(^|[\s(])@([\p{L}\p{N}_-]{1,32})[\s]$/u.exec(upto);
+		// 与渲染/通知同一套规则：@ 前面不需要空格，全角 ＠ 与半角等价
+		const m = /[@＠]([\p{L}\p{N}_-]{1,32})[\s]$/u.exec(upto);
 		if (!m) return;
 		const sel = window.getSelection();
 		const r = document.createRange();
 		try {
-			r.setStart(node, m.index + m[1].length);
-			r.setEnd(node, m.index + m[1].length + m[2].length + 1);
+			r.setStart(node, m.index);
+			r.setEnd(node, m.index + m[0].length);
 		} catch (e) { return; }
 		r.deleteContents();
-		const node2 = mentionNode(m[2]);
+		const node2 = mentionNode(m[1]);
 		r.insertNode(node2);
-		r.setStartAfter(node2);
+		// 空格补在 chip 外面并落光标，避免后面输入的字黏进 chip
+		const space = document.createTextNode(" ");
+		node2.parentNode.insertBefore(space, node2.nextSibling);
+		r.setStart(space, 1);
+		r.collapse(true);
 		sel.removeAllRanges();
 		sel.addRange(r);
 	}

@@ -10,12 +10,13 @@ function renderAnnouncementEmojis(snippet) {
 		m
 	);
 }
-async function loadAnnouncements() {
+async function loadAnnouncements(prefetched) {
 	const bar = $("announceBar");
 	if (!bar || window.innerWidth <= 800) return;
 	try {
-		const res = await apiGet("/api/posts?tag=公告&perPage=3");
-		const posts = res?.posts || [];
+		const posts = Array.isArray(prefetched) ?
+			prefetched :
+			((await apiGet("/api/posts?tag=公告&perPage=3"))?.posts || []);
 		if (!posts.length) {
 			bar.innerHTML = "";
 			return;

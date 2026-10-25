@@ -1,6 +1,10 @@
 let presenceTimer = null;
+let lastPresenceTouch = 0;
 async function touchPresence() {
 	if (!currentUser) return;
+	// 4 分钟内不重复上报（刷新页面、切页都会触发，没必要每次都打接口）
+	if (Date.now() - lastPresenceTouch < 4 * 60 * 1000) return;
+	lastPresenceTouch = Date.now();
 	try {
 		await apiPut("/api/users/" + currentUser.id + "/presence");
 	} catch {}
@@ -11,6 +15,8 @@ const ONLINE_TTL = 5 * 60 * 1000;
 async function loadOnlineUsers() {
 	const mini = $("onlineMini");
 	if (!mini) return;
+	// 点击事件每次都挂上：缓存命中（feed 预填）时也要能点开名单
+	mini.onclick = showOnlineUserList;
 	const now = Date.now();
 	if (now - onlineUsersCacheTime < ONLINE_TTL && onlineUsersCache.length) {
 		mini.textContent = t("online_label_prefix") + onlineUsersCache.length;
@@ -25,13 +31,15 @@ async function loadOnlineUsers() {
 	onlineUsersCache = data || [];
 	onlineUsersCacheTime = Date.now();
 	mini.textContent = t("online_label_prefix") + onlineUsersCache.length;
-	mini.onclick = () => {
-		if (!onlineUsersCache.length) {
-			modal(t("online_none"));
-			return;
-		}
-		document.querySelector(".modalBox").style.width = "320px";
-		modal(`
+}
+
+function showOnlineUserList() {
+	if (!onlineUsersCache.length) {
+		modal(t("online_none"));
+		return;
+	}
+	document.querySelector(".modalBox").style.width = "320px";
+	modal(`
 							<h3>${t("online_title", onlineUsersCache.length)}</h3>
 							<div id="onlineUserList"
 								 style="text-align:left;max-height:320px;overflow:auto;padding-right:4px;">
@@ -44,22 +52,21 @@ async function loadOnlineUsers() {
 										>
 										<span>${escapeHtml(getDisplayName(u))}</span>
 										<span class="userLevel">
-											${getUserLevel(u.coins || 0)}
+											${getUserLevel(userLevelCoins(u))}
 										</span>
 										${getRoleBadge(u)}
 									</div>
 								`).join("")}
 							</div>
 						`);
-		setTimeout(() => {
-			document.querySelectorAll(".onlineUser").forEach(el => {
-				el.onclick = () => {
-					$("modal").classList.add("hidden");
-					viewUser(Number(el.dataset.user));
-				};
-			});
-		}, 0);
-	};
+	setTimeout(() => {
+		document.querySelectorAll(".onlineUser").forEach(el => {
+			el.onclick = () => {
+				$("modal").classList.add("hidden");
+				viewUser(Number(el.dataset.user));
+			};
+		});
+	}, 0);
 }
 
 function startPresence() {

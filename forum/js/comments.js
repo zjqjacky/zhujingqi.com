@@ -1,3 +1,6 @@
+// 防止请求期间重复提交（连点按钮、连按回车都会命中）
+let commentBusy = false;
+
 function parseCommentContent(content) {
 	const match = String(content || "").match(/^\[reply:(\d+)\]\s*/);
 	if (match) {
@@ -65,7 +68,7 @@ async function renderComments(postId, container, comments, postAuthorId) {
 				`<span class="userLink userLinkWithAvatar" data-user="${c.author}">
 									<img class="avatar" src="${avatar}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
 									<b>${escapeHtml(getDisplayName(c.users))}</b>
-									<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>
+									<span class="userLevel">${getUserLevel(userLevelCoins(c.users))}</span>
 								${getRoleBadge(c.users)}
 								${c.author === postAuthorId ? '<span class="authorTag op">' + t("badge_op") + '</span>' : ""}
 							</span>: <span class="commentContent"></span>
@@ -125,11 +128,22 @@ async function renderComments(postId, container, comments, postAuthorId) {
 				div.insertBefore(w, childrenContainer);
 				const inp = w.querySelector("input");
 				inp.focus();
-				const send = () => {
+				const replyBtnEl = w.querySelector(".replySendBtn");
+				let replying = false;
+				const send = async () => {
+					if (replying) return;
 					const text = inp.value.trim();
-					if (text) addReply(postId, c.id, text, postAuthorId, c.author);
+					if (!text) return;
+					replying = true;
+					setBtnBusy(replyBtnEl, true);
+					try {
+						await addReply(postId, c.id, text, postAuthorId, c.author);
+					} finally {
+						replying = false;
+						if (replyBtnEl.isConnected) setBtnBusy(replyBtnEl, false);
+					}
 				};
-				w.querySelector(".replySendBtn").onclick = send;
+				replyBtnEl.onclick = send;
 				inp.addEventListener("keydown", e => e.key === "Enter" && send());
 			};
 			if (c._children.length > 0) {
@@ -163,7 +177,7 @@ async function openVotePeople(postId, kind) {
 															<div class="onlineUser voteUser" data-user="${x.users?.id}">
 																<img class="avatar onlineAvatar" src="${getAvatar(x.users)}" onerror="this.onerror=null;this.src='assets/img/head.svg'">
 																<span>${escapeHtml(getDisplayName(x.users))}</span>
-																<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
+																<span class="userLevel">${getUserLevel(userLevelCoins(x.users))}</span>
 																${getRoleBadge(x.users)}
 															</div>
 														`).join("")
@@ -183,6 +197,8 @@ async function openVotePeople(postId, kind) {
 async function addComment(postId, content, postAuthorId) {
 	const text = String(content || "").trim();
 	if (!text) return;
+	if (commentBusy) return;
+	commentBusy = true;
 	closeEmojiPicker();
 	try {
 		const result = await apiPost("/api/comments", {
@@ -193,6 +209,10 @@ async function addComment(postId, content, postAuthorId) {
 		});
 		const commentId = result?.id || null;
 		applyCoinDelta(result && result.coinsDelta);
+		if (result && result.duplicate) {
+			// 罚款的提示换成自定义文案（余额已在 applyCoinDelta 里更新）
+			showCoinMsg(t("coin_farm_penalty", 10));
+		}
 		await notifyMentions(text, postId, commentId);
 		await createNotification({
 			targetId: postAuthorId,
@@ -218,11 +238,15 @@ async function addComment(postId, content, postAuthorId) {
 		if (e.message === "JWT_EXPIRED") return;
 		console.error(e);
 		modalText(t("comment_fail", e.message));
+	} finally {
+		commentBusy = false;
 	}
 }
 async function addReply(postId, parentId, content, postAuthorId, parentAuthorId) {
 	const text = String(content || "").trim();
 	if (!text) return;
+	if (commentBusy) return;
+	commentBusy = true;
 	closeEmojiPicker();
 	const replyContent = `[reply:${parentId}] ${sanitizePostHtml(text)}`;
 	try {
@@ -234,6 +258,10 @@ async function addReply(postId, parentId, content, postAuthorId, parentAuthorId)
 		});
 		const commentId = result?.id || null;
 		applyCoinDelta(result && result.coinsDelta);
+		if (result && result.duplicate) {
+			// 罚款的提示换成自定义文案（余额已在 applyCoinDelta 里更新）
+			showCoinMsg(t("coin_farm_penalty", 10));
+		}
 		await notifyMentions(text, postId, commentId);
 		await createNotification({
 			targetId: postAuthorId,
@@ -263,6 +291,8 @@ async function addReply(postId, parentId, content, postAuthorId, parentAuthorId)
 		if (e.message === "JWT_EXPIRED") return;
 		console.error(e);
 		modalText(t("comment_fail", e.message));
+	} finally {
+		commentBusy = false;
 	}
 }
 async function likePost(id, postDiv) {

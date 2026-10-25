@@ -49,38 +49,6 @@ function getRoleBadge(user) {
 	return "";
 }
 
-const SHOP_ITEMS = [{
-		id: 'green_v',
-		name: '绿色V标',
-		price: 500
-	},
-	{
-		id: 'purple_star',
-		name: '紫星徽章',
-		price: 400
-	},
-	{
-		id: 'blue_diamond',
-		name: '蓝钻徽章',
-		price: 300
-	},
-	// {
-	// 	id: 'flower',
-	// 	name: '一束花',
-	// 	price: 20,
-	// 	gift: 18
-	// },
-	// {
-	// 	id: 'chocolate',
-	// 	name: '巧克力',
-	// 	price: 30,
-	// 	gift: 27
-	// },
-	// {
-	// 	id: 'cake',
-	// 	name: '蛋糕',
-	// 	price: 50,
-	// 	gift: 45
-	// },
-];
+// 商品清单不写在前端：价格、种类、十连价都由服务端提供
+// （GET /api/shop/items），避免前后端两份价格漂移。
 

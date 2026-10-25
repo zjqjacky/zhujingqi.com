@@ -1,6 +1,13 @@
 const $ = id => document.getElementById(id);
 let currentUser = null;
 let guestMode = false;
+
+/** 提交中状态：按钮转圈 + 禁用，避免请求期间被重复点击 */
+function setBtnBusy(btn, busy) {
+	if (!btn) return;
+	btn.classList.toggle("btn-loading", !!busy);
+	btn.disabled = !!busy;
+}
 function getDisplayName(u) {
 	if (!u) return typeof t === "function" ? t("post_unknown") : "";
 	return u.nickname || u.name || (typeof t === "function" ? t("post_unknown") : "");
@@ -77,7 +84,7 @@ function enterGuestMode() {
 	syncLayoutMode();
 	syncLayoutBtn();
 	syncUrlFromQuery();
-	loadPosts(1);
+	loadFeedPage(1);
 }
 let currentPage = "main";
 const defaultTags = ["学习", "日常", "搞笑", "提问"];
@@ -313,8 +320,6 @@ setT("welcomeTitle", t("login_title"));
 	setPH("regPass", t("reg_password"));
 	setPH("regPass2", t("reg_password2"));
 	setT("registerBtn", t("reg_btn"));
-	setT("regAgreePrefix", t("reg_agree"));
-	setT("termsBtn", t("terms_link"));
 	setT("regRemember", t("reg_remember"));
 	setH("accountShared", t("account_shared"));
 	setT("footerForumName", t("login_title"));

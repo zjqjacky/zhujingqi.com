@@ -42,10 +42,6 @@ $("goRegister").onclick = () => {
 	show("registerPage");
 };
 $("backLogin").onclick = () => show("welcomePage");
-$("termsBtn").onclick = () => {
-	document.querySelector(".modalBox").style.width = "800px";
-	modal(t("terms_content"));
-}
 
 $("bgBuyBtn").textContent = selectedPostBg ? t("editor_bg_used") : t("editor_bg");
 $("bgBuyBtn").onclick = openPostBgPicker;
