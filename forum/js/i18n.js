@@ -1330,6 +1330,13 @@ const TRANSLATIONS = {
 		de: "Werfen · {0} Münzen",
 		"zh-TW": "投一顆 · {0} 金幣"
 	},
+	plinko_drop_pack: {
+		zh: "{0} 连投 · {1} 金币",
+		en: "{0} balls · {1} coins",
+		es: "{0} bolas · {1} monedas",
+		de: "{0} Kugeln · {1} Münzen",
+		"zh-TW": "{0} 連投 · {1} 金幣"
+	},
 	lottery_cooldown: {
 		zh: "冷却中，请稍等一下",
 		en: "Cooling down, one moment",

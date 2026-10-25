@@ -389,6 +389,9 @@ async function openPlinko() {
 		const c = await apiGet("/api/lottery/plinko");
 		if (c && Array.isArray(c.payouts) && c.payouts.length === (c.rows || 8) + 1) cfg = c;
 	} catch {}
+	// 8 连投打包价，默认 60 币
+	let packCfg = { count: 8, cost: 60 };
+	if (cfg.pack && cfg.pack.count > 1) packCfg = cfg.pack;
 
 	if (!document.getElementById("plinkoStyle")) {
 		const st = document.createElement("style");
@@ -399,6 +402,9 @@ async function openPlinko() {
 #plinkoModal canvas{display:block;width:100%;height:auto;border-radius:16px;background:var(--bg);}
 #plinkoModal .plinkoBtn{width:100%;margin-top:12px;height:46px;font-size:17px;font-weight:700;border-radius:14px;border:0;background:var(--green);color:#fff;cursor:pointer;}
 #plinkoModal .plinkoBtn:disabled{opacity:.5;cursor:default;}
+#plinkoModal .plinkoBtns{display:flex;gap:8px;margin-top:12px;}
+#plinkoModal .plinkoBtns .plinkoBtn{margin-top:0;flex:1;min-width:0;padding:0 8px;white-space:nowrap;}
+#plinkoModal .plinkoBtnPack{background:#d4a017;}
 #plinkoModal .plinkoMsg{text-align:center;margin-top:8px;font-size:15px;min-height:22px;color:var(--sub);}
 `;
 		document.head.appendChild(st);
@@ -416,7 +422,10 @@ async function openPlinko() {
 				</div>
 			</div>
 			<canvas id="plinkoCv"></canvas>
-			<button id="plinkoDrop" class="plinkoBtn">${t("plinko_drop", cfg.cost)}</button>
+			<div class="plinkoBtns">
+				<button id="plinkoDrop" class="plinkoBtn">${t("plinko_drop", cfg.cost)}</button>
+				<button id="plinkoDropPack" class="plinkoBtn plinkoBtnPack">${t("plinko_drop_pack", packCfg.count, packCfg.cost)}</button>
+			</div>
 			<div class="plinkoMsg" id="plinkoMsg"></div>
 		</div>`;
 	document.body.appendChild(modal);
@@ -456,24 +465,24 @@ async function openPlinko() {
 	}
 
 	let flash = null;
-	let trail = [];
-	let squashUntil = 0;
 
-	function draw(ball, hit) {
+	function draw(balls, hits) {
 		ctx.clearRect(0, 0, W, H);
+		const hitList = hits || [];
+		const isHit = k => hitList.indexOf(k) >= 0;
 
 		// 底部格子
 		for (let k = 0; k < PAY.length; k++) {
 			const x = bucketX(k) - (DX - 8) / 2;
 			const y = bucketY - 14;
 			const w = DX - 8, h = 28;
-			ctx.fillStyle = hit === k ? GREEN : "rgba(128,128,128,.16)";
+			ctx.fillStyle = isHit(k) ? GREEN : "rgba(128,128,128,.16)";
 			roundRect(x, y, w, h, 8);
 			ctx.fill();
-			ctx.strokeStyle = hit === k ? GREEN : BORDER;
+			ctx.strokeStyle = isHit(k) ? GREEN : BORDER;
 			ctx.lineWidth = 1;
 			ctx.stroke();
-			ctx.fillStyle = hit === k ? "#fff" : SUB;
+			ctx.fillStyle = isHit(k) ? "#fff" : SUB;
 			ctx.font = "bold 13px sans-serif";
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
@@ -507,23 +516,22 @@ async function openPlinko() {
 			}
 		}
 
-		// 拖尾
-		for (let i = 0; i < trail.length; i++) {
-			const p = trail[i];
-			const k = (i + 1) / trail.length;
-			ctx.beginPath();
-			ctx.arc(p.x, p.y, 2 + k * 2.5, 0, Math.PI * 2);
-			ctx.globalAlpha = k * 0.22;
-			ctx.fillStyle = GREEN;
-			ctx.fill();
-			ctx.globalAlpha = 1;
-		}
-
-		if (ball) {
+		// 球 + 各自的拖尾
+		for (const b of (balls || [])) {
+			for (let i = 0; i < b.trail.length; i++) {
+				const p = b.trail[i];
+				const k = (i + 1) / b.trail.length;
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, 2 + k * 2.5, 0, Math.PI * 2);
+				ctx.globalAlpha = k * 0.22;
+				ctx.fillStyle = GREEN;
+				ctx.fill();
+				ctx.globalAlpha = 1;
+			}
 			// 撞柱瞬间压扁一下，做出「砸中」的手感
-			const hitNow = performance.now() < squashUntil;
+			const hitNow = performance.now() < b.squashUntil;
 			ctx.beginPath();
-			ctx.ellipse(ball.x, ball.y, hitNow ? 8.6 : 7, hitNow ? 5.2 : 7, 0, 0, Math.PI * 2);
+			ctx.ellipse(b.x, b.y, hitNow ? 8.6 : 7, hitNow ? 5.2 : 7, 0, 0, Math.PI * 2);
 			ctx.fillStyle = GREEN;
 			ctx.fill();
 			ctx.strokeStyle = "rgba(255,255,255,.75)";
@@ -553,66 +561,93 @@ async function openPlinko() {
 		return pts;
 	}
 
-	function animate(hit, done) {
-		const pts = pathFor(hit);
+	// 支持 1~8 颗球同时下落；每颗球错开 140ms 入场
+	function animateBalls(buckets, done) {
 		const T_FALL = 360;   // 顶部自由落体
 		const T_HOP = 285;    // 每撞一次柱子
 		const T_LAST = 340;   // 最后一跳落进格子
-		let phase = 0;        // 0=下落，k=从第 k 颗柱子跳到第 k+1 颗
-		let t0 = performance.now();
+		const start = performance.now();
 
 		flash = null;
-		trail = [];
-		squashUntil = 0;
+		const balls = buckets.map((hit, idx) => ({
+			pts: pathFor(hit),
+			hit,
+			phase: 0,
+			start: start + idx * 140,
+			t0: start + idx * 140,
+			x: CENTER,
+			y: TOP - 26,
+			trail: [],
+			squashUntil: 0,
+			finished: false
+		}));
+		const hits = [];
+		let landed = 0;
 
-		function bump(x, y) {
+		function bump(ball, x, y) {
 			flash = { x, y, t0: performance.now() };
-			squashUntil = performance.now() + 100;
+			ball.squashUntil = performance.now() + 100;
 		}
 
 		function frame(now) {
-			let x, y;
+			for (const b of balls) {
+				if (b.finished || now < b.start) continue;
+				const pts = b.pts;
+				let x, y;
 
-			if (phase === 0) {
-				const a = pts[0], b = pts[1];
-				const t = Math.min(1, (now - t0) / T_FALL);
-				x = a.x + (b.x - a.x) * t;
-				y = a.y + (b.y - a.y) * (t * t);   // 重力加速
-				if (t >= 1) {
-					bump(b.x, b.y + 8);
-					phase = 1;
-					t0 = now;
+				if (b.phase === 0) {
+					const a = pts[0], c = pts[1];
+					const t = Math.min(1, (now - b.t0) / T_FALL);
+					x = a.x + (c.x - a.x) * t;
+					y = a.y + (c.y - a.y) * (t * t);   // 重力加速
+					if (t >= 1) {
+						bump(b, c.x, c.y + 8);
+						b.phase = 1;
+						b.t0 = now;
+					}
+				} else {
+					const k = b.phase;
+					const a = pts[k], c = pts[k + 1];
+					const dur = k === ROWS ? T_LAST : T_HOP;
+					const hop = k === ROWS ? 9 : 19;   // 抛物线弹起高度
+					const t = Math.min(1, (now - b.t0) / dur);
+					x = a.x + (c.x - a.x) * t;
+					y = a.y + (c.y - a.y) * t - Math.sin(Math.PI * t) * hop;
+					if (t >= 1) {
+						if (k < ROWS) bump(b, c.x, c.y + 8);
+						b.phase++;
+						b.t0 = now;
+					}
 				}
+
+				if (b.phase > ROWS) {
+					b.x = pts[ROWS + 1].x;
+					b.y = pts[ROWS + 1].y;
+					b.finished = true;
+					landed++;
+					hits.push(b.hit);
+				} else {
+					b.x = x;
+					b.y = y;
+					b.trail.push({ x, y });
+					if (b.trail.length > 7) b.trail.shift();
+				}
+			}
+
+			draw(balls.filter(b => !b.finished), hits);
+
+			if (landed < balls.length) {
+				requestAnimationFrame(frame);
 			} else {
-				const k = phase;
-				const a = pts[k], b = pts[k + 1];
-				const dur = k === ROWS ? T_LAST : T_HOP;
-				const hop = k === ROWS ? 9 : 19;   // 抛物线弹起高度
-				const t = Math.min(1, (now - t0) / dur);
-				x = a.x + (b.x - a.x) * t;
-				y = a.y + (b.y - a.y) * t - Math.sin(Math.PI * t) * hop;
-				if (t >= 1) {
-					if (k < ROWS) bump(b.x, b.y + 8);
-					phase++;
-					t0 = now;
-				}
-			}
-
-			trail.push({ x, y });
-			if (trail.length > 7) trail.shift();
-			draw({ x, y }, null);
-
-			if (phase > ROWS) {
-				draw({ x: pts[ROWS + 1].x, y: pts[ROWS + 1].y }, hit);
+				draw([], hits);
 				done();
-				return;
 			}
-			requestAnimationFrame(frame);
 		}
 		requestAnimationFrame(frame);
 	}
 
 	const btn = modal.querySelector("#plinkoDrop");
+	const packBtn = modal.querySelector("#plinkoDropPack");
 	const msgEl = modal.querySelector("#plinkoMsg");
 	const coinsEl = modal.querySelector("#plinkoCoins");
 	let busy = false;
@@ -622,24 +657,31 @@ async function openPlinko() {
 		if (coinsEl && currentUser) coinsEl.textContent = currentUser.coins || 0;
 	}
 
-	async function drop() {
+	function setButtons(disabled) {
+		if (btn) btn.disabled = disabled;
+		if (packBtn) packBtn.disabled = disabled;
+	}
+
+	async function drop(count) {
+		const pack = count > 1;
+		const cost = pack ? packCfg.cost : cfg.cost;
 		if (busy) return;
 		if (Date.now() < nextAllowedAt) {
 			msgEl.textContent = t("lottery_cooldown");
 			return;
 		}
-		if ((currentUser?.coins || 0) < cfg.cost) {
+		if ((currentUser?.coins || 0) < cost) {
 			msgEl.textContent = t("lottery_no_coins");
 			return;
 		}
 		busy = true;
-		btn.disabled = true;
+		setButtons(true);
 		nextAllowedAt = Date.now() + 5200;
 		msgEl.textContent = "";
 		const before = currentUser?.coins || 0;
 		let res;
 		try {
-			res = await apiPost("/api/lottery/plinko", {});
+			res = await apiPost("/api/lottery/plinko", pack ? { count: count } : {});
 		} catch (e) {
 			busy = false;
 			if (e.message !== "JWT_EXPIRED") {
@@ -648,28 +690,31 @@ async function openPlinko() {
 					: t("lottery_no_coins");
 			}
 			// 按钮等冷却结束再亮，别让人点了又被拒
-			setTimeout(() => { btn.disabled = false; }, Math.max(0, nextAllowedAt - Date.now()));
+			setTimeout(() => setButtons(false), Math.max(0, nextAllowedAt - Date.now()));
 			return;
 		}
-		animate(res.bucket, () => {
+		const buckets = (res.results || [{ bucket: res.bucket }]).map(r => r.bucket);
+		animateBalls(buckets, () => {
 			// 落定之后才结算，和转盘一致
 			if (currentUser) currentUser.coins = res.coins;
 			setCoins();
 			showCoinDelta(res.coins - before);
-			msgEl.textContent = res.payout >= res.cost
-				? `🎉 +${res.payout} ${t("profile_coins")}`
-				: `+${res.payout} ${t("profile_coins")}`;
+			const paid = pack ? res.total : res.payout;
+			msgEl.textContent = paid >= cost
+				? `🎉 +${paid} ${t("profile_coins")}`
+				: `+${paid} ${t("profile_coins")}`;
 			busy = false;
-			setTimeout(() => { btn.disabled = false; }, Math.max(0, nextAllowedAt - Date.now()));
+			setTimeout(() => setButtons(false), Math.max(0, nextAllowedAt - Date.now()));
 		});
 	}
 
-	btn.onclick = drop;
+	btn.onclick = () => drop(1);
+	if (packBtn) packBtn.onclick = () => drop(packCfg.count);
 	modal.querySelector("#plinkoClose").onclick = () => modal.remove();
 	modal.onclick = e => {
 		if (e.target === modal) modal.remove();
 	};
-	draw(null, null);
+	draw([], []);
 	setCoins();
 	window.openPlinko = openPlinko;
 }

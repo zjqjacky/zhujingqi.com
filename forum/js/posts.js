@@ -337,7 +337,24 @@ async function fetchFeed(page, perPage) {
 	return apiGet("/api/feed" + q);
 }
 
+// 首页刷新：点一次立刻清空并显示加载中，同时拦住重复点击
+let feedLoading = false;
 async function loadFeedPage(page = 1) {
+	if (feedLoading) return;
+	feedLoading = true;
+	const box = $("posts");
+	if (box) {
+		box.innerHTML =
+			'<p style="text-align:center;color:var(--sub);margin-top:20px;">' + t("loading") + "</p>";
+	}
+	try {
+		await doLoadFeed(page);
+	} finally {
+		feedLoading = false;
+	}
+}
+
+async function doLoadFeed(page) {
 	const perPage = guestMode ? 4 : getPostsPerPage();
 	let feed = null;
 	try {
