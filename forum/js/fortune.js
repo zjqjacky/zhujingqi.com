@@ -124,13 +124,15 @@ function renderLevelProgress(coins) {
 }
 
 /**
- * 等级按「累计获得」算，不看当前余额 —— 花币、抽奖、删帖都不会掉级。
- * 老数据没有 earned_total 时退回 coins，保证兼容。
+ * 等级按「累计贡献」算（earned_total），不看当前余额 —— 花币、删帖都不会掉级。
+ * 抽奖 / 弹珠机的收支服务端只动 coins、不动 earned_total，所以抽奖刷不出等级。
+ * 注意 earned_total 为 0 是合法值（新用户刚开始），不能退回 coins：
+ * 否则只靠抽奖赚币的人会顺着余额涨等级。只有字段缺失（老缓存）时才退回 coins。
  */
 function userLevelCoins(user) {
 	if (!user) return 0;
 	const earned = user.earned_total;
-	if (typeof earned === "number" && earned > 0) return earned;
+	if (typeof earned === "number") return earned;
 	return user.coins || 0;
 }
 

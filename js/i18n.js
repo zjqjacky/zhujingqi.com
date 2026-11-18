@@ -21,7 +21,6 @@ const TRANSLATIONS = {
 		en: "<b>A wise saying: </b>If you press a specific series of keys on the keyboard, good things will happen.",
 		es: "<b>Una frase sabia: </b>Si presionas una serie específica de teclas en el teclado, sucederán cosas buenas."
 	},
-	featured: { zh: "我的大作：", en: "Featured projects: ", es: "Proyectos destacados: " },
 	other_works: { zh: "其它作品：", en: "Other works: ", es: "Otros proyectos: " },
 	jackianity_zh: { zh: "杰基教（Jackianity）", en: "Jackianity", es: "Jackianidad" },
 	watered_count: { zh: "浇水次数: ", en: "Total watered times: ", es: "Veces regadas: " },

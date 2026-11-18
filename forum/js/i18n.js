@@ -1,21 +1,14 @@
 const TRANSLATIONS = {
 	ai_title: { zh: "Jacky AI", en: "Jacky AI", es: "Jacky AI", de: "Jacky AI", "zh-TW": "Jacky AI" },
 	ai_entry: { zh: "Jacky AI", en: "Jacky AI", es: "Jacky AI", de: "Jacky AI", "zh-TW": "Jacky AI" },
-	ai_placeholder: { zh: "", en: "", es: "", de: "", "zh-TW": "" },
 	ai_send: { zh: "发送", en: "Send", es: "Enviar", de: "Senden", "zh-TW": "發送" },
-	ai_cost: { zh: "每天前 10 次免费，之后每次消耗", en: "First 10 free daily, then costs", es: "Primeras 10 gratis al día, luego cuesta", de: "Erste 10 täglich gratis, danach kostet", "zh-TW": "每天前 10 次免費，之後每次消耗" },
 	ai_generating: { zh: "AI 正在思考…", en: "AI is thinking…", es: "La IA está pensando…", de: "KI denkt nach…", "zh-TW": "AI 正在思考…" },
-	ai_generated_tag: { zh: "AI 生成", en: "AI generated", es: "Generado por IA", de: "Von KI erstellt", "zh-TW": "AI 生成" },
 	ai_login_required: { zh: "请先登录后再使用 AI 问答", en: "Please log in to use AI Assistant", es: "Inicia sesión para usar el asistente IA", de: "Bitte melde dich an, um den KI-Assistenten zu nutzen", "zh-TW": "請先登入後再使用 AI 問答" },
-	ai_no_coins: { zh: "今日 10 次免费额度已用完，金币不足，无法提问（每次需 1 金币）", en: "Free quota used up, not enough coins (1 coin per question)", es: "Cuota gratis agotada, monedas insuficientes (1 moneda por pregunta)", de: "Gratis-Kontingent aufgebraucht, nicht genug Münzen (1 Münze pro Frage)", "zh-TW": "今日 10 次免費額度已用完，金幣不足，無法提問（每次需 1 金幣）" },
 	ai_free_used: { zh: "本次提问免费（每天前 10 次不扣金币）", en: "Free question (first 10 daily are free)", es: "Pregunta gratis (las primeras 10 del día)", de: "Kostenlose Frage (erste 10 täglich)", "zh-TW": "本次提問免費（每天前 10 次不扣金幣）" },
-	ai_free_left: { zh: "今天还剩余 {0} 次免费提问", en: "{0} free questions left today", es: "Quedan {0} preguntas gratis hoy", de: "Noch {0} kostenlose Fragen heute", "zh-TW": "今天還剩餘 {0} 次免費提問" },
 	ai_error: { zh: "AI 服务开小差了，1 金币已退回", en: "AI service error, your coin has been refunded", es: "Error del servicio IA, tu moneda fue devuelta", de: "KI-Fehler, deine Münze wurde erstattet", "zh-TW": "AI 服務開小差了，1 金幣已退回" },
-	ai_refunded: { zh: "AI 生成失败，已退回 1 金币", en: "Generation failed, 1 coin refunded", es: "Error, 1 moneda devuelta", de: "Fehler, 1 Münze erstattet", "zh-TW": "AI 生成失敗，已退回 1 金幣" },
 	ai_queue: { zh: "AI 繁忙，正在排队处理，请稍后重试", en: "AI is busy and queued, please try again later", es: "La IA está ocupada, en cola. Inténtalo de nuevo más tarde", de: "KI ist beschäftigt, in der Warteschlange. Bitte später erneut versuchen", "zh-TW": "AI 繁忙，正在排隊處理，請稍後重試" },
 	ai_queue_refund: { zh: "本次已退回 1 金币，稍后可重试", en: "1 coin refunded, try again later", es: "1 moneda devuelta, inténtalo más tarde", de: "1 Münze erstattet, versuche es später", "zh-TW": "本次已退回 1 金幣，稍後可重試" },
 	ai_logs_title: { zh: "AI 调用记录", en: "AI Logs", es: "Registros de IA", de: "KI-Protokolle", "zh-TW": "AI 調用記錄" },
-	ai_logs_admin: { zh: "AI 调用记录", en: "AI Logs", es: "Registros de IA", de: "KI-Protokolle", "zh-TW": "AI 調用記錄" },
 	ai_logs_empty: { zh: "暂无调用记录", en: "No logs yet", es: "Sin registros", de: "Keine Protokolle", "zh-TW": "暫無調用記錄" },
 	ai_logs_close: { zh: "关闭", en: "Close", es: "Cerrar", de: "Schließen", "zh-TW": "關閉" },
 	ai_clear: { zh: "清空历史", en: "Clear history", es: "Borrar historial", de: "Verlauf löschen", "zh-TW": "清空歷史" },
@@ -23,7 +16,6 @@ const TRANSLATIONS = {
 	ai_delete: { zh: "删除", en: "Delete", es: "Eliminar", de: "Löschen", "zh-TW": "刪除" },
 	ai_copied: { zh: "已复制", en: "Copied", es: "Copiado", de: "Kopiert", "zh-TW": "已複製" },
 	ai_clear_confirm: { zh: "确定要清空所有 AI 对话历史吗？", en: "Clear all AI chat history?", es: "¿Borrar todo el historial de IA?", de: "Gesamten KI-Verlauf löschen?", "zh-TW": "確定要清空所有 AI 對話歷史嗎？" },
-	ai_me: { zh: "我", en: "Me", es: "Yo", de: "Ich", "zh-TW": "我" },
 	ai_remaining: { zh: "今日 AI 问答还剩余 {0} 次", en: "You have {0} AI questions left today", es: "Te quedan {0} preguntas de IA hoy", de: "Noch {0} KI-Fragen heute", "zh-TW": "今日 AI 問答還剩餘 {0} 次" },
 	ai_used_up: { zh: "今日 AI 问答次数已用完，明天再来吧", en: "Daily AI questions used up, come back tomorrow", es: "Se agotaron las preguntas de IA de hoy, vuelve mañana", de: "Heutige KI-Fragen aufgebraucht, komm morgen wieder", "zh-TW": "今日 AI 問答次數已用完，明天再來吧" },
 	ai_cite_open: { zh: "查看原帖", en: "View post", es: "Ver publicación", de: "Beitrag ansehen", "zh-TW": "查看原帖" },
@@ -133,13 +125,6 @@ const TRANSLATIONS = {
 		de: "Der Kontoname dient zum Anmelden, nur Buchstaben und Zahlen, und kann nach der Registrierung nicht geändert werden. Der Spitzname wird öffentlich angezeigt und ist jederzeit änderbar. Bitte merke dir Kontoname und Passwort.",
 		"zh-TW": "帳號名用於登入，僅限字母和數字，註冊後不可修改；暱稱是對外顯示的名字，可隨時修改。請牢記帳號名和密碼。"
 	},
-	terms_link: {
-		zh: "用户协议",
-		en: "Terms of Service",
-		es: "Términos de Servicio",
-		de: "Nutzungsbedingungen",
-		"zh-TW": "用戶協議"
-	},
 	terms_doc: {
 		zh: "使用条款",
 		en: "Terms of Use",
@@ -161,19 +146,33 @@ const TRANSLATIONS = {
 		de: "Bitte zuerst die Nutzungsbedingungen lesen und akzeptieren",
 		"zh-TW": "請先閱讀並勾選同意《使用條款》"
 	},
-	terms_content: {
-		zh: '<h3>Jacky 论坛 用户协议</h3><p>注册或使用 Jacky 论坛，即表示您同意以下条款：</p><ul><li>禁止发布违法内容。</li><li>所有内容和设计归 Jacky 论坛 所有。</li><li>请妥善保管账号和密码，因账号泄露造成的损失由用户自行承担。</li><li>本论坛对内容及服务拥有最终解释权，并可随时修改协议或规则。</li><li>本论坛不保证内容绝对正确或服务持续可用。</li><li>使用本论坛即表示您接受本协议及其未来更新。</li></ul><p>如有疑问，请联系 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>',
-		en: '<h3>Jacky Forum Terms of Service</h3><p>By registering or using Jacky Forum, you agree to the following terms:</p><ul><li>Do not post illegal content.</li><li>All content and design belong to Jacky Forum.</li><li>Please safeguard your account credentials. You are responsible for any losses due to account compromise.</li><li>The forum reserves final interpretation rights over content and services, and may modify these terms at any time.</li><li>The forum does not guarantee absolute correctness of content or continuous availability of service.</li><li>By using this forum, you accept this agreement and any future updates.</li></ul><p>For questions, contact <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>',
-		es: '<h3>Términos de Servicio del Foro Jacky</h3><p>Al registrarte o usar el Foro Jacky, aceptas los siguientes términos:</p><ul><li>No publiques contenido ilegal.</li><li>Todo el contenido y diseño pertenecen al Foro Jacky.</li><li>Protege tus credenciales. Eres responsable de las pérdidas por compromiso de cuenta.</li><li>El foro se reserva el derecho de interpretación final y puede modificar estos términos en cualquier momento.</li><li>El foro no garantiza la corrección absoluta del contenido ni la disponibilidad continua del servicio.</li><li>Al usar este foro, aceptas este acuerdo y sus futuras actualizaciones.</li></ul><p>Si tienes preguntas, contacta a <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>',
-		de: '<h3>Nutzungsbedingungen des Jacky Forums</h3><p>Mit der Registrierung oder Nutzung des Jacky Forums stimmst du folgenden Bedingungen zu:</p><ul><li>Keine illegalen Inhalte veröffentlichen.</li><li>Alle Inhalte und Designs gehören dem Jacky Forum.</li><li>Bewahre deine Zugangsdaten sicher auf. Du bist für Verluste durch kompromittierte Konten verantwortlich.</li><li>Das Forum behält sich das Recht der endgültigen Auslegung vor und kann diese Bedingungen jederzeit ändern.</li><li>Das Forum garantiert keine absolute Richtigkeit der Inhalte oder kontinuierliche Verfügbarkeit.</li><li>Durch die Nutzung akzeptierst du diese Vereinbarung und zukünftige Aktualisierungen.</li></ul><p>Bei Fragen kontaktiere <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>',
-		"zh-TW": '<h3>Jacky 論壇 用戶協議</h3><p>註冊或使用 Jacky 論壇，即表示您同意以下條款：</p><ul><li>禁止發布違法內容。</li><li>所有內容和設計歸 Jacky 論壇 所有。</li><li>請妥善保管帳號和密碼，因帳號洩露造成的損失由用戶自行承擔。</li><li>本論壇對內容及服務擁有最終解釋權，並可隨時修改協議或規則。</li><li>本論壇不保證內容絕對正確或服務持續可用。</li><li>使用本論壇即表示您接受本協議及其未來更新。</li></ul><p>如有疑問，請聯繫 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>'
+	reg_agree_transfer: {
+		zh: "我同意将账号信息（含登录 IP）传输至境外服务器存储和处理",
+		en: "I agree to transfer my account data (including login IP) to servers located outside my country",
+		es: "Acepto transferir los datos de mi cuenta (incluida la IP de inicio de sesión) a servidores situados fuera de mi país",
+		de: "Ich stimme der Übertragung meiner Kontodaten (inkl. Login-IP) auf Server außerhalb meines Landes zu",
+		"zh-TW": "我同意將帳號資訊（含登入 IP）傳輸至境外伺服器儲存與處理"
 	},
-	reg_agree: {
-		zh: "注册即代表您同意",
-		en: "By registering you agree to the",
-		es: "Al registrarte aceptas los",
-		de: "Mit der Registrierung stimmst du den",
-		"zh-TW": "註冊即代表您同意"
+	agree_transfer_required: {
+		zh: "请先勾选同意「数据出境」条款",
+		en: "Please agree to the cross-border data transfer first",
+		es: "Primero acepta la transferencia internacional de datos",
+		de: "Bitte zuerst der Datenübermittlung ins Ausland zustimmen",
+		"zh-TW": "請先勾選同意「資料出境」條款"
+	},
+	reg_agree_age: {
+		zh: "我确认已年满 14 周岁，或未满 14 周岁但已取得监护人同意",
+		en: "I confirm I am 14 or older, or that I have my guardian's consent if I am under 14",
+		es: "Confirmo que tengo 14 años o más, o que cuento con el consentimiento de mi tutor si soy menor de 14",
+		de: "Ich bestätige, dass ich mindestens 14 Jahre alt bin oder – falls jünger – die Zustimmung meines Erziehungsberechtigten habe",
+		"zh-TW": "我確認已年滿 14 歲，或未滿 14 歲但已取得監護人同意"
+	},
+	agree_age_required: {
+		zh: "请先确认年龄（未满 14 周岁需取得监护人同意）",
+		en: "Please confirm your age first (guardian consent is required under 14)",
+		es: "Confirma primero tu edad (los menores de 14 necesitan consentimiento del tutor)",
+		de: "Bitte zuerst das Alter bestätigen (unter 14 Jahren ist die Zustimmung der Erziehungsberechtigten nötig)",
+		"zh-TW": "請先確認年齡（未滿 14 歲需取得監護人同意）"
 	},
 	account_shared: {
 		zh: '账号体系已与 <b><a href="https://zhujingqi.com/chat/">Jacky Chat</a></b> 互通',
@@ -463,20 +462,6 @@ const TRANSLATIONS = {
 		de: "Option hinzufügen",
 		"zh-TW": "新增選項"
 	},
-	poll_remove_option: {
-		zh: "删除选项",
-		en: "Remove option",
-		es: "Eliminar opción",
-		de: "Option entfernen",
-		"zh-TW": "刪除選項"
-	},
-	poll_option_limit: {
-		zh: "最多 5 个选项",
-		en: "Max 5 options",
-		es: "Máx. 5 opciones",
-		de: "Max. 5 Optionen",
-		"zh-TW": "最多 5 個選項"
-	},
 	poll_anonymous: {
 		zh: "匿名投票",
 		en: "Anonymous",
@@ -505,26 +490,12 @@ const TRANSLATIONS = {
 		de: "Alle",
 		"zh-TW": "所有人可見"
 	},
-	poll_voters_none: {
-		zh: "不可见",
-		en: "Hidden",
-		es: "Oculto",
-		de: "Verborgen",
-		"zh-TW": "不可見"
-	},
 	poll_deadline: {
 		zh: "截止时间（可不填）",
 		en: "Deadline (optional)",
 		es: "Fecha límite (opcional)",
 		de: "Frist (optional)",
 		"zh-TW": "截止時間（可不填）"
-	},
-	poll_no_deadline: {
-		zh: "不设截止时间",
-		en: "No deadline",
-		es: "Sin fecha límite",
-		de: "Keine Frist",
-		"zh-TW": "不設截止時間"
 	},
 	poll_create: {
 		zh: "创建投票",
@@ -547,27 +518,6 @@ const TRANSLATIONS = {
 		de: "Optionen dürfen nicht doppelt sein",
 		"zh-TW": "選項內容不能重複"
 	},
-	poll_option_empty: {
-		zh: "选项不能为空",
-		en: "Options cannot be empty",
-		es: "Las opciones no pueden estar vacías",
-		de: "Optionen dürfen nicht leer sein",
-		"zh-TW": "選項不能為空"
-	},
-	poll_vote: {
-		zh: "投票",
-		en: "Vote",
-		es: "Votar",
-		de: "Abstimmen",
-		"zh-TW": "投票"
-	},
-	poll_voted: {
-		zh: "已投票",
-		en: "Voted",
-		es: "Votado",
-		de: "Abgestimmt",
-		"zh-TW": "已投票"
-	},
 	poll_total: {
 		zh: "共 {0} 票",
 		en: "{0} votes",
@@ -588,20 +538,6 @@ const TRANSLATIONS = {
 		es: "Finalizar encuesta",
 		de: "Umfrage beenden",
 		"zh-TW": "結束投票"
-	},
-	poll_settings: {
-		zh: "设置",
-		en: "Settings",
-		es: "Ajustes",
-		de: "Einstellungen",
-		"zh-TW": "設定"
-	},
-	poll_apply: {
-		zh: "保存",
-		en: "Save",
-		es: "Guardar",
-		de: "Speichern",
-		"zh-TW": "儲存"
 	},
 	poll_login: {
 		zh: "登录后可投票",
@@ -631,26 +567,12 @@ const TRANSLATIONS = {
 		de: "Noch keine Stimmen",
 		"zh-TW": "暫無投票"
 	},
-	poll_expired: {
-		zh: "已截止",
-		en: "Ended",
-		es: "Finalizado",
-		de: "Beendet",
-		"zh-TW": "已截止"
-	},
 	poll_fail: {
 		zh: "投票失败",
 		en: "Vote failed",
 		es: "Voto fallido",
 		de: "Abstimmung fehlgeschlagen",
 		"zh-TW": "投票失敗"
-	},
-	poll_already: {
-		zh: "你已经投过票了",
-		en: "You have already voted",
-		es: "Ya has votado",
-		de: "Du hast bereits abgestimmt",
-		"zh-TW": "你已經投過票了"
 	},
 	rankings_title: {
 		zh: "排行榜",
@@ -875,13 +797,6 @@ const TRANSLATIONS = {
 		de: "Nach dem Beenden ist die Abstimmung geschlossen und nicht rückgängig zu machen. Abstimmung beenden?",
 		"zh-TW": "結束後將無法再投票，且此操作無法撤銷。確定要結束這個投票嗎？"
 	},
-	modal_loading: {
-		zh: "加载中...",
-		en: "Loading...",
-		es: "Cargando...",
-		de: "Lädt...",
-		"zh-TW": "加載中..."
-	},
 	modal_load_fail: {
 		zh: "加载失败",
 		en: "Load failed",
@@ -1001,13 +916,6 @@ const TRANSLATIONS = {
 		de: "{0} ungelesene Nachrichten",
 		"zh-TW": "有 {0} 條未讀訊息"
 	},
-	notif_op_reply: {
-		zh: "帖主评论了你参与的帖子",
-		en: "OP commented on a post you interacted with",
-		es: "El OP comentó en una publicación en la que participaste",
-		de: "OP hat einen Beitrag kommentiert, an dem du beteiligt warst",
-		"zh-TW": "帖主評論了你參與的帖子"
-	},
 	notif_title: {
 		zh: "通知",
 		en: "Notifications",
@@ -1035,13 +943,6 @@ const TRANSLATIONS = {
 		es: "¡Bienvenido <b>{0}</b> al <b>Foro Jacky</b>!",
 		de: "Willkommen <b>{0}</b> im <b>Jacky</b> Forum!",
 		"zh-TW": "歡迎 <b>{0}</b> 來到 <b>Jacky</b> 論壇！"
-	},
-	profile_logout: {
-		zh: "登出",
-		en: "Logout",
-		es: "Cerrar sesión",
-		de: "Abmelden",
-		"zh-TW": "登出"
 	},
 	profile_edit_avatar: {
 		zh: "修改头像",
@@ -1147,20 +1048,6 @@ const TRANSLATIONS = {
 		es: "Oscuro",
 		de: "Dunkel",
 		"zh-TW": "深色"
-	},
-	level_rules_title: {
-		zh: "等级规则",
-		en: "Level Rules",
-		es: "Reglas de nivel",
-		de: "Level-Regeln",
-		"zh-TW": "等級規則"
-	},
-	coin_rules_title: {
-		zh: "金币规则",
-		en: "Coin Rules",
-		es: "Reglas de monedas",
-		de: "Münz-Regeln",
-		"zh-TW": "金幣規則"
 	},
 	register_fail: {
 		zh: "注册失败：{0}",
@@ -1897,13 +1784,6 @@ const TRANSLATIONS = {
 		de: "Könnte unangenehme Inhalte enthalten",
 		"zh-TW": "可能包含不適宜的內容"
 	},
-	location_fail: {
-		zh: "定位帖子失败：{0}",
-		en: "Failed to locate post: {0}",
-		es: "Error al localizar publicación: {0}",
-		de: "Beitrag konnte nicht gefunden werden: {0}",
-		"zh-TW": "定位帖子失敗：{0}"
-	},
 	jump_ph: {
 		zh: "跳转",
 		en: "Go to",
@@ -1911,33 +1791,12 @@ const TRANSLATIONS = {
 		de: "Gehe zu",
 		"zh-TW": "跳轉"
 	},
-	guest_more: {
-		zh: "查看更多 →",
-		en: "View More →",
-		es: "Ver más →",
-		de: "Mehr anzeigen →",
-		"zh-TW": "查看更多 →"
-	},
 	discover_title: {
 		zh: "探索",
 		en: "Discover",
 		es: "Explorar",
 		de: "Entdecken",
 		"zh-TW": "探索"
-	},
-	lang_label: {
-		zh: "语言",
-		en: "Language",
-		es: "Idioma",
-		de: "Sprache",
-		"zh-TW": "語言"
-	},
-	error_generic: {
-		zh: "出错了：{0}",
-		en: "Error: {0}",
-		es: "Error: {0}",
-		de: "Fehler: {0}",
-		"zh-TW": "出錯了：{0}"
 	},
 	level_full: {
 		zh: "已满级！",
@@ -1973,20 +1832,6 @@ const TRANSLATIONS = {
 		es: "En línea ",
 		de: "Online ",
 		"zh-TW": "在線 "
-	},
-	level_rules_content: {
-		zh: "1. 等级分为 LV0 - LV12 共 13 个等级<br>2. 不同等级会有不同颜色区分<br>3. 金币到达某数量后，自动升级<br>4. 获取金币并提升等级吧！",
-		en: "1. There are 13 levels: LV0 - LV12<br>2. Different levels have different colors<br>3. Auto-level-up when reaching coin thresholds<br>4. Earn coins and level up!",
-		es: "1. Hay 13 niveles: LV0 - LV12<br>2. Diferentes niveles tienen colores diferentes<br>3. Subida de nivel automática al alcanzar umbrales de monedas<br>4. ¡Gana monedas y sube de nivel!",
-		de: "1. Es gibt 13 Stufen: LV0 - LV12<br>2. Verschiedene Stufen haben verschiedene Farben<br>3. Automatischer Aufstieg beim Erreichen von Münz-Schwellenwerten<br>4. Verdiene Münzen und steige auf!",
-		"zh-TW": "1. 等級分為 LV0 - LV12 共 13 個等級<br>2. 不同等級會有不同顏色區分<br>3. 金幣到達某數量後，自動升級<br>4. 獲取金幣並提升等級吧！"
-	},
-	coin_rules_content: {
-		zh: "1. 发布 +5 金币<br>2. 评论 +3 金币<br>3. 被点赞 +1 金币（给帖子作者）<br>4. 踩帖不扣金币（取消踩也不加）<br>5. 删除帖子、内容或取消点赞，减少对应数量金币<br>金币用途：提升等级；购买彩色帖子背景；商店中购买徽章、改名卡；金币抽奖",
-		en: "1. Post +5 coins<br>2. Comment +3 coins<br>3. Getting liked +1 coin (for the post author)<br>4. Dislikes cost no coins (removing a dislike adds none either)<br>5. Deleting posts/content or unliking reduces coins accordingly<br>Uses: Level up; Buy colorful post backgrounds; Buy badges & rename cards in shop; Coin lottery",
-		es: "1. Publicar +5 monedas<br>2. Comentar +3 monedas<br>3. Recibir me gusta +1 moneda (para el autor)<br>4. No me gusta no cuesta monedas (quitarlo tampoco suma)<br>5. Eliminar publicaciones/contenido o quitar me gusta reduce monedas<br>Usos: Subir de nivel; Comprar fondos de publicación coloridos; Comprar insignias y tarjetas en la tienda; Lotería de monedas",
-		de: "1. Posten +5 Münzen<br>2. Kommentieren +3 Münzen<br>3. Ein Like erhalten +1 Münze (für den Autor)<br>4. Dislike kostet keine Münzen (Entfernen bringt auch keine)<br>5. Löschen von Posts/Inhalten oder Entfernen von Likes reduziert Münzen<br>Verwendung: Level aufsteigen; Bunte Post-Hintergründe kaufen; Abzeichen & Umbenennungskarten im Shop kaufen; Münz-Lotterie",
-		"zh-TW": "1. 發佈 +5 金幣<br>2. 評論 +3 金幣<br>3. 被按讚 +1 金幣（給貼文作者）<br>4. 踩帖不扣金幣（取消踩也不加）<br>5. 刪除帖子、內容或取消按讚，減少對應數量金幣<br>金幣用途：提升等級；購買彩色帖子背景；商店中購買徽章、改名卡；金幣抽獎"
 	},
 	about_title: {
 		zh: "关于",
@@ -2036,13 +1881,6 @@ const TRANSLATIONS = {
 		es: "OP",
 		de: "OP",
 		"zh-TW": "帖主"
-	},
-	badge_self: {
-		zh: "我",
-		en: "Me",
-		es: "Yo",
-		de: "Ich",
-		"zh-TW": "我"
 	},
 	role_official: {
 		zh: "官方用户",
@@ -2239,13 +2077,6 @@ const TRANSLATIONS = {
 		es: "Lista de seguimiento pública",
 		de: "Öffentliche Folgeliste",
 		"zh-TW": "公開關注/粉絲列表"
-	},
-	follow_self: {
-		zh: "不能关注自己",
-		en: "Cannot follow yourself",
-		es: "No puedes seguirte a ti mismo",
-		de: "Kann dir nicht selbst folgen",
-		"zh-TW": "不能關注自己"
 	},
 	jwt_expired: {
 		zh: "登录已过期，请重新登录",

@@ -90,6 +90,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+	margin-bottom: 10px;
 }
 
 .cr-top {
@@ -110,12 +111,31 @@
 	min-height: 80px;
 }
 
+.cr-top .ct {
+	min-height: 80px;
+}
+
+.cr-top .rc .r.c {
+	flex: 1;
+	height: auto;
+	min-height: 80px;
+}
+
 .cc {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	margin-left: 10px;
+}
+
+.email-ct {
+	display: flex;
+	align-items: center;
+}
+
+.email-ct a {
+	white-space: nowrap;
 }
 
 .c {

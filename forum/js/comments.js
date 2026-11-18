@@ -1,17 +1,36 @@
 // 防止请求期间重复提交（连点按钮、连按回车都会命中）
 let commentBusy = false;
 
+// 评论是纯文本：渲染时一律走 textContent，不需要也不应该做 HTML 转义。
+// 但历史评论在写入时被转义过（以及服务端可能仍会转义 &），库里残留着
+// &amp; / &lt; / &quot; 这类实体，直接 textContent 出来就是一串源码。
+// 这里在展示前统一还原一次；单次 replace 不会二次解码，新写入的纯文本不受影响。
+const COMMENT_ENTITY_MAP = {
+	"&amp;": "&",
+	"&lt;": "<",
+	"&gt;": ">",
+	"&quot;": "\"",
+	"&#39;": "'",
+	"&#x27;": "'",
+	"&#X27;": "'",
+	"&apos;": "'"
+};
+function decodeCommentText(text) {
+	return String(text ?? "").replace(/&(amp|lt|gt|quot|#39|#[xX]27|apos);/g,
+		m => COMMENT_ENTITY_MAP[m] || m);
+}
+
 function parseCommentContent(content) {
 	const match = String(content || "").match(/^\[reply:(\d+)\]\s*/);
 	if (match) {
 		return {
 			parentId: parseInt(match[1]),
-			text: content.slice(match[0].length)
+			text: decodeCommentText(content.slice(match[0].length))
 		};
 	}
 	return {
 		parentId: null,
-		text: content || ""
+		text: decodeCommentText(content || "")
 	};
 }
 
@@ -203,7 +222,8 @@ async function addComment(postId, content, postAuthorId) {
 	try {
 		const result = await apiPost("/api/comments", {
 			postid: postId,
-			content: sanitizePostHtml(text),
+			// 纯文本原样入库：显示端用 textContent，转义只会让用户看到 &amp;
+			content: text,
 			author: currentUser.id,
 			time: new Date().toISOString()
 		});
@@ -248,7 +268,7 @@ async function addReply(postId, parentId, content, postAuthorId, parentAuthorId)
 	if (commentBusy) return;
 	commentBusy = true;
 	closeEmojiPicker();
-	const replyContent = `[reply:${parentId}] ${sanitizePostHtml(text)}`;
+	const replyContent = `[reply:${parentId}] ${text}`;
 	try {
 		const result = await apiPost("/api/comments", {
 			postid: postId,

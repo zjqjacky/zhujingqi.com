@@ -25,7 +25,6 @@
 		margin-left: 0;
 	}
 
-	.cc,
 	.rc {
 		flex-direction: column;
 	}
@@ -117,5 +116,17 @@
 
 	#plant-container {
 		transform: scale(.85);
+	}
+}
+
+@media (max-width: 560px) {
+	.r.c {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.r.c a {
+		margin-right: 0 !important;
 	}
 }

@@ -1,79 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 	<head>
 		<title>介绍 - Zhujingqi</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Jacky Zhu 的个人介绍：NFLS 初中学牲、JavaScript 全栈开发者；关于我、喜好、MBTI、GitHub 开源项目与联系方式。">
 		<link id="maincss" rel="stylesheet" href="/css/main.css">
 		<link id="mobilecss" rel="stylesheet" href="/css/mobile.css">
 		<link id="darkcss" rel="stylesheet" href="/css/dark.css">
 		<link rel="icon" type="image/x-icon" href="/img/zjq.svg">
+		<script>document.documentElement.classList.add('js');</script>
 		<style>
+			/* ===== 页面骨架 ===== */
 			.me-section {
 				max-width: 800px;
 				margin: 0 auto;
-				padding: 40px 20px;
+				padding: 48px 24px 64px;
 			}
 
 			.me-hero {
 				display: flex;
 				align-items: center;
 				gap: 24px;
-				margin-bottom: 48px;
+				margin-bottom: 40px;
 			}
 
 			.me-hero img {
-				width: 80px;
-				height: 80px;
+				width: 88px;
+				height: 88px;
 				border-radius: 50%;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 			}
 
 			.me-hero h1 {
-				font-size: 36px;
+				font-size: clamp(30px, 5vw, 40px);
+				line-height: 1.1;
+				letter-spacing: -0.03em;
 				margin: 0;
 				color: #111;
 			}
 
 			.me-hero .subtitle {
-				color: #888;
-				font-size: 16px;
-				margin-top: 4px;
+				color: #6e6e73;
+				font-size: 15px;
+				margin: 6px 0 0;
 			}
 
 			.me-section h2 {
 				font-size: 22px;
+				letter-spacing: -0.01em;
 				margin: 48px 0 20px 0;
 				color: #111;
-				border-bottom: 2px solid #e0e0e0;
-				padding-bottom: 8px;
-			}
-
-			.me-section p {
-				font-size: 17px;
-				line-height: 2;
-				color: #333;
-				margin-bottom: 16px;
-			}
-
-			.me-section ul {
-				list-style: none;
-				padding: 0;
-				margin: 0;
-			}
-
-			.me-section li {
-				font-size: 16px;
-				line-height: 2;
-				color: #444;
-				padding: 4px 0;
-			}
-
-			.me-section li::before {
-				content: "·";
-				color: #007bff;
-				font-weight: bold;
-				margin-right: 8px;
+				border-bottom: 1px solid #e5e5ea;
+				padding-bottom: 10px;
 			}
 
 			.me-section a {
@@ -85,117 +64,826 @@
 				text-decoration: underline;
 			}
 
-			.me-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-				gap: 16px;
-				margin: 20px 0;
-			}
-
-			.me-card {
-				background: #f8f8f8;
-				border-radius: 16px;
-				padding: 24px;
-				transition: transform 0.2s;
-			}
-
-			.me-card:hover {
-				transform: translateY(-2px);
-			}
-
-			.me-card h3 {
-				font-size: 16px;
-				margin: 0 0 8px 0;
-				color: #111;
-			}
-
-			.me-card p {
-				font-size: 14px;
-				line-height: 1.8;
-				color: #666;
+			/* ===== 圆点列表 ===== */
+			.dot-list {
+				list-style: none;
+				padding: 0;
 				margin: 0;
 			}
 
-			.me-card a {
-				font-size: 14px;
-			}
-
-			.contact-row {
-				display: flex;
-				gap: 24px;
-				margin: 16px 0;
-				flex-wrap: wrap;
-			}
-
-			.contact-row a {
-				color: #007bff;
-				text-decoration: none;
+			.dot-list > li {
+				position: relative;
 				font-size: 16px;
+				line-height: 1.9;
+				color: #444;
+				padding: 4px 0 4px 18px;
 			}
 
-			.links-grid {
+			.dot-list > li::before {
+				content: "";
+				position: absolute;
+				left: 2px;
+				top: 15px;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: #007bff;
+			}
+
+			/* ===== 创造与分享 ===== */
+			.create-layout {
+				margin: 0;
+			}
+
+			.create-row {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-				gap: 12px;
-				margin: 20px 0;
+				grid-template-columns: repeat(12, minmax(0, 1fr));
+				column-gap: 32px;
+				padding: 24px 0;
+				border-bottom: 1px solid #e5e5ea;
 			}
 
-			.links-grid a {
-				font-size: 15px;
+			.create-row:first-child {
+				padding-top: 0;
+			}
+
+			.create-row:last-child {
+				padding-bottom: 0;
+				border-bottom: 0;
+			}
+
+			.interest-block {
+				grid-column: 1 / span 7;
+			}
+
+			.github-block {
+				grid-column: 1 / -1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.mbti-block {
+				grid-column: 8 / span 5;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.module-title {
+				display: flex;
+				align-items: baseline;
+				gap: 10px;
+				margin: 0 0 18px;
+				font-size: 14px;
+				line-height: 1.4;
+				font-weight: 600;
+				color: #111;
+			}
+
+			.module-en {
+				font-size: 9px;
+				line-height: 1.4;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				color: #8e8e93;
+				text-transform: uppercase;
+			}
+
+			.apple-mark {
+				width: 10px;
+				height: 12px;
+				margin-left: 4px;
+				fill: currentColor;
+				vertical-align: -1px;
+			}
+
+			/* MBTI */
+			.mbti-type {
+				margin: auto 0;
+				text-align: center;
+				font-size: clamp(56px, 5.8vw, 72px);
+				line-height: 1;
+				font-weight: 600;
+				letter-spacing: -0.05em;
+				color: #111;
+			}
+
+			.mbti-type span {
+				display: inline;
+			}
+
+			/* GitHub */
+			.gh-links {
+				display: flex;
+				flex-direction: column;
+				gap: 14px;
+				margin: auto 0;
+			}
+
+			.gh-link {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 16px;
 				color: #007bff;
 				text-decoration: none;
-				padding: 4px 0;
 			}
 
-			.links-grid a:hover {
+			.gh-main {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				min-width: 0;
+			}
+
+			.gh-name {
+				font-size: 15px;
+				font-weight: 500;
+				line-height: 1.4;
+				color: #007bff;
+			}
+
+			.gh-meta {
+				font-size: 10px;
+				line-height: 1.4;
+				color: #8e8e93;
+				overflow-wrap: anywhere;
+			}
+
+			.gh-arrow {
+				font-size: 14px;
+				line-height: 1.4;
+				color: #007bff;
+				transition: transform 0.2s ease;
+			}
+
+			.gh-link:hover .gh-arrow {
+				transform: translate(2px, -2px);
+			}
+
+			/* ===== 项目 3D 轮播 ===== */
+			.project-carousel {
+				--stage-h: 300px;
+				position: relative;
+				margin: 8px 0 0;
+				overflow: hidden;
+				user-select: none;
+				touch-action: pan-y;
+			}
+
+			.project-stage {
+				display: grid;
+				gap: 12px;
+			}
+
+			.project-card {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				padding: 22px;
+				background-color: #ffffff;
+				background-image: linear-gradient(150deg, rgba(255, 255, 255, 0) 58%, var(--accent-soft, #f2f2f7) 150%);
+				border: 1px solid #e5e5ea;
+				border-radius: 22px;
+				color: inherit;
+				text-decoration: none;
+				overflow: hidden;
+				box-sizing: border-box;
+				transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.45s ease, box-shadow 0.45s ease;
+			}
+
+			.project-card::before {
+				content: "";
+				position: absolute;
+				top: -90px;
+				right: -70px;
+				width: 230px;
+				height: 230px;
+				border-radius: 50%;
+				background: radial-gradient(circle, var(--accent-soft, rgba(0, 0, 0, 0.05)) 0%, transparent 68%);
+				pointer-events: none;
+			}
+
+			.js .project-stage {
+				display: block;
+				height: var(--stage-h);
+				perspective: 1200px;
+				perspective-origin: 50% 45%;
+			}
+
+			.js .project-card {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: min(400px, 78%);
+				height: 236px;
+				transform: translate(-50%, -50%);
+				will-change: transform, opacity;
+				box-shadow: 0 20px 40px -22px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.04);
+			}
+
+			.js .project-card.is-active {
+				box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.05);
+			}
+
+			.js .project-carousel {
+				cursor: grab;
+			}
+
+			.js .project-carousel.is-dragging {
+				cursor: grabbing;
+			}
+
+			.project-card,
+			.project-card * {
+				cursor: pointer;
+			}
+
+			.project-card:hover {
+				border-color: var(--accent, #007bff);
+			}
+
+			.project-card:hover h3 {
+				color: var(--accent, #007bff);
+			}
+
+			/* 覆盖全局 a:hover 的下划线，卡片任何位置 hover 都不显示下划线 */
+			.me-section .project-card,
+			.me-section .project-card * {
+				text-decoration: none !important;
+			}
+
+			.me-section .gh-link:hover,
+			.me-section .gh-link:hover * {
+				text-decoration: none;
+			}
+
+			.project-card-top {
+				position: relative;
+				z-index: 1;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				margin-bottom: 14px;
+			}
+
+			.project-icon {
+				display: grid;
+				place-items: center;
+				width: 44px;
+				height: 44px;
+				border-radius: 13px;
+				background: var(--accent-soft, #f2f2f7);
+			}
+
+			.project-icon img {
+				width: 28px;
+				height: 28px;
+				object-fit: contain;
+				-webkit-user-drag: none;
+			}
+
+			.project-tag {
+				font-size: 11px;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: #8e8e93;
+			}
+
+			.project-card h3 {
+				position: relative;
+				z-index: 1;
+				font-size: 21px;
+				line-height: 1.3;
+				letter-spacing: -0.01em;
+				margin: 0 0 5px;
+				color: #111;
+			}
+
+			.project-card p {
+				position: relative;
+				z-index: 1;
+				font-size: 14px;
+				line-height: 1.6;
+				color: #6e6e73;
+				margin: 0;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
+			.project-open {
+				position: relative;
+				z-index: 1;
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				margin-top: auto;
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--accent, #007bff);
+			}
+
+			.project-card[data-project="home"] {
+				--accent: #0071e3;
+				--accent-soft: rgba(0, 113, 227, 0.1);
+				--accent-bright: #5b9cff;
+			}
+
+			.project-card[data-project="forum"] {
+				--accent: #248a3d;
+				--accent-soft: rgba(52, 199, 89, 0.13);
+				--accent-bright: #6ee7a0;
+			}
+
+			.project-card[data-project="chat"] {
+				--accent: #8e44ad;
+				--accent-soft: rgba(175, 82, 222, 0.13);
+				--accent-bright: #d8a6ff;
+			}
+
+			.project-card[data-project="games"] {
+				--accent: #c76a00;
+				--accent-soft: rgba(255, 159, 10, 0.14);
+				--accent-bright: #ffc46b;
+			}
+
+			.project-card[data-project="tools"] {
+				--accent: #007c8a;
+				--accent-soft: rgba(48, 176, 199, 0.14);
+				--accent-bright: #7fe0f0;
+			}
+
+			.carousel-btn {
+				display: none;
+			}
+
+			.js .carousel-btn {
+				position: absolute;
+				top: calc(var(--stage-h) / 2);
+				z-index: 50;
+				display: grid;
+				place-items: center;
+				width: 38px;
+				height: 38px;
+				padding: 0;
+				border: 1px solid #e5e5ea;
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.92);
+				color: #1d1d1f;
+				cursor: pointer;
+				transform: translateY(-50%);
+				box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+				-webkit-backdrop-filter: blur(12px);
+				backdrop-filter: blur(12px);
+				transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+			}
+
+			.js .carousel-btn.prev {
+				left: 2px;
+			}
+
+			.js .carousel-btn.next {
+				right: 2px;
+			}
+
+			.js .carousel-btn:hover:not(:disabled) {
+				background: #ffffff;
+				border-color: #d2d2d7;
+			}
+
+			.js .carousel-btn:disabled {
+				opacity: 0.25;
+				cursor: default;
+			}
+
+			.carousel-dots {
+				display: none;
+			}
+
+			.js .carousel-dots {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				margin-top: 4px;
+			}
+
+			.carousel-dot {
+				width: 6px;
+				height: 6px;
+				padding: 0;
+				border: 0;
+				border-radius: 999px;
+				background: #c7c7cc;
+				cursor: pointer;
+				transition: width 0.3s ease, background 0.3s ease;
+			}
+
+			.carousel-dot[aria-current="true"] {
+				width: 18px;
+				background: #1d1d1f;
+			}
+
+			.project-carousel:focus {
+				outline: none;
+			}
+
+			.project-carousel:focus-visible {
+				outline: 2px solid #0071e3;
+				outline-offset: 8px;
+				border-radius: 24px;
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+
+			.project-more {
+				font-size: 14px;
+				color: #8e8e93;
+				margin: 14px 0 0;
+			}
+
+			/* ===== 联系方式 ===== */
+			.frequent {
+				display: inline-block;
+				margin-left: 4px;
+				padding: 1px 8px;
+				border-radius: 999px;
+				background: rgba(245, 166, 35, 0.12);
+				color: #b26a00;
+				font-size: 11px;
+				line-height: 1.6;
+				vertical-align: 1px;
+			}
+
+			.contact-extra,
+			.links-extra {
+				display: grid;
+				grid-template-rows: 1fr;
+			}
+
+			.js .contact-extra,
+			.js .links-extra {
+				grid-template-rows: 0fr;
+				opacity: 0;
+				transition: grid-template-rows 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.3s ease;
+			}
+
+			.js .contact-extra.open,
+			.js .links-extra.open {
+				grid-template-rows: 1fr;
+				opacity: 1;
+			}
+
+			.contact-extra-inner,
+			.links-extra-inner {
+				overflow: hidden;
+				min-height: 0;
+			}
+
+			.contact-toggle {
+				display: none;
+				align-items: center;
+				gap: 6px;
+				margin-top: 10px;
+				padding: 8px 0;
+				border: 0;
+				background: none;
+				color: #007bff;
+				font: inherit;
+				font-size: 14px;
+				cursor: pointer;
+			}
+
+			.js .contact-toggle {
+				display: inline-flex;
+			}
+
+			.contact-toggle:hover {
 				text-decoration: underline;
 			}
 
+			.contact-toggle svg {
+				transition: transform 0.3s ease;
+			}
+
+			.contact-toggle.open svg {
+				transform: rotate(180deg);
+			}
+
+			/* ===== 链接 ===== */
+			.link-groups {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 24px 32px;
+				margin-top: 8px;
+			}
+
+			.link-group h3 {
+				font-size: 13px;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				margin: 0 0 8px 0;
+				color: #8e8e93;
+				font-weight: 600;
+			}
+
+			.link-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			.link-list li {
+				padding: 3px 0;
+				line-height: 1.6;
+			}
+
+			.link-list a {
+				font-size: 15px;
+			}
+
+			/* ===== 深色模式 ===== */
 			body.dark-mode .me-hero h1 {
-				color: #e0e0e0;
+				color: #f5f5f7;
 			}
 
 			body.dark-mode .me-hero .subtitle {
-				color: #999;
+				color: #a1a1a6;
 			}
 
 			body.dark-mode .me-section h2 {
-				color: #e0e0e0;
-				border-bottom-color: #444;
+				color: #f5f5f7;
+				border-bottom-color: #3a3a3c;
 			}
 
-			body.dark-mode .me-section p,
-			body.dark-mode .me-section li {
-				color: #ccc;
+			body.dark-mode .dot-list > li {
+				color: #d1d1d6;
 			}
 
-			body.dark-mode .me-section li::before {
-				color: #5b9cff;
+			body.dark-mode .dot-list > li::before {
+				background: #5b9cff;
 			}
 
 			body.dark-mode .me-section a {
 				color: #5b9cff;
 			}
 
-			body.dark-mode .me-card {
-				background: #2a2a2a;
+			body.dark-mode .create-row {
+				border-bottom-color: #3a3a3c;
 			}
 
-			body.dark-mode .me-card h3 {
-				color: #e0e0e0;
+			body.dark-mode .module-title {
+				color: #f5f5f7;
 			}
 
-			body.dark-mode .me-card p {
-				color: #aaa;
+			body.dark-mode .module-en {
+				color: #a1a1a6;
 			}
 
-			body.dark-mode .contact-row a {
+			body.dark-mode .mbti-type {
+				color: #f5f5f7;
+			}
+
+			body.dark-mode .gh-link,
+			body.dark-mode .gh-name,
+			body.dark-mode .gh-arrow {
 				color: #5b9cff;
 			}
 
-			body.dark-mode .links-grid a {
+			body.dark-mode .gh-meta {
+				color: #8e8e93;
+			}
+
+			body.dark-mode .create-row > section {
+				border-bottom-color: #3a3a3c;
+			}
+
+			body.dark-mode .frequent {
+				background: rgba(245, 166, 35, 0.16);
+				color: #ffc46b;
+			}
+
+			body.dark-mode .contact-toggle {
 				color: #5b9cff;
 			}
+
+			body.dark-mode .link-group h3 {
+				color: #a1a1a6;
+			}
+
+			body.dark-mode .project-card {
+				background-color: #232325;
+				background-image: linear-gradient(150deg, rgba(35, 35, 37, 0) 58%, var(--accent-soft) 150%);
+				border-color: #3a3a3c;
+				box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.2);
+			}
+
+			body.dark-mode .project-card.is-active {
+				box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.25);
+			}
+
+			body.dark-mode .project-card h3 {
+				color: #f5f5f7;
+			}
+
+			body.dark-mode .project-card:hover {
+				border-color: var(--accent-bright);
+			}
+
+			body.dark-mode .project-card:hover h3 {
+				color: var(--accent-bright);
+			}
+
+			body.dark-mode .project-card p {
+				color: #a1a1a6;
+			}
+
+			body.dark-mode .project-tag {
+				color: #8e8e93;
+			}
+
+			body.dark-mode .project-open {
+				color: var(--accent-bright);
+			}
+
+			body.dark-mode .carousel-btn {
+				background: rgba(44, 44, 46, 0.92);
+				border-color: #3a3a3c;
+				color: #f5f5f7;
+			}
+
+			body.dark-mode .carousel-btn:hover:not(:disabled) {
+				background: #3a3a3c;
+				border-color: #48484a;
+			}
+
+			body.dark-mode .carousel-dot {
+				background: #48484a;
+			}
+
+			body.dark-mode .carousel-dot[aria-current="true"] {
+				background: #f5f5f7;
+			}
+
+			body.dark-mode .project-carousel:focus-visible {
+				outline-color: #5b9cff;
+			}
+
+			/* ===== 响应式 ===== */
+			@media (max-width: 720px) {
+				.me-section {
+					padding: 32px 18px 48px;
+				}
+
+				.me-hero {
+					gap: 16px;
+					margin-bottom: 32px;
+				}
+
+				.me-hero img {
+					width: 66px;
+					height: 66px;
+				}
+
+				.me-hero h1 {
+					font-size: 30px;
+				}
+
+				.me-hero .subtitle {
+					font-size: 13px;
+				}
+
+				.me-section h2 {
+					font-size: 20px;
+					margin-top: 40px;
+				}
+
+				.create-row {
+					grid-template-columns: 1fr;
+					padding: 0;
+					border-bottom: 0;
+				}
+
+				.create-row > section {
+					grid-column: 1 / -1;
+					padding: 24px 0;
+					border-bottom: 1px solid #e5e5ea;
+				}
+
+				.create-row:first-child > section:first-child {
+					padding-top: 0;
+				}
+
+				.create-row:last-child > section:last-child {
+					padding-bottom: 0;
+					border-bottom: 0;
+				}
+
+				.module-title {
+					margin-bottom: 14px;
+				}
+
+				.mbti-type {
+					margin: 18px 0 0;
+					font-size: 64px;
+				}
+
+				.gh-links {
+					margin: 0;
+					gap: 12px;
+				}
+
+				.dot-list > li {
+					font-size: 15px;
+				}
+
+				.link-groups {
+					grid-template-columns: 1fr;
+					gap: 20px;
+				}
+
+				.project-carousel {
+					--stage-h: 266px;
+				}
+
+				.js .project-card {
+					width: min(320px, 78%);
+					height: 220px;
+					padding: 18px;
+				}
+
+				.project-icon {
+					width: 40px;
+					height: 40px;
+					border-radius: 12px;
+				}
+
+				.project-icon img {
+					width: 25px;
+					height: 25px;
+				}
+
+				.project-card h3 {
+					font-size: 19px;
+				}
+
+				.project-card p {
+					font-size: 13px;
+				}
+
+				.project-open {
+					font-size: 12px;
+				}
+
+				.js .carousel-btn {
+					display: none;
+				}
+			}
+
+			@media (max-width: 380px) {
+				.mbti-type {
+					font-size: 56px;
+				}
+
+				.project-carousel {
+					--stage-h: 252px;
+				}
+
+				.js .project-card {
+					width: 80%;
+					height: 214px;
+					padding: 16px;
+				}
+
+				.project-card h3 {
+					font-size: 18px;
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.contact-extra,
+				.contact-toggle svg,
+				.project-card,
+				.carousel-dot,
+				.gh-arrow {
+					transition: none !important;
+					animation: none !important;
+				}
+			}
+
 		</style>
 	</head>
 	<body>
@@ -204,109 +892,260 @@
 			<a href="/me/" class="active">介绍</a>
 			<a href="/game/">游戏</a>
 			<a href="/tool/">工具</a>
-			<a id="switch-theme-btn" style="position: absolute; right: 0px; padding: 5px; cursor: pointer;"><img src="/img/switch-theme.svg"
-					height="40px" width="auto" /></a>
+			<a id="switch-theme-btn" style="padding: 5px; cursor: pointer;"><img src="/img/switch-theme.svg"
+					height="40px" width="auto" alt="切换主题"></a>
 		</div>
 		<div class="me-section">
 			<div class="me-hero">
-				<img src="/img/zjq.png" alt="Jacky">
+				<img src="/img/zjq.png" alt="Jacky Zhu">
 				<div>
 					<h1>Jacky Zhu</h1>
+					<p class="subtitle">NFLS 初中学牲 · JavaScript 全栈开发者</p>
 				</div>
 			</div>
 
 			<h2>关于我</h2>
-			<ul>
-				<li>热爱学习、喜爱出游</li>
+			<ul class="dot-list">
 				<li>思维诡异、想法奇特</li>
-				<li>就读于 <a href="http://www.nfls.com.cn/">NFLS</a></li>
+				<li>一旬半老人</li>
+				<li><a href="https://www.nfls.com.cn/">NFLS</a> 初中学牲</li>
 				<li>在 <a href="/game/">游戏中心</a>、<a href="/tool/">工具大全</a> 中查看我最新的作品</li>
 			</ul>
 
 			<h2>创造与分享</h2>
-			<div class="me-grid">
-				<div class="me-card">
-					<h3>语言</h3>
-					<p>English · Español · 中文 · Esperanto · Français · العربية</p>
+			<div class="create-layout">
+				<div class="create-row">
+					<section class="interest-block" aria-labelledby="interest-title">
+						<h3 class="module-title" id="interest-title">喜好<span class="module-en">Interests</span></h3>
+						<ul class="dot-list">
+							<li>人工智能与软件开发</li>
+							<li>黑客与互联网技术</li>
+							<li>语言学</li>
+							<li>电子游戏</li>
+							<li>Apple<svg class="apple-mark" viewBox="0 0 24 24" aria-hidden="true"
+									focusable="false">
+									<path
+										d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+								</svg></li>
+							<li>吃饭、睡觉</li>
+							<li>写作业（？）</li>
+						</ul>
+					</section>
+
+					<section class="mbti-block" aria-labelledby="mbti-title">
+						<h3 class="module-title" id="mbti-title">MBTI<span class="module-en">Personality</span></h3>
+						<p class="mbti-type" aria-label="ENTJ"><span>E</span><span>N</span><span>T</span><span>J</span></p>
+					</section>
 				</div>
-				<div class="me-card">
-					<h3>技术栈</h3>
-					<p>HTML · CSS · JavaScript</p>
-				</div>
-				<div class="me-card">
-					<h3>MBTI</h3>
-					<p>ENTJ</p>
-				</div>
-				<div class="me-card">
-					<h3>网站源码</h3>
-					<p>GitHub 开源</p>
-					<a href="https://github.com/zjqjacky/zhujingqi.com">查看 →</a>
-				</div>
-				<div class="me-card">
-					<h3>音乐</h3>
-					<p>国际互联网原生、偏 EDM 与流行摇滚、追求自由感与行动感的听众</p>
+
+				<div class="create-row">
+					<section class="github-block" aria-labelledby="github-title">
+						<h3 class="module-title" id="github-title">GitHub 开源<span class="module-en">Open Source</span></h3>
+						<div class="gh-links">
+							<a class="gh-link" href="https://github.com/zjqjacky" target="_blank"
+								rel="noopener noreferrer">
+								<span class="gh-main">
+									<span class="gh-name">GitHub 主页</span>
+									<span class="gh-meta">github.com/zjqjacky</span>
+								</span>
+								<span class="gh-arrow" aria-hidden="true">↗</span>
+							</a>
+							<a class="gh-link" href="https://github.com/zjqjacky/zhujingqi.com" target="_blank"
+								rel="noopener noreferrer">
+								<span class="gh-main">
+									<span class="gh-name">网站源码</span>
+									<span class="gh-meta">github.com/zjqjacky/zhujingqi.com</span>
+								</span>
+								<span class="gh-arrow" aria-hidden="true">↗</span>
+							</a>
+						</div>
+					</section>
 				</div>
 			</div>
 
-			<style>
-				.frequent {
-					color: #f5a623;
-					font-size: 13px;
-				}
-			</style>
+			<h2>项目</h2>
+			<div class="project-carousel" id="project-carousel" role="region" aria-roledescription="carousel"
+				aria-label="项目展示" tabindex="0">
+				<div class="project-stage">
+					<a class="project-card" href="/" data-project="home" data-title="zhujingqi.com"
+						target="_blank" rel="noopener noreferrer">
+						<div class="project-card-top">
+							<span class="project-icon"><img src="/img/zjq.svg" alt=""></span>
+							<span class="project-tag">主站</span>
+						</div>
+						<h3>zhujingqi.com</h3>
+						<p>个人网站，汇集个人介绍、游戏、工具等内容</p>
+						<span class="project-open">打开项目 <span aria-hidden="true">→</span></span>
+					</a>
+					<a class="project-card" href="/forum/" data-project="forum" data-title="Jacky 论坛"
+						target="_blank" rel="noopener noreferrer">
+						<div class="project-card-top">
+							<span class="project-icon"><img src="/forum/icon.svg" alt=""></span>
+							<span class="project-tag">论坛</span>
+						</div>
+						<h3>Jacky 论坛</h3>
+						<p>小型在线论坛</p>
+						<span class="project-open">打开项目 <span aria-hidden="true">→</span></span>
+					</a>
+					<a class="project-card" href="/chat/" data-project="chat" data-title="Jacky Chat"
+						target="_blank" rel="noopener noreferrer">
+						<div class="project-card-top">
+							<span class="project-icon"><img src="/chat/icon.svg" alt=""></span>
+							<span class="project-tag">聊天</span>
+						</div>
+						<h3>Jacky Chat</h3>
+						<p>在线聊天社交软件</p>
+						<span class="project-open">打开项目 <span aria-hidden="true">→</span></span>
+					</a>
+					<a class="project-card" href="/game/" data-project="games" data-title="Jacky Games"
+						target="_blank" rel="noopener noreferrer">
+						<div class="project-card-top">
+							<span class="project-icon"><img src="/img/zjq.svg" alt=""></span>
+							<span class="project-tag">游戏</span>
+						</div>
+						<h3>Jacky Games</h3>
+						<p>游戏中心</p>
+						<span class="project-open">打开项目 <span aria-hidden="true">→</span></span>
+					</a>
+					<a class="project-card" href="/tool/" data-project="tools" data-title="Jacky Tools"
+						target="_blank" rel="noopener noreferrer">
+						<div class="project-card-top">
+							<span class="project-icon"><img src="/img/zjq.svg" alt=""></span>
+							<span class="project-tag">工具</span>
+						</div>
+						<h3>Jacky Tools</h3>
+						<p>工具大全</p>
+						<span class="project-open">打开项目 <span aria-hidden="true">→</span></span>
+					</a>
+				</div>
+				<button class="carousel-btn prev" type="button" aria-label="上一个项目">
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+						<path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+				<button class="carousel-btn next" type="button" aria-label="下一个项目">
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+						<path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+				<div class="carousel-dots" role="group" aria-label="选择项目">
+					<button class="carousel-dot" type="button" aria-label="zhujingqi.com"
+						aria-current="true"></button>
+					<button class="carousel-dot" type="button" aria-label="Jacky 论坛"></button>
+					<button class="carousel-dot" type="button" aria-label="Jacky Chat"></button>
+					<button class="carousel-dot" type="button" aria-label="Jacky Games"></button>
+					<button class="carousel-dot" type="button" aria-label="Jacky Tools"></button>
+				</div>
+				<p class="sr-only" id="project-status" aria-live="polite"></p>
+			</div>
+			<p class="project-more">更多项目欢迎探索本网站 :)</p>
+
 			<h2 id="contact">联系方式</h2>
-			<ul>
-				<li>邮箱：<a href="mailto:97700826@qq.com">97700826@qq.com</a> <span class="frequent">[常用]</span></li>
-				<li>微信：jackyzhujingqi <span class="frequent">[常用]</span></li>
-				<li>Jacky 论坛：<a href="/forum/?uid=10">Jacky</a> <span class="frequent">[常用]</span></li>
-				<li>备用邮箱：<a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></li>
-				<li>Gmail：<a href="mailto:zhujingqi2011@gmail.com">zhujingqi2011@gmail.com</a></li>
-				<li>QQ：97700826</li>
-				<li>X：<a href="https://x.com/jackyzhujingqi">@jackyzhujingqi</a></li>
-				<li>Duolingo：<a href="https://www.duolingo.com/profile/jackyzhujingqi">jackyzhujingqi</a></li>
-				<li>GitHub：<a href="https://github.com/zjqjacky">zjqjacky</a></li>
+			<ul class="dot-list">
+				<li>邮箱：<a href="mailto:97700826@qq.com">97700826@qq.com</a> <span class="frequent">常用</span></li>
+				<li>微信：jackyzhujingqi <span class="frequent">常用</span></li>
+				<li>Jacky 论坛：<a href="/forum/?uid=10">Jacky</a> <span class="frequent">常用</span></li>
 			</ul>
+			<div class="contact-extra" id="contact-extra">
+				<div class="contact-extra-inner">
+					<ul class="dot-list">
+						<li>备用邮箱：<a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></li>
+						<li>Gmail：<a href="mailto:zhujingqi2011@gmail.com">zhujingqi2011@gmail.com</a></li>
+						<li>QQ：97700826</li>
+						<li>X：<a href="https://x.com/jackyzhujingqi">@jackyzhujingqi</a></li>
+						<li>Duolingo：<a href="https://www.duolingo.com/profile/jackyzhujingqi">jackyzhujingqi</a></li>
+						<li>GitHub：<a href="https://github.com/zjqjacky">zjqjacky</a></li>
+					</ul>
+				</div>
+			</div>
+			<button class="contact-toggle" id="contact-toggle" type="button" aria-expanded="false"
+				aria-controls="contact-extra">
+				<span class="toggle-text">显示其他联系方式</span>
+				<svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true" focusable="false">
+					<path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" stroke-width="1.8"
+						stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
 
 			<h2>有用的和没用的链接</h2>
-			<div class="links-grid">
-				<a href="https://www.breakyourownnews.com/">制作你的新闻</a>
-				<a href="https://supermariobros.zone/zh-cn/">在线马里奥游戏</a>
-				<a href="https://geekprank.com">GeekPrank</a>
-				<a href="https://mc.js.cool">MC.JS - Minecraft</a>
-				<a href="https://www.cjavapy.com">在线 C++ Java Python</a>
-				<a href="https://www.w3school.com.cn">W3School</a>
-				<a href="https://runoob.com">菜鸟教程</a>
-				<a href="https://neal.fun">Neal.fun</a>
-				<a href="https://world.xiaomawang.com/community/main/compose/8D4C666J">B737驾驶模拟器</a>
-				<a href="https://cybermap.kaspersky.com/">黑客地球</a>
-				<a href="https://webos.js.org">在线模拟各种系统</a>
-				<a href="https://c.runoob.com/compile/12/">C++在线编译器</a>
-				<a href="https://c.runoob.com/front-end/61/">WEB工具</a>
-				<a href="https://territorial.io">Territorial</a>
-				<a href="https://game.hullqin.cn">在线桌游</a>
-				<a href="https://freedomain.one">免费域名</a>
-				<a href="https://smbgames.be">在线马里奥系列游戏</a>
-				<a href="https://www.zerogpt.com/">ZeroGPT - AI Detector</a>
-				<a href="https://subway-surfers.gg/">Subway Surfers</a>
-				<a href="https://copy.sh/brainfuck/">Run Brainf*ck Code Online</a>
-				<a href="https://vocalremover.org/zh/">Vocal Remover</a>
-				<a href="https://theuselessweb.com/">The Useless Web</a>
-				<a href="https://nega.inkcraft.cn/">Native English Grammar Assistant</a>
-				<a href="https://www.thegitcity.com/">The Git City</a>
-				<a href="https://websim.com/@the_realistic_simulator_maker/ios-6-simulator-use-the-old-iphone-interface-onlin">iOS 6 simulator</a>
-				<a href="https://websim.com/@FrutigerAeroguy/ios-4-simulator-2">iOS 4 simulator</a>
-				<a href="https://infinitemac.org/">Infinite Mac</a>
-				<a href="https://jsfuck.com/">JS F*ck</a>
-				<a href="https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.com/">The Longest X</a>
-				<a href="https://www.dosgamesarchive.com/play/rogue">Rogue</a>
-				<a href="https://emulatorgamer.com/">Emulator Gamer</a>
-				<a href="https://flybrain.app/">Fly Brain</a>
+			<div class="links-extra" id="links-extra">
+				<div class="links-extra-inner">
+					<div class="link-groups">
+				<div class="link-group">
+					<h3>互联网奇观</h3>
+					<ul class="link-list">
+						<li><a href="https://www.breakyourownnews.com/">制作你的新闻</a></li>
+						<li><a href="https://geekprank.com">GeekPrank</a></li>
+						<li><a href="https://neal.fun">Neal.fun</a></li>
+						<li><a href="https://cybermap.kaspersky.com/">Cybermap</a></li>
+						<li><a href="https://theuselessweb.com/">The Useless Web</a></li>
+						<li><a href="https://www.thegitcity.com/">The Git City</a></li>
+						<li><a
+								href="https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.com/">The
+								Longest X</a></li>
+					</ul>
+				</div>
+				<div class="link-group">
+					<h3>游戏</h3>
+					<ul class="link-list">
+						<li><a href="https://supermariobros.zone/zh-cn/">马里奥游戏</a></li>
+						<li><a href="https://mcjs.link/">MC.JS</a></li>
+						<li><a href="https://world.xiaomawang.com/community/main/compose/8D4C666J">B737 驾驶模拟器</a></li>
+						<li><a href="https://territorial.io">Territorial</a></li>
+						<li><a href="https://game.hullqin.cn">在线桌游</a></li>
+						<li><a href="https://smbgames.be">马里奥系列游戏</a></li>
+						<li><a href="https://subway-surfers.gg/">Subway Surfers</a></li>
+						<li><a href="https://www.dosgamesarchive.com/play/rogue">Rogue</a></li>
+						<li><a href="https://emulatorgamer.com/">Emulator Gamer</a></li>
+					</ul>
+				</div>
+				<div class="link-group">
+					<h3>工具</h3>
+					<ul class="link-list">
+						<li><a href="https://www.cjavapy.com">在线 C++ / Java / Python</a></li>
+						<li><a href="https://www.w3school.com.cn">W3School</a></li>
+						<li><a href="https://runoob.com">菜鸟教程</a></li>
+						<li><a href="https://c.runoob.com/compile/12/">C++ 在线编译器</a></li>
+						<li><a href="https://c.runoob.com/front-end/61/">前端工具</a></li>
+						<li><a href="https://freedomain.one">免费域名</a></li>
+						<li><a href="https://www.zerogpt.com/">ZeroGPT - AI Detector</a></li>
+						<li><a href="https://copy.sh/brainfuck/">Run Brainf*ck Code Online</a></li>
+						<li><a href="https://vocalremover.org/zh/">Vocal Remover</a></li>
+						<li><a href="https://nega.inkcraft.cn/">Native English Grammar Assistant</a></li>
+						<li><a href="https://jsfuck.com/">JS F*ck</a></li>
+					</ul>
+				</div>
+				<div class="link-group">
+					<h3>其它</h3>
+					<ul class="link-list">
+						<li><a href="https://webos.js.org">在线模拟各种系统</a></li>
+						<li><a
+								href="https://websim.com/@the_realistic_simulator_maker/ios-6-simulator-use-the-old-iphone-interface-onlin">iOS
+								6 Simulator</a></li>
+						<li><a href="https://websim.com/@FrutigerAeroguy/ios-4-simulator-2">iOS 4 Simulator</a></li>
+						<li><a href="https://infinitemac.org/">Infinite Mac</a></li>
+						<li><a href="https://flybrain.app/">Fly Brain</a></li>
+					</ul>
+					</div>
+				</div>
 			</div>
+			</div>
+			<button class="contact-toggle" id="links-toggle" type="button" aria-expanded="false"
+				aria-controls="links-extra">
+				<span class="toggle-text">显示链接</span>
+				<svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true" focusable="false">
+					<path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" stroke-width="1.8"
+						stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
 		</div>
 		<div class="bottom">
 			<a href="/index.html"><b>Zhujingqi</b></a>
 			- by Jacky Zhu
 		</div>
 		<script src="/js/theme.js"></script>
+		<script src="/js/me.js"></script>
 	</body>
 </html>

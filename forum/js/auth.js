@@ -1,6 +1,8 @@
 $("registerBtn").onclick = async () => {
 	if (!captchaPassed) return modal(t("captcha_not_done"));
 	if (!($("agreeTerms") && $("agreeTerms").checked)) return modal(t("agree_required"));
+	if (!($("agreeTransfer") && $("agreeTransfer").checked)) return modal(t("agree_transfer_required"));
+	if (!($("agreeAge") && $("agreeAge").checked)) return modal(t("agree_age_required"));
 	let u = $("regUser").value.trim();
 	let nick = $("regNickname") ? $("regNickname").value.trim() : "";
 	let p1 = $("regPass").value.trim();
